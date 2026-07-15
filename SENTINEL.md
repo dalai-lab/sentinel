@@ -226,10 +226,33 @@ To ensure AI agents and developers never forget the layout, here is the exact lo
 - **GitHub Repo**: `https://github.com/dalai-lab/sentinel`
 
 #### Monitored Fleet (Telemetry Agents Deployed)
-1. **Master Node** (Oracle): `80.225.241.81`
-2. **Orbithyre** (`srv1213878`): `31.97.235.136`
-3. **Gaplytiq** (`srv1176513`): `72.61.235.141`
-4. **Dalai** (`srv1055295`): `168.231.122.248`
+
+All 4 servers have `node_exporter` (Port 9100) and `otelcol` installed and running as systemd services. They continuously scrape CPU, RAM, and system metrics and ship them to `https://telemetry.dalai.in/v1/metrics`.
+
+| # | Name | IP | Hostname | Role |
+|---|---|---|---|---|
+| 1 | **Oracle Master** | `80.225.241.81` | `instance-20260630-1713` | Central Hub — runs SigNoz, Supabase (multiple projects), Sentinel Dashboard |
+| 2 | **Orbithyre** | `31.97.235.136` | `srv1213878` | Web server — hosts the OrbitHyre enterprise platform |
+| 3 | **Gaplytiq** | `72.61.235.141` | `srv1176513` | Web server — hosts the Gaplytiq platform |
+| 4 | **Dalai** | `168.231.122.248` | `srv1055295` | Web server — hosts Dalai.in and related services |
+
+**Agent Services on Each Server:**
+- `node_exporter.service` — Exports system metrics (CPU, RAM, disk, network) on Port `9100`
+- `otelcol.service` — Scrapes node_exporter at `127.0.0.1:9100` and forwards to `https://telemetry.dalai.in/v1/metrics`
+
+**To reinstall the agent on a new server:**
+```bash
+# Download and run the install script
+curl -O https://raw.githubusercontent.com/dalai-lab/sentinel/main/install_agent.sh
+chmod +x install_agent.sh
+./install_agent.sh
+```
+
+**To check agent health on any server:**
+```bash
+sudo systemctl status node_exporter
+sudo systemctl status otelcol
+```
 
 Instead of opening custom database ports (like `4317` or `8080`) through the Oracle Cloud firewall, we built a fully secure, enterprise-grade pipeline using **Cloudflare** and **Nginx**.
 

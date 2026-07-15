@@ -3,6 +3,7 @@ import { Sparkles } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ServerCard from '../components/ServerCard';
+import SecurityFeed from '../components/SecurityFeed';
 import { fetchServerMetrics } from '../api/signoz';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
@@ -147,10 +148,16 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px', alignContent: 'start' }}>
-          {servers.map(server => (
-            <ServerCard key={server.id} {...server} />
-          ))}
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px', alignContent: 'start' }}>
+            {servers.map(server => (
+              <ServerCard key={server.id} {...server} />
+            ))}
+          </div>
+          
+          <div style={{ width: '350px', position: 'sticky', top: '24px', height: 'calc(100vh - 48px)' }}>
+            <SecurityFeed />
+          </div>
         </div>
       </main>
     </div>

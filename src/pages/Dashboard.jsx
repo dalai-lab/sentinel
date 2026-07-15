@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ServerCard from '../components/ServerCard';
 import { fetchServerMetrics } from '../api/signoz';
+import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
 export default function Dashboard() {
   const [servers, setServers] = useState([
@@ -35,31 +36,13 @@ export default function Dashboard() {
             });
           }
 
-          // Friendly names map
-          const FRIENDLY_NAMES = {
-            'instance-20260630-1713': 'Oracle Master',
-            'Database-Server-Oracle': 'Oracle Master',
-            'srv1213878': 'Orbithyre',
-            'srv1176513': 'Gaplytiq',
-            'srv1055295': 'Dalai'
-          };
-          
-          // IP address map
-          const SERVER_IPS = {
-            'instance-20260630-1713': '80.225.241.81',
-            'Database-Server-Oracle': '80.225.241.81',
-            'srv1213878': '31.97.235.136',
-            'srv1176513': '72.61.235.141',
-            'srv1055295': '168.231.122.248'
-          };
-
           const activeServers = result.cpu.map((metric, index) => {
             const hostName = metric.metric.host_name || 'Database-Server-Oracle';
             const ramVal = memMap[hostName] || 0;
             return {
               id: index + 1,
-              name: FRIENDLY_NAMES[hostName] || hostName,
-              ip: SERVER_IPS[hostName] || 'Live',
+              name: getFriendlyName(hostName),
+              ip: getServerIp(hostName),
               cpu: parseFloat(metric.value[1]).toFixed(1),
               ram: ramVal.toFixed(1),
               status: 'online'

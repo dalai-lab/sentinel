@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 
-export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onCommandCopy }) {
+export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onCommandCopy, onRefreshAiAdvice }) {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -78,10 +78,23 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
       await fetch('http://localhost:3001/api/metrics/ai-summary/force', {
         method: 'POST'
       });
-      // The dashboard will pick up the fresh data in its next 15s poll, 
-      // or we could manually trigger a state update here if we passed down a callback.
+      if (onRefreshAiAdvice) onRefreshAiAdvice();
     } catch (e) {
       console.error('Failed to force refresh', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearIncidents = async () => {
+    setLoading(true);
+    try {
+      await fetch('http://localhost:3001/api/metrics/incidents', {
+        method: 'DELETE'
+      });
+      if (onRefreshAiAdvice) onRefreshAiAdvice();
+    } catch (e) {
+      console.error('Failed to clear incidents', e);
     } finally {
       setLoading(false);
     }
@@ -235,13 +248,34 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
           marginBottom: '14px',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
           gap: '10px'
         }}>
-          <AlertTriangle size={14} color="#ef4444" style={{ flexShrink: 0 }} />
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 600 }}>
-            <span style={{ color: '#ef4444', marginRight: '4px', fontWeight: 800 }}>AI Alert:</span>
-            Suspicious host activity logged from IP <span className="text-mono" style={{ background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px', fontSize: '0.72rem' }}>{aiData.top_threat}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <AlertTriangle size={14} color="#ef4444" style={{ flexShrink: 0 }} />
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+              <span style={{ color: '#ef4444', marginRight: '4px', fontWeight: 800 }}>AI Alert:</span>
+              Suspicious activity logged from IP/Host: <span className="text-mono" style={{ background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px', fontSize: '0.72rem' }}>{aiData.top_threat}</span>
+            </div>
           </div>
+          <button 
+            onClick={handleClearIncidents}
+            disabled={loading}
+            style={{
+              background: 'rgba(239, 68, 68, 0.12)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '4px',
+              color: '#ef4444',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              padding: '4px 10px',
+              cursor: 'pointer',
+              transition: 'var(--transition)'
+            }}
+            className="clear-threat-btn"
+          >
+            Clear Threats
+          </button>
         </div>
       )}
 

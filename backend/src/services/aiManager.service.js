@@ -114,17 +114,40 @@ class AiManagerService {
       if (alerts.length > this.lastKnownState.alertCount) {
         triggerAnalysis = true;
         triggerReason = 'New Active Alert Detected';
+
+        // Handle security alerts (e.g. ClamAV Malware) and resolve hostnames from logs
+        const logs = await signozService.fetchLogs();
+        const incidentService = require('./incident.service');
+        
+        for (const alert of alerts) {
+          const alertName = alert.labels?.alertname || '';
+          if (alertName.toLowerCase().includes('malware') || alertName.toLowerCase().includes('clamav')) {
+            let host = 'unknown host';
+            // Search logs in reverse (newest first) for ClamAV 'FOUND' messages to correlate the host
+            const matchingLog = [...logs].reverse().find(l => l.msg && (l.msg.includes('FOUND') || l.msg.toLowerCase().includes('malware')));
+            if (matchingLog) {
+              host = getFriendlyName(matchingLog.service);
+            }
+
+            incidentService.addIncident({
+              alertname: alertName,
+              severity: alert.labels?.severity || 'critical',
+              host: host,
+              fingerprint: alert.fingerprint || alertName
+            });
+          }
+        }
       }
       this.lastKnownState.alertCount = alerts.length;
 
-      // 2. Event-Driven: CPU Spikes > 85%
+      // 2. Event-Driven: CPU Spikes > 75%
       const currentHighCpuHosts = new Set();
       servers.forEach(s => {
-        if (parseFloat(s.cpu) > 85) {
+        if (parseFloat(s.cpu) > 75) {
           currentHighCpuHosts.add(s.name);
           if (!this.lastKnownState.highCpuHosts.has(s.name)) {
             triggerAnalysis = true;
-            triggerReason = `CPU Spike on ${s.name} (>85%)`;
+            triggerReason = `CPU Spike on ${s.name} (>75%)`;
           }
         }
       });

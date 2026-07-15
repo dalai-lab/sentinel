@@ -171,23 +171,23 @@ export default function Dashboard() {
     serversRef.current = servers;
   }, [servers]);
 
-  useEffect(() => {
-    async function loadAiAdvice() {
-      try {
-        const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary/latest');
-        if (aiRes.status === 503) {
-          // AI is still generating, skip update
-          return;
-        }
-        const aiData = await aiRes.json();
-        if (aiData.aiSummary) {
-          setAiCopilotData(parseAiData(aiData.aiSummary));
-        }
-      } catch (err) {
-        console.error('Failed to fetch latest AI summary', err);
+  async function loadAiAdvice() {
+    try {
+      const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary/latest');
+      if (aiRes.status === 503) {
+        // AI is still generating, skip update
+        return;
       }
+      const aiData = await aiRes.json();
+      if (aiData.aiSummary) {
+        setAiCopilotData(parseAiData(aiData.aiSummary));
+      }
+    } catch (err) {
+      console.error('Failed to fetch latest AI summary', err);
     }
+  }
 
+  useEffect(() => {
     // Poll the fast, cached backend endpoint every 15 seconds (costs 0 tokens)
     const timer = setTimeout(loadAiAdvice, 3000); // minor delay to allow backend to boot
     const interval = setInterval(loadAiAdvice, 15000); 
@@ -293,6 +293,7 @@ export default function Dashboard() {
               alerts={activeAlerts}
               recentLogs={recentLogs}
               onCommandCopy={handleCopyCommand}
+              onRefreshAiAdvice={loadAiAdvice}
             />
 
             {apiError && apiError !== 'waiting_for_token' && (

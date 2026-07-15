@@ -13,6 +13,12 @@ router.get('/ai-summary/latest', metricsController.getLatestAiSummary);
 // POST /api/metrics/ai-summary/force
 router.post('/ai-summary/force', metricsController.forceAiSummary);
 
+// GET /api/metrics/incidents
+router.get('/incidents', metricsController.getIncidents);
+
+// DELETE /api/metrics/incidents
+router.delete('/incidents', metricsController.clearIncidents);
+
 // POST /api/metrics/ai-summary
 router.post('/ai-summary', metricsController.getAiSummary);
 

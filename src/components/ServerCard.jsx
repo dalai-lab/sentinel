@@ -2,12 +2,12 @@ import React from 'react';
 import { Cpu, HardDrive, Database, Clock, Server, Globe, AlertTriangle } from 'lucide-react';
 
 // Reimagined AAA-Grade Premium Progress Bar
-function PremiumProgressBar({ value, warningThreshold = 85 }) {
+function PremiumProgressBar({ value, warningThreshold = 75 }) {
   const parsedValue = parseFloat(value) || 0;
 
   const getStatusColor = (val) => {
     if (val > warningThreshold) return '#ef4444'; // var(--status-danger)
-    if (val > 70) return '#f59e0b'; // var(--status-warning)
+    if (val > 60) return '#f59e0b'; // var(--status-warning)
     return '#10b981'; // var(--status-healthy)
   };
 
@@ -44,14 +44,14 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
   const parsedRam = parseFloat(ram) || 0;
   const parsedDisk = parseFloat(disk) || 0;
 
-  const isCpuHigh = parsedCpu > 85;
-  const isRamHigh = parsedRam > 85;
-  const isDiskHigh = parsedDisk > 85;
+  const isCpuHigh = parsedCpu > 75;
+  const isRamHigh = parsedRam > 75;
+  const isDiskHigh = parsedDisk > 75;
   const isAnyMetricHigh = isCpuHigh || isRamHigh || isDiskHigh;
 
   const getStatusColor = (val) => {
-    if (val > 85) return 'var(--status-danger)';
-    if (val > 70) return 'var(--status-warning)';
+    if (val > 75) return 'var(--status-danger)';
+    if (val > 60) return 'var(--status-warning)';
     return 'var(--status-healthy)';
   };
 

@@ -54,6 +54,28 @@ async function forceAiSummary(req, res) {
   }
 }
 
+const incidentService = require('../services/incident.service');
+
+async function getIncidents(req, res) {
+  try {
+    const list = incidentService.getIncidents();
+    return res.json(list);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+async function clearIncidents(req, res) {
+  try {
+    incidentService.clearIncidents();
+    // Force AI regeneration immediately so it clears from AI headline too!
+    const summary = await aiManagerService.forceRun();
+    return res.json({ success: true, aiSummary: JSON.stringify(summary) });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 async function askAi(req, res) {
   try {
     const { question, servers, alerts, logs } = req.body;
@@ -72,5 +94,7 @@ module.exports = {
   getAiSummary,
   getLatestAiSummary,
   forceAiSummary,
+  getIncidents,
+  clearIncidents,
   askAi
 };

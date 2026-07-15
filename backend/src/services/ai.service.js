@@ -64,8 +64,21 @@ async function generateHealthSummary(servers, recentLogs = []) {
       });
     }
 
-    // Fetch active alerts to combine with metrics
-    const alerts = await signozService.fetchActiveAlerts().catch(() => []);
+    // Fetch active alerts to combine with metrics, and merge with persistent incidents
+    const liveAlerts = await signozService.fetchActiveAlerts().catch(() => []);
+    const incidentService = require('./incident.service');
+    const persistentAlerts = incidentService.getIncidents().map(inc => ({
+      labels: {
+        alertname: inc.alertname,
+        severity: inc.severity,
+        host_name: inc.host
+      },
+      annotations: {
+        summary: `PERSISTENT SECURITY ALERT: ${inc.alertname}`
+      }
+    }));
+
+    const alerts = [...liveAlerts, ...persistentAlerts];
 
     const serverStats = servers.map(s => `- Server: ${s.name} (${s.ip}) | CPU: ${s.cpu}% | RAM: ${s.ram}% | Disk: ${s.disk || 0}% | Uptime: ${s.uptime || 0}s | Status: ${s.status}`);
     const alertStats = alerts.map(a => `- Alert: [Severity: ${a.labels?.severity || 'warning'}] ${a.labels?.alertname} on ${getAlertHost(a)}`);
@@ -91,6 +104,7 @@ Output a single, valid JSON object containing your analysis. Keep the language n
 Avoid generic descriptions. Reference actual IP addresses, usernames, AND SPECIFIC SERVER NAMES if they appear in logs or telemetry.
 If an alert says it occurred on "unknown host", YOU MUST check the recent logs to find which server recently logged that specific event, and use that server name in your report! Never say "unknown host".
 IMPORTANT: Failed login attempts or brute-force scanning (like trying to guess username 'zabbix' or 'root') are normal background noise and spam. IGNORE THEM for alerts. ONLY raise a warning/alert or highlight a security threat in your headline/mood if someone ACTUALLY logged in successfully (e.g., successful SSH authentication/accepted password). If there is only failed brute-force scanning spam, report the system health as normal/healthy.
+IMPORTANT FOR HEADLINE: Keep the headline focused ONLY on active issues, spikes, or threats. DO NOT mention healthy servers in the headline just to say they are healthy (e.g., do NOT say "No threats on Gaplytiq, but Oracle has high CPU" – instead, just say "Oracle DB Server shows high CPU usage"). Only mention healthy servers if ALL servers are healthy (e.g., "All servers are calm and healthy today").
 
 Expected JSON schema:
 {

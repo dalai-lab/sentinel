@@ -1,4 +1,6 @@
 # Logs
+Password.md
+*.md.secret
 logs
 *.log
 npm-debug.log*

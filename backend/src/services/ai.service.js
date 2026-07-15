@@ -86,10 +86,35 @@ async function generateHealthSummary(servers, recentLogs = []) {
     // Format recent logs for the prompt (limit to 30 logs to avoid token bloat)
     const formattedLogs = recentLogs.slice(0, 30).map(l => `[${l.time}] [${l.level}] [Host: ${l.service}] ${l.msg}`);
 
-    const prompt = `
-You are the "Sentinel AI Copilot", a friendly, senior SRE & Security Copilot.
-Analyze the following server telemetry, active alerts, and recent security logs, and formulate a clear, jargon-free diagnostic briefing.
+    const systemPrompt = `
+You are the "Sentinel AI Copilot", a world-class, AAA-grade Senior SRE & Security Copilot.
+Analyze server telemetry, active alerts, and security logs to formulate a clear, actionable, and highly accurate diagnostic briefing covering the ENTIRE SERVER FLEET.
 
+CRITICAL RULES:
+1. STRICT GROUNDING (ZERO HALLUCINATION): You MUST rely ONLY on the provided telemetry, alerts, and logs. Do NOT invent, assume, or hallucinate metrics, IP addresses, or events. If data is absent, state that there is no data.
+2. FLEET-WIDE FOCUS: You are monitoring MULTIPLE servers. If all servers are healthy, your headline and summary MUST state that the entire fleet is healthy (e.g., "All servers are operating normally"). Do NOT single out just one server (like "Orbithyre is healthy") if everything is fine across the board.
+3. NOISE REDUCTION (STRICT): Failed login attempts, connection resets, and brute-force scanning (e.g., trying user 'root' or 'zabbix') are normal background noise. IGNORE THEM. ONLY escalate to 'warning' or 'critical' if a login is SUCCESSFUL or an exploit is confirmed.
+4. ACTIONABLE & SPECIFIC: Reference actual IP addresses, usernames, and specific server names. Never use generic descriptions.
+5. HOSTNAME MAPPING: Correlate raw hostnames (like 'instance-20260630-1713') found in logs/alerts with the friendly server names provided in the telemetry data. Use the friendly names in your report.
+6. HEADLINE FOCUS: Focus the headline ONLY on active issues, spikes, or confirmed threats. If the only events are background noise (failed logins), report the ENTIRE SYSTEM as completely healthy.
+
+Expected JSON schema:
+{
+  "_reasoning": "Step-by-step reasoning evaluating the data against the rules (e.g., checking if logins were successful vs failed before setting mood).",
+  "headline": "A single punchy, user-friendly headline summarizing the overall health or security status of the FLEET. If healthy, mention all servers/the fleet.",
+  "mood": "Choose exactly one: 'healthy' (all fine/only background noise), 'warning' (minor issues), 'critical' (high CPU, alerts firing, or massive attacks)",
+  "insights": [
+    "Insight 1 (e.g., 'All 5 servers have stable resource usage, with Oracle DB peaking at 21% CPU.')",
+    "Insight 2 (e.g., 'Ignored background noise of failed SSH scans from several IPs across the fleet.')"
+  ],
+  "daily_digest": "A 2-3 sentence professional summary of what happened today across all servers, what the operator should know, and overall fleet sanity.",
+  "top_threat": "If there is an active attacker IP or malicious event, specify the raw IP address or event name here. Otherwise, set to null.",
+  "tip": "One clear, friendly security or maintenance tip.",
+  "command": "A single diagnostic shell command the operator can run to investigate or check system status."
+}
+`;
+
+    const userPrompt = `
 --- TELEMETRY DATA ---
 ${serverStats.join('\n')}
 
@@ -98,35 +123,17 @@ ${alertStats.length > 0 ? alertStats.join('\n') : 'No active alerts.'}
 
 --- RECENT SYSTEM/SSH LOGS ---
 ${formattedLogs.length > 0 ? formattedLogs.join('\n') : 'No recent logs available.'}
-
---- OBJECTIVE ---
-Output a single, valid JSON object containing your analysis. Keep the language natural, helpful, and friendly (NOT overly technical or full of dry SRE jargon).
-Avoid generic descriptions. Reference actual IP addresses, usernames, AND SPECIFIC SERVER NAMES if they appear in logs or telemetry.
-If an alert says it occurred on "unknown host", YOU MUST check the recent logs to find which server recently logged that specific event, and use that server name in your report! Never say "unknown host".
-IMPORTANT: Failed login attempts or brute-force scanning (like trying to guess username 'zabbix' or 'root') are normal background noise and spam. IGNORE THEM for alerts. ONLY raise a warning/alert or highlight a security threat in your headline/mood if someone ACTUALLY logged in successfully (e.g., successful SSH authentication/accepted password). If there is only failed brute-force scanning spam, report the system health as normal/healthy.
-IMPORTANT FOR HEADLINE: Keep the headline focused ONLY on active issues, spikes, or threats. DO NOT mention healthy servers in the headline just to say they are healthy (e.g., do NOT say "No threats on Gaplytiq, but Oracle has high CPU" – instead, just say "Oracle DB Server shows high CPU usage"). Only mention healthy servers if ALL servers are healthy (e.g., "All servers are calm and healthy today").
-
-Expected JSON schema:
-{
-  "headline": "A single punchy, user-friendly headline summarizing the overall health or security status. MUST include the affected Server Name. (e.g., 'Suspicious login attempt blocked on Oracle DB Server from IP 23.134.76.12.')",
-  "mood": "Choose exactly one: 'healthy' (all fine), 'warning' (minor issues or suspicious scans), 'critical' (high CPU, alerts firing, or massive attacks)",
-  "insights": [
-    "Insight 1 in plain English (e.g., 'Oracle DB server has ultra-low resource usage at 4% CPU.')",
-    "Insight 2 in plain English (e.g., 'CrowdSec blocked a brute force scan for user 'root' from 103.13.206.100.')"
-  ],
-  "daily_digest": "A 2-3 sentence friendly summary of what happened today, what the operator should know, and overall system sanity.",
-  "top_threat": "If there is an active attacker IP or malicious event in the logs, specify the raw IP address or event name here. Otherwise, set to null.",
-  "tip": "One clear, friendly security or maintenance tip (e.g., 'Consider disabling password logins for root on Oracle DB.')",
-  "command": "A single diagnostic shell command the operator can run to investigate or check system status."
-}
 `;
 
     const response = await openai.chat.completions.create({
       model: config.OPENAI_MODEL || 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.2,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0,
       response_format: { type: "json_object" },
-      max_tokens: 600
+      max_tokens: 800
     });
 
     return response.choices[0].message.content.trim();

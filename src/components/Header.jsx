@@ -1,7 +1,7 @@
 import React from 'react';
 import { Menu, Search, CheckCircle2 } from 'lucide-react';
 
-export default function Header({ onMenuToggle }) {
+export default function Header({ onMenuToggle, search, onSearchChange }) {
   return (
     <header className="dashboard-card" style={{
       height: '72px',
@@ -38,19 +38,32 @@ export default function Header({ onMenuToggle }) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* Modern Search */}
+        {/* Working Global Search Input */}
         <div style={{
           background: 'rgba(0,0,0,0.2)',
           border: '1px solid var(--border-color)',
           borderRadius: 'var(--radius-sm)',
-          padding: '8px 14px',
+          padding: '6px 12px',
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          width: '220px'
+          width: '260px'
         }} className="header-search">
-          <Search size={16} color="var(--text-muted)" />
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Search metrics...</span>
+          <Search size={14} color="var(--text-muted)" />
+          <input
+            type="text"
+            placeholder="Search servers, ips, metrics..."
+            value={search || ''}
+            onChange={(e) => onSearchChange(e.target.value)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-primary)',
+              fontSize: '0.82rem',
+              outline: 'none',
+              width: '100%'
+            }}
+          />
         </div>
 
         {/* Health status pill */}

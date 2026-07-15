@@ -218,3 +218,32 @@ h6 {
   align-items: center;
   gap: 4px;
 }
+
+/* Global Select Options Styling */
+select option {
+  background-color: #1a1d24 !important;
+  color: #f4f4f5 !important;
+}
+
+/* SSH Event Row Styles */
+.ssh-event-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: transparent;
+  transition: background 0.15s, transform 0.1s;
+  cursor: pointer;
+}
+
+.ssh-event-row:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+@media (max-width: 640px) {
+  .ssh-event-row {
+    padding: 12px 14px !important;
+    gap: 10px !important;
+  }
+}

@@ -1,12 +1,22 @@
 import React from 'react';
-import { LayoutDashboard, Server, Activity, Settings, X, Terminal, Key } from 'lucide-react';
+import { LayoutDashboard, Server, Activity, Settings, X, Terminal, Key, Shield } from 'lucide-react';
 
 export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
-  const navItems = [
-    { name: 'Overview', id: 'overview', icon: LayoutDashboard },
-    { name: 'Servers', id: 'servers', icon: Server },
-    { name: 'Logs & Traces', id: 'logs', icon: Activity },
-    { name: 'SSH Logins', id: 'ssh', icon: Key }
+  const categories = [
+    {
+      title: 'Telemetry',
+      items: [
+        { name: 'Overview', id: 'overview', icon: LayoutDashboard },
+        { name: 'Servers', id: 'servers', icon: Server }
+      ]
+    },
+    {
+      title: 'Intelligence',
+      items: [
+        { name: 'Logs & Traces', id: 'logs', icon: Activity },
+        { name: 'SSH Logins', id: 'ssh', icon: Key }
+      ]
+    }
   ];
 
   const handleNavClick = (id) => {
@@ -27,9 +37,10 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        padding: '24px',
+        padding: '24px 16px 20px 16px',
         width: 'var(--sidebar-width)'
-      }}>        {/* Mobile Close Button */}
+      }}>
+        {/* Mobile Close Button */}
         <button
           onClick={onClose}
           style={{
@@ -40,7 +51,8 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
             border: 'none',
             color: 'var(--text-secondary)',
             cursor: 'pointer',
-            padding: '4px'
+            padding: '4px',
+            zIndex: 10
           }}
           className="mobile-close-btn"
           aria-label="Close menu"
@@ -48,76 +60,93 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
           <X size={20} />
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '2.5rem', marginTop: '10px' }}>
+        {/* Branding Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 8px', marginBottom: '2rem', marginTop: '10px' }}>
           <div style={{
             background: 'linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%)',
             padding: '8px',
-            borderRadius: '10px',
+            borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.3)'
+            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)'
           }}>
             <Terminal size={18} color="#fff" />
           </div>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 700, letterSpacing: '0.05em' }}>SENTINEL</h2>
-        </div>
-
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <div
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  fontWeight: isActive ? 600 : 500,
-                  padding: '12px 16px',
-                  background: isActive ? 'var(--accent-light)' : 'transparent',
-                  border: isActive ? '1px solid rgba(99, 102, 241, 0.25)' : '1px solid transparent',
-                  borderRadius: 'var(--radius-sm)',
-                  cursor: 'pointer',
-                  transition: 'var(--transition)'
-                }}
-                className={!isActive ? 'nav-item' : ''}
-              >
-                <Icon size={18} color={isActive ? 'var(--accent)' : 'currentColor'} />
-                <span style={{ fontSize: '0.9rem' }}>{item.name}</span>
-              </div>
-            );
-          })}
-        </nav>
-
-        <div style={{
-          padding: '16px',
-          background: 'rgba(0,0,0,0.15)',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid var(--border-color)',
-          marginTop: 'auto'
-        }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '6px' }}>Connected to SigNoz</div>
-          <div style={{ fontSize: '0.85rem', color: 'var(--status-healthy)', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--status-healthy)', boxShadow: '0 0 8px var(--status-healthy)' }} />
-            80.225.241.81
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '0.08em', margin: 0 }}>SENTINEL</h2>
           </div>
         </div>
+
+        {/* Categorized Navigation */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+          {categories.map((cat, idx) => (
+            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <span style={{
+                fontSize: '0.62rem',
+                fontWeight: 750,
+                color: 'var(--text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.08em',
+                padding: '0 12px',
+                marginBottom: '4px'
+              }}>
+                {cat.title}
+              </span>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                {cat.items.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleNavClick(item.id)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+                        fontWeight: isActive ? 600 : 500,
+                        padding: '10px 12px',
+                        background: isActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                        borderLeft: `3px solid ${isActive ? 'var(--accent)' : 'transparent'}`,
+                        borderRadius: '0 6px 6px 0',
+                        cursor: 'pointer',
+                        transition: 'var(--transition)'
+                      }}
+                      className={!isActive ? 'nav-item' : ''}
+                    >
+                      <Icon size={16} color={isActive ? 'var(--accent)' : 'currentColor'} style={{ flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.86rem' }}>{item.name}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
       </aside>
 
       {/* Add custom styling for navigation item hover states */}
       <style>{`
         .nav-item:hover {
           color: var(--text-primary) !important;
-          background: rgba(255, 255, 255, 0.03) !important;
+          background: rgba(255, 255, 255, 0.02) !important;
+          border-left-color: rgba(255, 255, 255, 0.15) !important;
         }
         @media (min-width: 769px) {
           .mobile-close-btn {
             display: none !important;
           }
+        }
+        .operator-pulse-dot {
+          animation: status-glow 2s infinite ease-in-out;
+        }
+        @keyframes status-glow {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.2); opacity: 1; }
         }
       `}</style>
     </>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
+import { Sparkles, Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp, RefreshCw, Activity } from 'lucide-react';
 
 export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onCommandCopy, onRefreshAiAdvice }) {
   const [question, setQuestion] = useState('');
@@ -143,10 +143,10 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
   return (
     <div className="dashboard-card" style={{
-      background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(15, 15, 19, 0.95) 100%)',
-      border: '1px solid rgba(99, 102, 241, 0.12)',
+      background: 'rgba(255, 255, 255, 0.015)',
+      border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius-md)',
-      padding: '16px 20px',
+      padding: '20px',
       boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
       marginBottom: '16px'
     }}>
@@ -159,8 +159,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         flexWrap: 'wrap',
         gap: '10px',
         borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-        paddingBottom: '10px',
-        marginBottom: '12px'
+        paddingBottom: '12px',
+        marginBottom: '16px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
@@ -171,11 +171,11 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <Sparkles size={14} color="var(--accent)" />
+            <Activity size={14} color="var(--accent)" />
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              SENTINEL AI COPILOT
+            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              AI COPILOT BRIEFING
               <button 
                 onClick={handleForceRefresh}
                 disabled={loading}
@@ -477,17 +477,7 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
           </div>
         )}
       </div>
-
-      <style>{`
-        .mood-orb {
-          animation: orb-pulse 2s infinite ease-in-out;
-        }
-        @keyframes orb-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.15); opacity: 1; }
-        }
-      `}</style>
-
+     {/* Style Tag Removed */}
     </div>
   );
 }

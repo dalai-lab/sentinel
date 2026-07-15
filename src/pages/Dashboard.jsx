@@ -14,6 +14,7 @@ import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [globalSearch, setGlobalSearch] = useState('');
   const [servers, setServers] = useState([
     { id: 1, name: 'Oracle database server', ip: '80.225.241.81', cpu: 0, ram: 0, status: 'connecting' }
   ]);
@@ -204,6 +205,12 @@ export default function Dashboard() {
   const avgCpu = Math.round(servers.reduce((acc, curr) => acc + (parseFloat(curr.cpu) || 0), 0) / servers.length);
   const activeAlertsCount = activeAlerts.length;
 
+  const filteredServers = servers.filter(s => {
+    if (!globalSearch) return true;
+    const term = globalSearch.toLowerCase();
+    return s.name.toLowerCase().includes(term) || s.ip.includes(term);
+  });
+
   return (
     <div className="app-layout">
       <Sidebar
@@ -214,7 +221,11 @@ export default function Dashboard() {
       />
 
       <main className="main-content">
-        <Header onMenuToggle={() => setSidebarOpen(true)} />
+        <Header 
+          onMenuToggle={() => setSidebarOpen(true)} 
+          search={globalSearch}
+          onSearchChange={setGlobalSearch}
+        />
 
         {/* Dynamic Views Router */}
         {activeTab === 'overview' && (
@@ -223,78 +234,6 @@ export default function Dashboard() {
               <h1 style={{ fontSize: '1.65rem', fontWeight: 700, marginBottom: '6px' }}>Infrastructure Overview</h1>
               <p className="text-muted" style={{ fontSize: '0.9rem' }}>Real-time telemetry and health scores across your servers.</p>
             </div>
-
-            {/* Quick Summary Cards Grid */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '16px',
-              marginBottom: '24px'
-            }}>
-              {/* Stat 1 */}
-              <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ background: 'var(--status-healthy-bg)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.15)' }}>
-                  <Server size={18} color="var(--status-healthy)" />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Servers Online</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>
-                    {onlineServersCount} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {totalServersCount}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stat 2 */}
-              <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ background: 'var(--accent-light)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.15)' }}>
-                  <Cpu size={18} color="var(--accent)" />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg CPU Load</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>{avgCpu}%</div>
-                </div>
-              </div>
-
-              {/* Stat 3 */}
-              <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{
-                  background: activeAlertsCount > 0 ? 'var(--status-danger-bg)' : 'var(--status-healthy-bg)',
-                  padding: '10px',
-                  borderRadius: '8px',
-                  border: `1px solid ${activeAlertsCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}`
-                }}>
-                  <ShieldAlert size={18} color={activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--status-healthy)'} />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Active Threats</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px', color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)' }}>
-                    {activeAlertsCount}
-                  </div>
-                </div>
-              </div>
-
-              {/* Stat 4 */}
-              <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ background: 'var(--status-healthy-bg)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.15)' }}>
-                  <CheckCircle size={18} color="var(--status-healthy)" />
-                </div>
-                <div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Platform State</div>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '4px', color: 'var(--status-healthy)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Nominal
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <AiCopilotCard
-              aiData={aiCopilotData}
-              servers={servers}
-              alerts={activeAlerts}
-              recentLogs={recentLogs}
-              onCommandCopy={handleCopyCommand}
-              onRefreshAiAdvice={loadAiAdvice}
-            />
 
             {apiError && apiError !== 'waiting_for_token' && (
               <div style={{
@@ -312,20 +251,101 @@ export default function Dashboard() {
 
             {/* Core Layout Grid */}
             <div className="dashboard-grid">
-              <div className="servers-container">
-                {servers.map(server => (
-                  <ServerCard key={server.id} {...server} />
-                ))}
+              
+              {/* Left Column: Stats Summary & Telemetry Cards */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                
+                {/* Quick Summary Cards Grid */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                  gap: '16px'
+                }}>
+                  {/* Stat 1 */}
+                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ background: 'var(--status-healthy-bg)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.15)' }}>
+                      <Server size={18} color="var(--status-healthy)" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Servers Online</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>
+                        {onlineServersCount} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {totalServersCount}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stat 2 */}
+                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ background: 'var(--accent-light)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.15)' }}>
+                      <Cpu size={18} color="var(--accent)" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg CPU Load</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>{avgCpu}%</div>
+                    </div>
+                  </div>
+
+                  {/* Stat 3 */}
+                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{
+                      background: activeAlertsCount > 0 ? 'var(--status-danger-bg)' : 'var(--status-healthy-bg)',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      border: `1px solid ${activeAlertsCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}`
+                    }}>
+                      <ShieldAlert size={18} color={activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--status-healthy)'} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Active Threats</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px', color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)' }}>
+                        {activeAlertsCount}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stat 4 */}
+                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ background: 'var(--status-healthy-bg)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.15)' }}>
+                      <CheckCircle size={18} color="var(--status-healthy)" />
+                    </div>
+                    <div>
+                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Platform State</div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '4px', color: 'var(--status-healthy)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Nominal
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Server Telemetry Cards Container */}
+                <div className="servers-container">
+                  {filteredServers.map(server => (
+                    <ServerCard key={server.id} {...server} />
+                  ))}
+                </div>
               </div>
 
-              <div className="security-feed-panel">
-                <SecurityFeed />
+              {/* Right Column: AI SRE Briefing & Active Alerts Feed */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                <AiCopilotCard
+                  aiData={aiCopilotData}
+                  servers={servers}
+                  alerts={activeAlerts}
+                  recentLogs={recentLogs}
+                  onCommandCopy={handleCopyCommand}
+                  onRefreshAiAdvice={loadAiAdvice}
+                />
+                
+                <div className="security-feed-panel" style={{ width: '100%' }}>
+                  <SecurityFeed />
+                </div>
               </div>
+
             </div>
           </>
         )}
 
-        {activeTab === 'servers' && <ServerList servers={servers} />}
+        {activeTab === 'servers' && <ServerList servers={filteredServers} />}
 
         {activeTab === 'logs' && <LogConsole />}
 

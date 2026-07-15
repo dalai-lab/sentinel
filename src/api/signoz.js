@@ -58,3 +58,17 @@ export async function fetchServerMetrics() {
     return { error: 'fetch_failed', message: error.message };
   }
 }
+
+export async function fetchActiveAlerts() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/alerts`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) throw new Error('Failed to fetch alerts from Backend');
+    return await response.json();
+  } catch (error) {
+    console.error("Backend API Alerts Error:", error);
+    return [];
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, ShieldCheck, ShieldBan, Shield } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, ShieldBan, Shield, Flame } from 'lucide-react';
+import { fetchActiveAlerts } from '../api/signoz';
 
 const EVENTS = [
   { type: 'ban', msg: 'CrowdSec: Blocked SSH brute force', color: '#ff4a4a', icon: ShieldBan },
@@ -28,12 +29,27 @@ export default function SecurityFeed() {
   const [feed, setFeed] = useState([
     { id: 1, type: 'info', msg: 'Security Center initialized', color: '#818cf8', icon: Shield, server: 'System', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }
   ]);
+  const [realAlerts, setRealAlerts] = useState([]);
+
+  useEffect(() => {
+    // Fetch real alerts from SigNoz every 10 seconds
+    const pollAlerts = async () => {
+      const alerts = await fetchActiveAlerts();
+      if (alerts && Array.isArray(alerts)) {
+        setRealAlerts(alerts);
+      }
+    };
+    pollAlerts();
+    const interval = setInterval(pollAlerts, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Add a new random event every 8 to 15 seconds
+    let timeoutId;
     const tick = () => {
       const timeout = Math.floor(Math.random() * 7000) + 8000;
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setFeed(prev => {
           const newFeed = [generateRandomEvent(), ...prev];
           return newFeed.slice(0, 15); // Keep only the latest 15 events
@@ -43,7 +59,7 @@ export default function SecurityFeed() {
     };
     
     tick();
-    return () => {}; // For simplicity in this hackathon version, we don't clear the timeout strictly on unmount
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
@@ -54,6 +70,33 @@ export default function SecurityFeed() {
       </div>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto', flex: 1, paddingRight: '8px' }}>
+        {realAlerts.length > 0 && (
+          <div style={{ marginBottom: '8px' }}>
+            <h4 style={{ color: '#ff4a4a', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>Active Threats</h4>
+            {realAlerts.map(alert => (
+              <div key={alert.fingerprint} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '12px', padding: '12px', background: 'rgba(255, 74, 74, 0.1)', border: '1px solid rgba(255, 74, 74, 0.3)', borderRadius: '8px' }}>
+                <div style={{ padding: '8px', background: '#ff4a4a25', borderRadius: '8px', flexShrink: 0 }}>
+                  <Flame size={16} color="#ff4a4a" />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#ff4a4a' }}>
+                      {alert.labels?.host_name || 'Fleet'}
+                    </span>
+                    <span className="text-muted" style={{ fontSize: '0.75rem', marginLeft: '12px', color: '#ff4a4a' }}>
+                      FIRING
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.85rem', lineHeight: 1.4, fontWeight: 500, color: 'var(--text-primary)' }}>
+                    {alert.labels?.alertname}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div style={{ height: '1px', background: 'rgba(255, 255, 255, 0.1)', margin: '16px 0' }} />
+          </div>
+        )}
+
         {feed.map(event => {
           const Icon = event.icon;
           return (

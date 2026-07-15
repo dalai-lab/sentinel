@@ -67,22 +67,20 @@ echo "[4/4] Configuring OpenTelemetry Collector..."
 # Get the hostname to uniquely identify this server in Sentinel
 HOSTNAME=$(hostname)
 
-echo "[5/6] Installing Security Tools (CrowdSec, ClamAV, rkhunter, AIDE)..."
+echo "[5/6] Installing Security Tools (CrowdSec, ClamAV)..."
 apt-get update
 # Install security tools non-interactively
-DEBIAN_FRONTEND=noninteractive apt-get install -y crowdsec clamav rkhunter aide
+DEBIAN_FRONTEND=noninteractive apt-get install -y crowdsec clamav
 
 echo "[6/6] Configuring Security Scans and Log Shipping..."
 # Create log directories/files to ensure OTEL collector doesn't fail on startup
 mkdir -p /var/log/clamav
 touch /var/log/clamav/clamscan.log
-touch /var/log/rkhunter.log
 touch /var/log/crowdsec.log
-chmod 644 /var/log/clamav/clamscan.log /var/log/rkhunter.log /var/log/crowdsec.log /var/log/auth.log
+chmod 644 /var/log/clamav/clamscan.log /var/log/crowdsec.log /var/log/auth.log
 
-# Configure Cron Jobs for Nightly/Weekly scans
+# Configure Cron Jobs for Nightly scans
 echo "0 2 * * * root clamscan -r /home /etc /var /tmp > /var/log/clamav/clamscan.log 2>&1" > /etc/cron.d/clamav_scan
-echo "0 3 * * 0 root rkhunter --check --sk > /var/log/rkhunter.log 2>&1" > /etc/cron.d/rkhunter_scan
 
 cat <<EOF > /opt/otelcol/config.yaml
 receivers:
@@ -101,9 +99,6 @@ receivers:
   filelog/clamav:
     include: [ /var/log/clamav/clamscan.log ]
     start_at: end
-  filelog/rkhunter:
-    include: [ /var/log/rkhunter.log ]
-    start_at: end
   filelog/crowdsec:
     include: [ /var/log/crowdsec.log ]
     start_at: end
@@ -120,7 +115,7 @@ service:
       receivers: [prometheus]
       exporters: [otlphttp]
     logs:
-      receivers: [filelog/auth, filelog/clamav, filelog/rkhunter, filelog/crowdsec]
+      receivers: [filelog/auth, filelog/clamav, filelog/crowdsec]
       exporters: [otlphttp]
 EOF
 

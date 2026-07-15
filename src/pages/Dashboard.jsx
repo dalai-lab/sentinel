@@ -30,23 +30,42 @@ export default function Dashboard() {
           setServers([{ id: 1, name: 'Database-Server-Oracle', ip: '80.225.241.81', cpu: 0, ram: 0, status: 'gathering data...' }]);
           setApiError(null);
         } else {
-          // Create a lookup map for memory data
+          // Create lookup maps for memory, disk, and uptime data
           const memMap = {};
           if (result.mem) {
             result.mem.forEach(m => {
               memMap[m.metric.host_name] = parseFloat(m.value[1]);
             });
           }
+          
+          const diskMap = {};
+          if (result.disk) {
+            result.disk.forEach(d => {
+              diskMap[d.metric.host_name] = parseFloat(d.value[1]);
+            });
+          }
+
+          const uptimeMap = {};
+          if (result.uptime) {
+            result.uptime.forEach(u => {
+              uptimeMap[u.metric.host_name] = parseFloat(u.value[1]);
+            });
+          }
 
           const activeServers = result.cpu.map((metric, index) => {
             const hostName = metric.metric.host_name || 'Database-Server-Oracle';
             const ramVal = memMap[hostName] || 0;
+            const diskVal = diskMap[hostName] || 0;
+            const uptimeVal = uptimeMap[hostName] || 0;
+            
             return {
               id: index + 1,
               name: getFriendlyName(hostName),
               ip: getServerIp(hostName),
               cpu: parseFloat(metric.value[1]).toFixed(1),
               ram: ramVal.toFixed(1),
+              disk: diskVal.toFixed(1),
+              uptime: uptimeVal, // raw seconds
               status: 'online'
             };
           });

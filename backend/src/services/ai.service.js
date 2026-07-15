@@ -27,7 +27,7 @@ async function generateHealthSummary(servers) {
       return "Sentinel AI: Waiting for telemetry data from agents...";
     }
 
-    const serverStats = servers.map(s => `- ${s.name}: CPU ${s.cpu}%, RAM ${s.ram}%`);
+    const serverStats = servers.map(s => `- ${s.name}: CPU ${s.cpu}%, RAM ${s.ram}%, Disk ${s.disk}%`);
 
     const prompt = `
 You are the "Sentinel AI", an autonomous SRE agent monitoring a server fleet.

@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ServerCard from '../components/ServerCard';
 import SecurityFeed from '../components/SecurityFeed';
+import SshLoginsCard from '../components/SshLoginsCard';
 import ServerList from '../components/ServerList';
 import LogConsole from '../components/LogConsole';
 import SettingsPanel from '../components/SettingsPanel';
@@ -439,6 +440,8 @@ export default function Dashboard() {
         {activeTab === 'servers' && <ServerList servers={servers} />}
 
         {activeTab === 'logs' && <LogConsole />}
+
+        {activeTab === 'ssh' && <SshLoginsCard />}
 
         {activeTab === 'settings' && <SettingsPanel />}
       </main>

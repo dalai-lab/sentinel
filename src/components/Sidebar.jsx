@@ -1,11 +1,12 @@
 import React from 'react';
-import { LayoutDashboard, Server, Activity, Settings, X, Terminal } from 'lucide-react';
+import { LayoutDashboard, Server, Activity, Settings, X, Terminal, Key } from 'lucide-react';
 
 export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
   const navItems = [
     { name: 'Overview', id: 'overview', icon: LayoutDashboard },
     { name: 'Servers', id: 'servers', icon: Server },
     { name: 'Logs & Traces', id: 'logs', icon: Activity },
+    { name: 'SSH Logins', id: 'ssh', icon: Key },
     { name: 'Settings', id: 'settings', icon: Settings },
   ];
 

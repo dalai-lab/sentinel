@@ -58,9 +58,10 @@ systemctl daemon-reload
 systemctl enable node_exporter --now
 
 echo "[3/4] Downloading OpenTelemetry Collector..."
-wget -q "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.92.0/otelcol_0.92.0_linux_${OTEL_ARCH}.tar.gz" -O otelcol.tar.gz
+wget -q "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.92.0/otelcol-contrib_0.92.0_linux_${OTEL_ARCH}.tar.gz" -O otelcol.tar.gz
 mkdir -p /opt/otelcol
 tar xf otelcol.tar.gz -C /opt/otelcol
+mv /opt/otelcol/otelcol-contrib /opt/otelcol/otelcol
 rm -f otelcol.tar.gz
 
 echo "[4/4] Configuring OpenTelemetry Collector..."
@@ -77,6 +78,7 @@ echo "[6/6] Configuring Security Scans and Log Shipping..."
 mkdir -p /var/log/clamav
 touch /var/log/clamav/clamscan.log
 touch /var/log/crowdsec.log
+touch /var/log/auth.log
 chmod 644 /var/log/clamav/clamscan.log /var/log/crowdsec.log /var/log/auth.log
 
 # Configure Cron Jobs for Nightly scans
@@ -103,6 +105,16 @@ receivers:
     include: [ /var/log/crowdsec.log ]
     start_at: end
 
+processors:
+  resource:
+    attributes:
+      - key: service.name
+        value: "sentinel-agent"
+        action: insert
+      - key: host.name
+        value: "${HOSTNAME}"
+        action: insert
+
 exporters:
   otlphttp:
     endpoint: "https://${SIGNOZ_IP}/v1/traces"
@@ -116,6 +128,7 @@ service:
       exporters: [otlphttp]
     logs:
       receivers: [filelog/auth, filelog/clamav, filelog/crowdsec]
+      processors: [resource]
       exporters: [otlphttp]
 EOF
 
@@ -133,7 +146,8 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable otelcol --now
+systemctl enable otelcol
+systemctl restart otelcol
 
 echo "=========================================="
 echo "✅ Installation Complete!"

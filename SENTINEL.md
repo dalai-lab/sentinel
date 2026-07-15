@@ -634,4 +634,32 @@ Before submitting on Devpost / the submission form, ensure these non-technical r
 
 ---
 
+## Guide: How to Setup SigNoz Alerts Manually
+
+If you need to manually provision an alert rule in the SigNoz UI (e.g., for CPU Critical >90%), follow these steps:
+
+1. **Navigate to Alerts**: Go to the **Alerts** page in the SigNoz dashboard and click **New Alert**.
+2. **Select Metric Type**: Choose **PromQL** as your query language.
+3. **Enter the Query**: Paste your PromQL query. For example, to track CPU usage percentage:
+   ```promql
+   100 - (avg by (host_name) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+   ```
+4. **Define Alert Conditions**: 
+   - Set the **Alert Threshold** (e.g., `90` for >90% CPU).
+5. **Configure the Alert**:
+   - Give the alert a mandatory **Alert Name** (e.g., `Sentinel: CPU Critical`).
+   - Leave severity as Warning or Critical.
+6. **Set up Notification Channel**:
+   - Scroll to the bottom to **Notification Channels** (this is mandatory to save the rule).
+   - If none exist, click **+ Create a notification channel**.
+   - Create a dummy **Webhook** channel (Name: `Sentinel Webhook`, URL: `https://webhook.site/sentinel-test-123`).
+   - Save the channel, then ensure it is selected in the dropdown.
+7. **Save**: Click the **Create Rule** button at the bottom left.
+
+**Testing the Alert:**
+To test the integration, edit the alert and drop the threshold to `0`. Within 60 seconds, the alert will trigger (since all servers use >0% CPU). 
+You can view the active alert in the **Triggered Alerts** tab in SigNoz, and it will automatically stream to the **Active Threats** sidebar in the React Dashboard! Remember to set the threshold back to `90` when done testing.
+
+---
+
 *Document last updated: July 2026*

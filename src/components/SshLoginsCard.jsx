@@ -513,9 +513,12 @@ export default function SshLoginsCard() {
                   : (statusConfig[event.status] || statusConfig.disconnected);
 
                 const isFirst = idx === 0 && searchQuery === '';
+                const glowClass = isFirst 
+                  ? (isBot ? 'row-glow-bot' : event.status === 'success' ? 'row-glow-success' : event.status === 'failed' ? 'row-glow-failed' : 'row-glow-neutral')
+                  : '';
 
                 return (
-                  <div key={idx} style={{ borderBottom: idx < displayEvents.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none', borderLeft: `3px solid ${isBot ? '#d97706' : cfg.leftBorder}`, background: isBot ? 'rgba(245,158,11,0.01)' : 'transparent', transition: 'background 0.15s' }} className="ssh-event-row">
+                  <div key={idx} style={{ borderBottom: idx < displayEvents.length - 1 ? '1px solid rgba(255,255,255,0.03)' : 'none', borderLeft: `3px solid ${isBot ? '#d97706' : cfg.leftBorder}`, background: isBot ? 'rgba(245,158,11,0.01)' : 'transparent', transition: 'background 0.15s' }} className={`ssh-event-row ${glowClass}`}>
                     
                     {/* Event Icon */}
                     <div style={{ width: '32px', height: '32px', background: isBot ? 'rgba(245,158,11,0.05)' : cfg.bg, border: `1px solid ${isBot ? 'rgba(245,158,11,0.15)' : cfg.border}`, borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }} className="ssh-event-icon">
@@ -638,6 +641,61 @@ export default function SshLoginsCard() {
       </div>
 
       <style>{`
+        /* Glow animations for the latest connection */
+        @keyframes border-glow-green {
+          0%, 100% {
+            box-shadow: inset 0 0 4px rgba(16, 185, 129, 0.05), 0 0 4px rgba(16, 185, 129, 0.05);
+            background: rgba(16, 185, 129, 0.01) !important;
+          }
+          50% {
+            box-shadow: inset 0 0 24px rgba(16, 185, 129, 0.35), 0 0 16px rgba(16, 185, 129, 0.25);
+            background: rgba(16, 185, 129, 0.08) !important;
+          }
+        }
+        @keyframes border-glow-red {
+          0%, 100% {
+            box-shadow: inset 0 0 4px rgba(239, 68, 68, 0.05), 0 0 4px rgba(239, 68, 68, 0.05);
+            background: rgba(239, 68, 68, 0.01) !important;
+          }
+          50% {
+            box-shadow: inset 0 0 24px rgba(239, 68, 68, 0.35), 0 0 16px rgba(239, 68, 68, 0.25);
+            background: rgba(239, 68, 68, 0.08) !important;
+          }
+        }
+        @keyframes border-glow-amber {
+          0%, 100% {
+            box-shadow: inset 0 0 4px rgba(245, 158, 11, 0.03), 0 0 4px rgba(245, 158, 11, 0.03);
+            background: rgba(245, 158, 11, 0.01) !important;
+          }
+          50% {
+            box-shadow: inset 0 0 24px rgba(245, 158, 11, 0.3), 0 0 16px rgba(245, 158, 11, 0.2);
+            background: rgba(245, 158, 11, 0.06) !important;
+          }
+        }
+        @keyframes border-glow-indigo {
+          0%, 100% {
+            box-shadow: inset 0 0 4px rgba(99, 102, 241, 0.03), 0 0 4px rgba(99, 102, 241, 0.03);
+            background: rgba(99, 102, 241, 0.01) !important;
+          }
+          50% {
+            box-shadow: inset 0 0 24px rgba(99, 102, 241, 0.3), 0 0 16px rgba(99, 102, 241, 0.2);
+            background: rgba(99, 102, 241, 0.06) !important;
+          }
+        }
+        
+        .row-glow-success {
+          animation: border-glow-green 2.5s infinite ease-in-out;
+        }
+        .row-glow-failed {
+          animation: border-glow-red 2.5s infinite ease-in-out;
+        }
+        .row-glow-bot {
+          animation: border-glow-amber 2.5s infinite ease-in-out;
+        }
+        .row-glow-neutral {
+          animation: border-glow-indigo 2.5s infinite ease-in-out;
+        }
+
         .ssh-event-row {
           display: grid;
           grid-template-columns: 32px 1fr auto;

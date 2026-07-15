@@ -48,7 +48,7 @@ async function fetchLogs(startTime, endTime) {
             spec: {
               name: 'A',
               signal: 'logs',
-              limit: 500,
+              limit: 5000,
               offset: 0
             }
           }

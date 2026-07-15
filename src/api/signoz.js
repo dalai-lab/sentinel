@@ -92,3 +92,18 @@ export async function fetchRealLogs(startTime, endTime) {
     return [];
   }
 }
+
+export async function fetchIpInfo(ips) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/ip-info`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ips })
+    });
+    if (!response.ok) throw new Error('Failed to fetch IP info');
+    return await response.json(); // { "1.2.3.4": { country, city, isp, ... }, ... }
+  } catch (error) {
+    console.error("IP Info Error:", error);
+    return {};
+  }
+}

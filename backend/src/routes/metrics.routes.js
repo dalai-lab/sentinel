@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const metricsController = require('../controllers/metrics.controller');
 const signozService = require('../services/signoz.service');
+const ipGeoService = require('../services/ipGeo.service');
 
 // POST /api/metrics
 router.post('/', metricsController.getMetrics);
@@ -29,6 +30,18 @@ router.get('/logs', async (req, res) => {
     res.json(logs);
   } catch (error) {
     console.error('Error in /logs route:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post('/ip-info', async (req, res) => {
+  try {
+    const { ips } = req.body;
+    if (!Array.isArray(ips)) return res.status(400).json({ error: 'ips must be an array' });
+    const geoMap = await ipGeoService.lookupIps(ips);
+    res.json(geoMap);
+  } catch (error) {
+    console.error('Error in /ip-info route:', error);
     res.status(500).json({ error: error.message });
   }
 });

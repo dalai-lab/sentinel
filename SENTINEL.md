@@ -20,8 +20,10 @@ Sentinel is primarily targeting **Track 02 (Signals & Dashboards)** and **Track 
 
 To build this quickly for the hackathon, the project is split into two halves:
 
-1. **The Backend Engine (SigNoz):** Installed on a remote cloud server (`80.225.241.81`), SigNoz does the heavy lifting. It acts as the database and ingestion pipeline that collects metrics (CPU, RAM, Logs) from all target servers.
-2. **The Frontend UI (Sentinel):** Built locally on your PC (for now), Sentinel is the custom React dashboard and API that talks to SigNoz. Sentinel pulls the raw data from SigNoz and presents it in our beautiful, custom dashboard with Health Scores and AI summaries.
+1. **The Backend Engine (SigNoz):** Deployed on a remote cloud server (`80.225.241.81`), SigNoz does the heavy lifting. It collects metrics (CPU, RAM, Logs) from all target servers via OTLP.
+2. **The Secure Proxy (Node.js Backend):** A lightweight Express.js server that holds the SigNoz Service Account API Key and proxies metric queries from the dashboard frontend securely. The frontend never sees any secrets.
+3. **The Frontend UI (Sentinel):** The custom React dashboard. It calls the Node.js backend proxy to fetch data and renders it in our premium dark-themed UI.
+4. **Docker Compose:** Both the frontend (Nginx) and backend (Node.js) run as Docker containers on the Oracle server, managed by `docker-compose.yml`.
 
 ---
 
@@ -40,27 +42,30 @@ Sentinel should answer these three questions **instantly**:
 ## Current Infrastructure
 
 ```
-Oracle VPS (Central Hub)
+Oracle VPS (80.225.241.81) - Central Hub
 │
-├── Sentinel Platform
-│   ├── SigNoz
-│   ├── React Dashboard
-│   ├── Backend API
-│   ├── ClickHouse
-│   ├── PostgreSQL
-│   ├── Alert Engine
-│   └── Nginx
+├── Docker Containers (managed by docker-compose.yml)
+│   ├── Frontend Container (nginx:alpine, Port 3000)
+│   │   └── Serves React app + proxies /api/ to backend
+│   └── Backend Container (node:20-alpine, Port 3001)
+│       └── Holds API Key, proxies queries to SigNoz
 │
-└───────────────┬──────────────────────
-                │
-                │  Secure Telemetry
-                │
-────────────────┼────────────────────────────────────
-                │
-                ├── Database Server        (3 Databases)
-                ├── Website Server 1       (2–3 Websites)
-                ├── Website Server 2       (2–3 Websites)
-                └── Website Server 3       (2–3 Websites)
+├── SigNoz Stack (Docker Compose, direct on host)
+│   ├── signoz/signoz:latest        (Port 8080 - UI + API)
+│   ├── signoz-otel-collector       (Port 4317, 4318 - OTLP Receiver)
+│   ├── clickhouse-server           (Metrics Storage)
+│   └── postgres                    (Metadata Storage)
+│
+└── Nginx (host, Port 80)
+    ├── /v1/  → localhost:4318  (OTLP agent data)
+    └── /     → localhost:3000  (Sentinel React Dashboard)
+│
+└── Cloudflare (DNS Proxy)
+    └── telemetry.dalai.in → 80.225.241.81
+│
+└───────── Telemetry Agents (on each monitored server)
+           node_exporter (Port 9100)
+           otelcol (scrapes node_exporter, sends to telemetry.dalai.in/v1/metrics)
 ```
 
 > **Key Principle:** Only lightweight telemetry agents run on production servers. All heavy processing happens on the Central Hub.
@@ -211,12 +216,14 @@ When configuring the OTEL Prometheus receiver to scrape a local Node Exporter in
 
 ### Infrastructure Map
 To ensure AI agents and developers never forget the layout, here is the exact location of all services:
-- **Central Database/Server**: Oracle Cloud VPS (`80.225.241.81`)
-- **Domain Name**: `telemetry.dalai.in`
-- **DNS/Proxy**: Cloudflare (Orange Cloud / Proxied) pointing `telemetry.dalai.in` to `80.225.241.81`
-- **SigNoz Dashboard (UI)**: Running locally on the Oracle VPS at `http://localhost:8080`. Externally accessible via `https://telemetry.dalai.in` (handled by Nginx).
-- **SigNoz OTLP Receiver (Metrics)**: Running locally on the Oracle VPS at `http://localhost:4318`. Agents send data to `https://telemetry.dalai.in/v1/metrics`.
-- **Local React Dashboard**: Running on your local Windows PC at `http://localhost:5173`. Fetches data securely from `https://telemetry.dalai.in/api/v1/query`.
+- **Central Server**: Oracle Cloud VPS (`80.225.241.81`)
+- **Public Domain**: `telemetry.dalai.in`
+- **DNS/Proxy**: Cloudflare (Orange Cloud / Proxied) → `80.225.241.81`
+- **Sentinel Dashboard** (Production): `https://telemetry.dalai.in` served by the Frontend Docker container (Port 3000)
+- **SigNoz UI** (Internal only): `http://localhost:8080` — only accessible via SSH tunnel from dev machines
+- **SigNoz OTLP Receiver**: `http://localhost:4318` — agents send data to `https://telemetry.dalai.in/v1/metrics`
+- **Sentinel Backend API** (Internal): `http://localhost:3001` inside Docker network — proxies metric queries to SigNoz
+- **GitHub Repo**: `https://github.com/dalai-lab/sentinel`
 
 #### Monitored Fleet (Telemetry Agents Deployed)
 1. **Master Node** (Oracle): `80.225.241.81`
@@ -239,7 +246,8 @@ If you ever need to rebuild this, you must configure Cloudflare correctly, other
 2. **The Page Rule**: Go to Rules -> Page Rules. Create a rule for `telemetry.dalai.in/*`. Set the **SSL/TLS encryption mode** strictly to **Flexible**. *(Do not change your Global SSL settings, as it will break your other websites!)*
 
 ### The Nginx Configuration
-If your Oracle server reboots and Nginx fails, or you need to recreate the proxy, this is the exact Nginx configuration required (stored in `/etc/nginx/sites-available/telemetry.dalai.in`):
+The Nginx config on the Oracle server is stored at `/etc/nginx/sites-available/telemetry.dalai.in`.
+Route 1 sends agent telemetry to the SigNoz OTLP collector. Route 2 sends all web traffic to the Sentinel Dashboard Docker container on port 3000 (not directly to SigNoz anymore!):
 
 ```nginx
 server {
@@ -254,9 +262,9 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 
-    # Route 2: SigNoz Backend API (For your React Dashboard)
+    # Route 2: Sentinel React Dashboard (Docker Container)
     location / {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -264,6 +272,75 @@ server {
 }
 ```
 *(Note: Do not add manual CORS headers to Nginx! SigNoz natively adds them, and duplicating them will cause the browser to block the dashboard.)*
+
+---
+
+## Production Deployment
+
+### Deploying to Oracle Server
+```bash
+# Clone the repo
+sudo git clone https://github.com/dalai-lab/sentinel.git /var/www/sentinel
+cd /var/www/sentinel
+
+# Create the backend environment file (NOT committed to git for security!)
+sudo nano backend/.env
+```
+Paste this in nano:
+```env
+SIGNOZ_URL=http://host.docker.internal:8080
+SIGNOZ_API_KEY=<your_service_account_key_here>
+PORT=3001
+```
+Then deploy:
+```bash
+sudo chmod +x deploy.sh
+sudo ./deploy.sh
+```
+
+### Updating Production After Code Changes
+```bash
+cd /var/www/sentinel
+sudo git pull
+sudo ./deploy.sh
+```
+
+### Local Development (Windows)
+Because SigNoz port 8080 is firewalled, you must use an SSH tunnel to access it locally.
+
+**Step 1:** Open the SSH tunnel in a dedicated PowerShell terminal and leave it running:
+```powershell
+ssh -i "D:\INTERNSHIP\keys\config\ssh-key-2026-06-30.key" -N -L 8080:localhost:8080 ubuntu@80.225.241.81
+```
+
+**Step 2:** Make sure your local `backend/.env` points to localhost:
+```env
+SIGNOZ_URL=http://localhost:8080
+SIGNOZ_API_KEY=<your_service_account_key_here>
+PORT=3001
+```
+
+**Step 3:** Start backend and frontend:
+```powershell
+# Terminal 1
+cd backend; node server.js
+
+# Terminal 2
+npm run dev
+```
+Dashboard is now live at `http://localhost:5173`
+
+---
+
+## Authentication & Security Architecture
+
+| Layer | Method | Details |
+|---|---|---|
+| **Agent → SigNoz** | HTTPS via Cloudflare | Flexible SSL Page Rule on `telemetry.dalai.in` |
+| **Frontend → Backend** | Internal Docker network | `nginx /api/` → `backend:3001` (private, never exposed) |
+| **Backend → SigNoz** | `SIGNOZ-API-KEY` header | Service Account Key with `signoz-viewer` role |
+| **Public Access** | `telemetry.dalai.in` | Cloudflare + Nginx → Sentinel Dashboard on Port 3000 |
+| **SigNoz UI** | SSH Tunnel only | Port 8080 firewalled, only accessible via tunnel |
 
 ---
 

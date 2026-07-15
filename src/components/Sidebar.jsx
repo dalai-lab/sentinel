@@ -22,7 +22,6 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
         className={`sidebar-overlay ${isOpen ? 'show' : ''}`}
         onClick={onClose}
       />
-
       <aside className={`sidebar-aside ${isOpen ? 'open' : ''}`} style={{
         backgroundColor: 'var(--bg-secondary)',
         borderRight: '1px solid var(--border-color)',
@@ -30,10 +29,8 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
         flexDirection: 'column',
         height: '100%',
         padding: '24px',
-        width: 'var(--sidebar-width)',
-        position: 'relative'
-      }}>
-        {/* Mobile Close Button */}
+        width: 'var(--sidebar-width)'
+      }}>        {/* Mobile Close Button */}
         <button
           onClick={onClose}
           style={{

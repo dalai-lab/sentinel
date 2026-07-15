@@ -48,7 +48,7 @@ async function fetchLogs(startTime, endTime) {
             spec: {
               name: 'A',
               signal: 'logs',
-              limit: 100,
+              limit: 500,
               offset: 0
             }
           }
@@ -79,12 +79,16 @@ async function fetchLogs(startTime, endTime) {
         else if (d.body.toLowerCase().includes('debug')) level = 'DEBUG';
       }
 
+      // Prefer host.name from resource labels (actual hostname like srv1213878)
+      const host = d.resources_string?.['host.name'] || '';
       const service = d.resources_string?.['service.name'] || d.attributes_string?.['log.file.name'] || 'system';
 
       return {
+        rawTs: date.toISOString(),
         time: timeStr,
         level: level.toUpperCase(),
-        service: service.replace('.log', ''),
+        // Use host.name as service identifier so SSH card can map to friendly server name
+        service: host || service.replace('.log', ''),
         msg: d.body
       };
     });

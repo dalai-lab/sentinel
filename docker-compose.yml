@@ -20,3 +20,5 @@ services:
     expose:
       - "3001"
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

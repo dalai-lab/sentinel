@@ -196,7 +196,7 @@ function computeActiveSessions(sortedEvents) {
   return Object.values(sessionState).filter(e => e.status === 'success');
 }
 
-export default function SshLoginsCard() {
+export default function SshLoginsCard({ topThreat }) {
   const [allEvents, setAllEvents] = useState([]);
   const [crowdSecEvents, setCrowdSecEvents] = useState([]);
   const [ipGeo, setIpGeo] = useState({});
@@ -544,6 +544,10 @@ export default function SshLoginsCard() {
 
                         {isFirst && (
                           <span style={{ fontSize: '0.62rem', background: 'rgba(99,102,241,0.1)', color: 'var(--accent)', padding: '1px 6px', borderRadius: '4px', fontWeight: 700, border: '1px solid rgba(99,102,241,0.2)' }}>LATEST</span>
+                        )}
+
+                        {topThreat && event.ip === topThreat && (
+                          <span style={{ fontSize: '0.62rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '1px 6px', borderRadius: '4px', fontWeight: 800, border: '1px solid rgba(239, 68, 68, 0.2)' }}>🔴 AI FLAGGED</span>
                         )}
                       </div>
 

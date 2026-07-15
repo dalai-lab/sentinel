@@ -15,21 +15,21 @@ function PremiumProgressBar({ value, warningThreshold = 85 }) {
 
   return (
     <div style={{
-      height: '8px',
+      height: '6px',
       background: 'rgba(255, 255, 255, 0.02)',
-      border: '1px solid rgba(255, 255, 255, 0.05)',
-      borderRadius: '4px',
+      border: '1px solid rgba(255, 255, 255, 0.04)',
+      borderRadius: '3px',
       overflow: 'hidden',
       position: 'relative',
-      marginTop: '6px'
+      marginTop: '4px'
     }}>
       <div
         style={{
           height: '100%',
           width: `${parsedValue}%`,
           background: `linear-gradient(90deg, ${activeColor}bb 0%, ${activeColor} 100%)`,
-          boxShadow: `0 0 10px ${activeColor}40`,
-          borderRadius: '4px',
+          boxShadow: `0 0 8px ${activeColor}30`,
+          borderRadius: '3px',
           transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
           position: 'relative',
           overflow: 'hidden'
@@ -40,7 +40,7 @@ function PremiumProgressBar({ value, warningThreshold = 85 }) {
   );
 }
 
-export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status }) {
+export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, load, netRecv, netSent }) {
   const parsedCpu = parseFloat(cpu) || 0;
   const parsedRam = parseFloat(ram) || 0;
   const parsedDisk = parseFloat(disk) || 0;
@@ -61,22 +61,29 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
     const d = Math.floor(seconds / (3600 * 24));
     const h = Math.floor(seconds % (3600 * 24) / 3600);
     const m = Math.floor(seconds % 3600 / 60);
-    if (d > 0) return `${d}d ${h}h ${m}m`;
+    if (d > 0) return `${d}d ${h}h`;
     if (h > 0) return `${h}h ${m}m`;
     return `${m}m`;
   };
 
+  const formatBytes = (bytes) => {
+    if (!bytes || isNaN(bytes)) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[Math.min(i, sizes.length - 1)];
+  };
+
   const isOnline = status === 'online';
 
-  // Decide overall health of the server card
   let healthState = 'healthy';
   if (!isOnline) healthState = 'offline';
   else if (isAnyMetricHigh) healthState = 'danger';
   else if (parsedCpu > 70 || parsedRam > 70 || parsedDisk > 70) healthState = 'warning';
 
   const getCardBorderColor = () => {
-    if (healthState === 'offline' || healthState === 'danger') return 'rgba(239, 68, 68, 0.3)';
-    if (healthState === 'warning') return 'rgba(245, 158, 11, 0.3)';
+    if (healthState === 'offline' || healthState === 'danger') return 'rgba(239, 68, 68, 0.25)';
+    if (healthState === 'warning') return 'rgba(245, 158, 11, 0.25)';
     return 'var(--border-color)';
   };
 
@@ -84,69 +91,74 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
     <div
       className={`dashboard-card premium-server-card state-${healthState}`}
       style={{
-        padding: '24px',
+        padding: '16px 20px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
+        gap: '14px',
         borderWidth: '1px',
         borderStyle: 'solid',
         borderColor: getCardBorderColor(),
-        boxShadow: healthState === 'danger' ? '0 0 15px rgba(239, 68, 68, 0.05)' : 'none'
+        boxShadow: healthState === 'danger' ? '0 0 12px rgba(239, 68, 68, 0.04)' : 'none'
       }}
     >
       {/* Header section of the card */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <div className={`server-icon-container status-${isOnline ? 'online' : 'offline'}`} style={{
             background: isOnline ? 'var(--status-healthy-bg)' : 'var(--status-danger-bg)',
-            border: `1px solid ${isOnline ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`,
-            padding: '10px',
-            borderRadius: '10px',
+            border: `1px solid ${isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)'}`,
+            padding: '8px',
+            borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             position: 'relative'
           }}>
-            <Server size={18} color={isOnline ? 'var(--status-healthy)' : 'var(--status-danger)'} />
+            <Server size={16} color={isOnline ? 'var(--status-healthy)' : 'var(--status-danger)'} />
             {isOnline && <span className="status-ping-dot" />}
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
               {name}
             </h4>
-            <div className="text-muted text-mono" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-              <Globe size={11} />
+            <div className="text-muted text-mono" style={{ fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+              <Globe size={10} />
               <span>{ip}</span>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
           <div
             className="status-pill"
             style={{
               background: isOnline ? 'var(--status-healthy-bg)' : 'var(--status-danger-bg)',
               color: isOnline ? 'var(--status-healthy)' : 'var(--status-danger)',
-              border: `1px solid ${isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)'}`
+              border: `1px solid ${isOnline ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)'}`,
+              padding: '2px 8px',
+              borderRadius: '8px',
+              fontSize: '0.68rem',
+              fontWeight: 750,
+              textTransform: 'uppercase'
             }}
           >
             {status}
           </div>
-          <div className="text-muted" style={{ fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Clock size={11} />
+          <div className="text-muted" style={{ fontSize: '0.68rem', display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <Clock size={10} />
             <span>Up {getUptimeString(uptime)}</span>
           </div>
         </div>
       </div>
 
       {/* Progress Bars / Telemetry Metrics */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {/* CPU Usage */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem', alignItems: 'center' }}>
-            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Cpu size={14} /> CPU
-              {isCpuHigh && <AlertTriangle size={12} color="var(--status-danger)" className="metric-warning-pulse" />}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '0.78rem', alignItems: 'center' }}>
+            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Cpu size={12} /> CPU
+              {isCpuHigh && <AlertTriangle size={10} color="var(--status-danger)" className="metric-warning-pulse" />}
             </span>
             <span style={{ color: getStatusColor(cpu), fontWeight: 700 }}>{cpu}%</span>
           </div>
@@ -155,10 +167,10 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
 
         {/* Memory Usage */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem', alignItems: 'center' }}>
-            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <HardDrive size={14} /> Memory
-              {isRamHigh && <AlertTriangle size={12} color="var(--status-danger)" className="metric-warning-pulse" />}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '0.78rem', alignItems: 'center' }}>
+            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <HardDrive size={12} /> Memory
+              {isRamHigh && <AlertTriangle size={10} color="var(--status-danger)" className="metric-warning-pulse" />}
             </span>
             <span style={{ color: getStatusColor(ram), fontWeight: 700 }}>{ram}%</span>
           </div>
@@ -167,14 +179,36 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
 
         {/* Disk Storage */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.85rem', alignItems: 'center' }}>
-            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Database size={14} /> Disk Storage
-              {isDiskHigh && <AlertTriangle size={12} color="var(--status-danger)" className="metric-warning-pulse" />}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '0.78rem', alignItems: 'center' }}>
+            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Database size={12} /> Disk Storage
+              {isDiskHigh && <AlertTriangle size={10} color="var(--status-danger)" className="metric-warning-pulse" />}
             </span>
             <span style={{ color: getStatusColor(disk), fontWeight: 700 }}>{disk}%</span>
           </div>
           <PremiumProgressBar value={disk} />
+        </div>
+      </div>
+
+      {/* Advanced Performance Stats */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: '10px',
+        borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+        paddingTop: '10px',
+        marginTop: '2px'
+      }}>
+        <div>
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em' }}>CPU Load (1m)</div>
+          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>{load || '0.00'}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em' }}>Network IO</div>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px', display: 'flex', gap: '6px' }} className="text-mono">
+            <span style={{ color: '#10b981' }}>↓{formatBytes(netRecv)}</span>
+            <span style={{ color: '#6366f1' }}>↑{formatBytes(netSent)}</span>
+          </div>
         </div>
       </div>
 
@@ -183,29 +217,28 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
           transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
         }
         .premium-server-card:hover {
-          transform: translateY(-4px) scale(1.01) !important;
-          box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5) !important;
+          transform: translateY(-2px) scale(1.005) !important;
+          box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.4) !important;
         }
         .premium-server-card.state-danger:hover {
-          box-shadow: 0 16px 32px -8px rgba(239, 68, 68, 0.1) !important;
+          box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.08) !important;
           border-color: var(--status-danger) !important;
         }
         .premium-server-card.state-warning:hover {
-          box-shadow: 0 16px 32px -8px rgba(245, 158, 11, 0.1) !important;
+          box-shadow: 0 10px 24px -6px rgba(245, 158, 11, 0.08) !important;
           border-color: var(--status-warning) !important;
         }
         
-        /* Status ping dot animation */
         .status-ping-dot {
           position: absolute;
-          bottom: -2px;
-          right: -2px;
-          width: 8px;
-          height: 8px;
+          bottom: -1px;
+          right: -1px;
+          width: 6px;
+          height: 6px;
           border-radius: 50%;
           background-color: var(--status-healthy);
-          border: 2px solid var(--bg-card);
-          box-shadow: 0 0 8px var(--status-healthy);
+          border: 1.5px solid var(--bg-card);
+          box-shadow: 0 0 6px var(--status-healthy);
           animation: statusPing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes statusPing {
@@ -213,7 +246,6 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
           50% { opacity: 0.4; transform: scale(1.2); }
         }
 
-        /* Metric Alert animation */
         .metric-warning-pulse {
           animation: warnPulse 1s ease-in-out infinite alternate;
         }
@@ -222,7 +254,6 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
           to { opacity: 1; transform: scale(1.1); }
         }
 
-        /* Continuous progress bar sliding stripes overlay animation */
         .progress-fill-animate::after {
           content: '';
           position: absolute;
@@ -242,7 +273,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status })
           );
           background-size: 15px 15px;
           animation: moveStripes 1.2s linear infinite;
-          opacity: 0.45;
+          opacity: 0.35;
         }
         @keyframes moveStripes {
           0% { background-position: 0 0; }

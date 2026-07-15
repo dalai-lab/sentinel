@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Terminal, Copy, Check, Info, Command, Server, ShieldAlert, Cpu, CheckCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Server, ShieldAlert, Cpu, CheckCircle } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ServerCard from '../components/ServerCard';
@@ -8,6 +8,7 @@ import SshLoginsCard from '../components/SshLoginsCard';
 import ServerList from '../components/ServerList';
 import LogConsole from '../components/LogConsole';
 import SettingsPanel from '../components/SettingsPanel';
+import AiCopilotCard from '../components/AiCopilotCard';
 import { fetchServerMetrics, fetchActiveAlerts } from '../api/signoz';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
@@ -18,35 +19,43 @@ export default function Dashboard() {
   ]);
   const [activeAlerts, setActiveAlerts] = useState([]);
   const [apiError, setApiError] = useState(null);
+  const [recentLogs, setRecentLogs] = useState([]);
 
   // Structured AI SRE Copilot data
   const [aiCopilotData, setAiCopilotData] = useState({
-    status: 'Sentinel AI SRE Copilot is preparing diagnostics...',
-    diagnostics: ['Ingesting live telemetry metrics...', 'Reading active alerts from SigNoz...'],
-    advice: 'Standing by for first diagnostic summary.',
+    headline: 'Sentinel AI SRE Copilot is preparing diagnostics...',
+    mood: 'healthy',
+    insights: ['Ingesting live telemetry metrics...', 'Reading active alerts from SigNoz...'],
+    daily_digest: 'Standing by for first diagnostic summary.',
+    top_threat: null,
+    tip: 'Reviewing active server configuration...',
     command: 'sudo systemctl status otelcol'
   });
 
-  const [copied, setCopied] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [copilotExpanded, setCopilotExpanded] = useState(true);
 
   const parseAiData = (rawText) => {
     try {
       const parsed = JSON.parse(rawText);
       if (parsed && typeof parsed === 'object') {
         return {
-          status: parsed.status || 'Nominal health parameters recorded.',
-          diagnostics: Array.isArray(parsed.diagnostics) ? parsed.diagnostics : ['No anomalous metrics identified.'],
-          advice: parsed.advice || 'Proactive server monitoring is recommended.',
+          headline: parsed.headline || parsed.status || 'Nominal health parameters recorded.',
+          mood: parsed.mood || 'healthy',
+          insights: Array.isArray(parsed.insights) ? parsed.insights : (Array.isArray(parsed.diagnostics) ? parsed.diagnostics : ['No anomalous metrics identified.']),
+          daily_digest: parsed.daily_digest || parsed.advice || 'Proactive server monitoring is recommended.',
+          top_threat: parsed.top_threat || null,
+          tip: parsed.tip || parsed.advice || 'Verify regular backups and security controls.',
           command: parsed.command || 'df -h'
         };
       }
     } catch {
       return {
-        status: rawText || 'Operational.',
-        diagnostics: ['AI text analysis parsed successfully.'],
-        advice: 'Review active system parameters.',
+        headline: rawText || 'Operational.',
+        mood: 'healthy',
+        insights: ['AI text analysis parsed successfully.'],
+        daily_digest: 'Review active system parameters.',
+        top_threat: null,
+        tip: 'Check dashboard logs for connection states.',
         command: 'docker ps --all'
       };
     }
@@ -100,11 +109,35 @@ export default function Dashboard() {
             });
           }
 
+          const loadMap = {};
+          if (result.load) {
+            result.load.forEach(l => {
+              loadMap[l.metric.host_name] = parseFloat(l.value[1]);
+            });
+          }
+
+          const netRecvMap = {};
+          if (result.netRecv) {
+            result.netRecv.forEach(n => {
+              netRecvMap[n.metric.host_name] = parseFloat(n.value[1]);
+            });
+          }
+
+          const netSentMap = {};
+          if (result.netSent) {
+            result.netSent.forEach(n => {
+              netSentMap[n.metric.host_name] = parseFloat(n.value[1]);
+            });
+          }
+
           const activeServers = result.cpu.map((metric, index) => {
             const hostName = metric.metric.host_name || 'Database-Server-Oracle';
             const ramVal = memMap[hostName] || 0;
             const diskVal = diskMap[hostName] || 0;
             const uptimeVal = uptimeMap[hostName] || 0;
+            const loadVal = loadMap[hostName] || 0;
+            const netRecvVal = netRecvMap[hostName] || 0;
+            const netSentVal = netSentMap[hostName] || 0;
 
             return {
               id: index + 1,
@@ -114,6 +147,9 @@ export default function Dashboard() {
               ram: ramVal.toFixed(1),
               disk: diskVal.toFixed(1),
               uptime: uptimeVal, // raw seconds
+              load: loadVal.toFixed(2),
+              netRecv: netRecvVal, // raw bytes/sec
+              netSent: netSentVal, // raw bytes/sec
               status: 'online'
             };
           });
@@ -142,10 +178,16 @@ export default function Dashboard() {
       if (!currentServers || currentServers.length === 0 || currentServers[0].status === 'connecting') return;
 
       try {
+        // Fetch recent logs first to give AI full contextual awareness
+        const logsRes = await fetch('http://localhost:3001/api/metrics/logs');
+        const logsData = await logsRes.json();
+        const logs = Array.isArray(logsData) ? logsData : [];
+        setRecentLogs(logs);
+
         const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ servers: currentServers })
+          body: JSON.stringify({ servers: currentServers, logs: logs.slice(0, 50) })
         });
         const aiData = await aiRes.json();
         if (aiData.aiSummary) {
@@ -255,158 +297,13 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <div className="dashboard-card" style={{
-              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.04) 0%, rgba(15, 15, 19, 0.9) 100%)',
-              border: '1px solid rgba(99, 102, 241, 0.2)',
-              borderRadius: 'var(--radius-lg)',
-              marginBottom: '20px',
-              padding: '18px 24px',
-              boxShadow: '0 4px 30px rgba(0, 0, 0, 0.2)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: copilotExpanded ? '16px' : '0'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifySelf: 'stretch', justifyContent: 'space-between', borderBottom: copilotExpanded ? '1px solid rgba(99, 102, 241, 0.1)' : '1px solid transparent', paddingBottom: copilotExpanded ? '14px' : '0', flexWrap: 'wrap', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{
-                    background: 'var(--accent-light)',
-                    padding: '8px',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <Sparkles size={16} color="var(--accent)" />
-                  </div>
-                  <div>
-                    <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      SENTINEL AI COPILOT
-                    </h4>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--accent)', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', marginTop: '2px' }}>
-                      Active SRE Diagnostic Engine
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    <Terminal size={12} />
-                    <span className="text-mono" style={{ color: 'var(--text-muted)' }}>copilot@sentinel-sre</span>
-                  </div>
-
-                  <button
-                    onClick={() => setCopilotExpanded(!copilotExpanded)}
-                    style={{
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid var(--border-color)',
-                      color: 'var(--text-secondary)',
-                      cursor: 'pointer',
-                      borderRadius: '4px',
-                      padding: '4px 8px',
-                      fontSize: '0.75rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontWeight: 600
-                    }}
-                  >
-                    {copilotExpanded ? (
-                      <>
-                        <span>Hide Console</span>
-                        <ChevronUp size={12} />
-                      </>
-                    ) : (
-                      <>
-                        <span>Show Console</span>
-                        <ChevronDown size={12} />
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {copilotExpanded && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }} className="copilot-grid">
-                  <div>
-                    <div style={{
-                      background: 'rgba(0,0,0,0.3)',
-                      borderLeft: '3px solid var(--accent)',
-                      padding: '12px 16px',
-                      borderRadius: '0 6px 6px 0',
-                      marginBottom: '14px'
-                    }}>
-                      <span className="text-mono" style={{ color: 'var(--accent)', marginRight: '8px', fontWeight: 700 }}>[root@sentinel-ai] /#</span>
-                      <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)', fontWeight: 500, lineHeight: 1.4 }}>
-                        {aiCopilotData.status}
-                      </span>
-                      <span className="terminal-cursor" />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', paddingLeft: '4px' }}>
-                      {aiCopilotData.diagnostics.map((insight, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                          <Info size={12} style={{ marginTop: '3px', flexShrink: 0, color: 'var(--accent)' }} />
-                          <span style={{ lineHeight: 1.4 }}>{insight}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                    padding: '16px',
-                    background: 'rgba(0,0,0,0.2)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)'
-                  }} className="copilot-action-panel">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Command size={14} color="var(--status-warning)" />
-                      <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--status-warning)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
-                        Recommended Remediation Action
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                      {aiCopilotData.advice}
-                    </p>
-
-                    {aiCopilotData.command && (
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        background: 'rgba(99, 102, 241, 0.05)',
-                        border: '1px solid rgba(99, 102, 241, 0.15)',
-                        borderRadius: '6px',
-                        padding: '10px 14px',
-                        marginTop: '6px',
-                        cursor: 'pointer'
-                      }}
-                        onClick={() => handleCopyCommand(aiCopilotData.command)}
-                        className="command-copy-box"
-                        title="Click to copy command"
-                      >
-                        <code className="text-mono" style={{ fontSize: '0.78rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, paddingRight: '12px' }}>
-                          $ {aiCopilotData.command}
-                        </code>
-                        <button style={{
-                          background: 'none',
-                          border: 'none',
-                          color: copied ? 'var(--status-healthy)' : 'var(--text-secondary)',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          padding: '2px'
-                        }} aria-label="Copy code">
-                          {copied ? <Check size={14} /> : <Copy size={14} />}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            <AiCopilotCard
+              aiData={aiCopilotData}
+              servers={servers}
+              alerts={activeAlerts}
+              recentLogs={recentLogs}
+              onCommandCopy={handleCopyCommand}
+            />
 
             {apiError && apiError !== 'waiting_for_token' && (
               <div style={{
@@ -441,7 +338,7 @@ export default function Dashboard() {
 
         {activeTab === 'logs' && <LogConsole />}
 
-        {activeTab === 'ssh' && <SshLoginsCard />}
+        {activeTab === 'ssh' && <SshLoginsCard topThreat={aiCopilotData.top_threat} />}
 
         {activeTab === 'settings' && <SettingsPanel />}
       </main>

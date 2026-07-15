@@ -15,8 +15,17 @@ export async function fetchServerMetrics() {
     // System uptime in seconds
     const uptimeQuery = 'time() - max by (host_name) (node_boot_time_seconds)';
 
+    // Load Average (1m)
+    const loadQuery = 'avg by (host_name) (node_load1)';
+
+    // Net receive (bytes/sec)
+    const netRecvQuery = 'sum by (host_name) (rate(node_network_receive_bytes_total{device=~"eth0|ens3|enp3s0|wlan0|bond0|enp0s3"}[1m]))';
+
+    // Net transmit (bytes/sec)
+    const netSentQuery = 'sum by (host_name) (rate(node_network_transmit_bytes_total{device=~"eth0|ens3|enp3s0|wlan0|bond0|enp0s3"}[1m]))';
+
     // Fetch from our secure Node.js backend
-    const [cpuResponse, memResponse, diskResponse, uptimeResponse] = await Promise.all([
+    const [cpuResponse, memResponse, diskResponse, uptimeResponse, loadResponse, netRecvResponse, netSentResponse] = await Promise.all([
       fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,22 +45,45 @@ export async function fetchServerMetrics() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: uptimeQuery })
+      }),
+      fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: loadQuery })
+      }),
+      fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: netRecvQuery })
+      }),
+      fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: netSentQuery })
       })
     ]);
 
-    if (!cpuResponse.ok || !memResponse.ok || !diskResponse.ok || !uptimeResponse.ok) throw new Error('Failed to fetch from Backend');
+    if (!cpuResponse.ok || !memResponse.ok || !diskResponse.ok || !uptimeResponse.ok || !loadResponse.ok || !netRecvResponse.ok || !netSentResponse.ok) {
+      throw new Error('Failed to fetch from Backend');
+    }
 
     const cpuData = await cpuResponse.json();
     const memData = await memResponse.json();
     const diskData = await diskResponse.json();
     const uptimeData = await uptimeResponse.json();
+    const loadData = await loadResponse.json();
+    const netRecvData = await netRecvResponse.json();
+    const netSentData = await netSentResponse.json();
 
     return {
       success: true,
       cpu: cpuData.data?.result || [],
       mem: memData.data?.result || [],
       disk: diskData.data?.result || [],
-      uptime: uptimeData.data?.result || []
+      uptime: uptimeData.data?.result || [],
+      load: loadData.data?.result || [],
+      netRecv: netRecvData.data?.result || [],
+      netSent: netSentData.data?.result || []
     };
   } catch (error) {
     console.error("Backend API Error:", error);

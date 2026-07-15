@@ -68,10 +68,11 @@ echo "[4/4] Configuring OpenTelemetry Collector..."
 # Get the hostname to uniquely identify this server in Sentinel
 HOSTNAME=$(hostname)
 
-echo "[5/6] Installing Security Tools (CrowdSec, ClamAV)..."
+echo "[5/6] Installing Security Tools (CrowdSec, ClamAV, rsyslog)..."
 apt-get update
 # Install security tools non-interactively
-DEBIAN_FRONTEND=noninteractive apt-get install -y crowdsec clamav
+DEBIAN_FRONTEND=noninteractive apt-get install -y crowdsec clamav rsyslog
+systemctl enable --now rsyslog
 
 echo "[6/6] Configuring Security Scans and Log Shipping..."
 # Create log directories/files to ensure OTEL collector doesn't fail on startup

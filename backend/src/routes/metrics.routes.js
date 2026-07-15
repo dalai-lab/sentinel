@@ -10,6 +10,9 @@ router.post('/', metricsController.getMetrics);
 // POST /api/metrics/ai-summary
 router.post('/ai-summary', metricsController.getAiSummary);
 
+// POST /api/metrics/ask
+router.post('/ask', metricsController.askAi);
+
 router.get('/alerts', async (req, res) => {
   try {
     const alerts = await signozService.fetchActiveAlerts();

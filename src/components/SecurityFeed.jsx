@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, Flame, ShieldCheck, ChevronDown, ChevronUp, Clock, Info } from 'lucide-react';
+import { ShieldAlert, Flame, ShieldCheck, ChevronDown, ChevronUp, Clock, Info, Server } from 'lucide-react';
 import { fetchActiveAlerts } from '../api/signoz';
 
 export default function SecurityFeed() {
@@ -30,6 +30,38 @@ export default function SecurityFeed() {
     return alert.labels?.severity || 'critical';
   };
 
+  // Robust host extractor for alerts
+  const getAlertHost = (alert) => {
+    if (!alert) return 'System Alert';
+    
+    // 1. Try common labels
+    const labels = alert.labels || {};
+    const possibleHost = 
+      labels.host_name || 
+      labels.host || 
+      labels.instance || 
+      labels.server || 
+      labels.service_name || 
+      labels.service;
+      
+    if (possibleHost && possibleHost !== 'unknown') {
+      return possibleHost;
+    }
+
+    // 2. Try parsing annotations
+    const annotations = alert.annotations || {};
+    if (annotations.summary) {
+      const onMatch = annotations.summary.match(/on\s+([a-zA-Z0-9_-]+)/i);
+      if (onMatch) return onMatch[1];
+    }
+    if (annotations.description) {
+      const forMatch = annotations.description.match(/(?:for|host|server|instance)\s+([a-zA-Z0-9_-]+)/i);
+      if (forMatch) return forMatch[1];
+    }
+
+    return 'All Systems';
+  };
+
   const formatDuration = (activeAt) => {
     if (!activeAt) return 'Active';
     const activeDate = new Date(activeAt);
@@ -45,14 +77,14 @@ export default function SecurityFeed() {
   // Grouping functions
   const groupAlerts = () => {
     if (groupMode === 'none') {
-      return { 'All Alerts': realAlerts };
+      return { 'All Security Alerts': realAlerts };
     }
 
     const groups = {};
     realAlerts.forEach(alert => {
       let key = 'Unassigned';
       if (groupMode === 'server') {
-        key = alert.labels?.host_name || 'All Systems';
+        key = getAlertHost(alert);
       } else if (groupMode === 'severity') {
         key = getAlertSeverity(alert).toUpperCase();
       }
@@ -69,34 +101,35 @@ export default function SecurityFeed() {
   const grouped = groupAlerts();
 
   return (
-    <div className="dashboard-card" style={{ padding: '24px', height: '100%', display: 'flex', flexDirection: 'column', minHeight: '400px' }}>
-      <div style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+    <div className="dashboard-card" style={{ padding: '18px 20px', height: '100%', display: 'flex', flexDirection: 'column', minHeight: '380px' }}>
+      <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
               background: realAlerts.length > 0 ? 'var(--status-danger-bg)' : 'var(--status-healthy-bg)',
-              padding: '8px',
-              borderRadius: '8px',
+              padding: '6px',
+              borderRadius: '6px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: `1px solid ${realAlerts.length > 0 ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`
+              border: `1px solid ${realAlerts.length > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}`
             }}>
-              <ShieldAlert size={18} color={realAlerts.length > 0 ? 'var(--status-danger)' : 'var(--status-healthy)'} />
+              <ShieldAlert size={15} color={realAlerts.length > 0 ? 'var(--status-danger)' : 'var(--status-healthy)'} />
             </div>
-            <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600 }}>Security Center</h3>
+            <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 800, color: 'var(--text-primary)' }}>Security Center</h3>
           </div>
 
           {realAlerts.length > 0 && (
             <span style={{
-              fontSize: '0.75rem',
+              fontSize: '0.65rem',
               background: 'var(--status-danger-bg)',
               color: 'var(--status-danger)',
               padding: '2px 8px',
-              borderRadius: '12px',
-              fontWeight: 700
+              borderRadius: '10px',
+              fontWeight: 800,
+              border: '1px solid rgba(239,68,68,0.15)'
             }}>
-              {realAlerts.length} Firing
+              {realAlerts.length} Active
             </span>
           )}
         </div>
@@ -107,94 +140,66 @@ export default function SecurityFeed() {
             display: 'flex',
             background: 'rgba(0,0,0,0.15)',
             border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-sm)',
+            borderRadius: '4px',
             padding: '2px'
           }}>
-            <button
-              onClick={() => setGroupMode('server')}
-              style={{
-                flex: 1,
-                background: groupMode === 'server' ? 'var(--bg-card)' : 'transparent',
-                border: 'none',
-                color: groupMode === 'server' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: '0.75rem',
-                padding: '6px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: groupMode === 'server' ? 600 : 500,
-                transition: 'var(--transition)'
-              }}
-            >
-              By Host
-            </button>
-            <button
-              onClick={() => setGroupMode('severity')}
-              style={{
-                flex: 1,
-                background: groupMode === 'severity' ? 'var(--bg-card)' : 'transparent',
-                border: 'none',
-                color: groupMode === 'severity' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: '0.75rem',
-                padding: '6px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: groupMode === 'severity' ? 600 : 500,
-                transition: 'var(--transition)'
-              }}
-            >
-              By Severity
-            </button>
-            <button
-              onClick={() => setGroupMode('none')}
-              style={{
-                flex: 1,
-                background: groupMode === 'none' ? 'var(--bg-card)' : 'transparent',
-                border: 'none',
-                color: groupMode === 'none' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                fontSize: '0.75rem',
-                padding: '6px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontWeight: groupMode === 'none' ? 600 : 500,
-                transition: 'var(--transition)'
-              }}
-            >
-              Plain
-            </button>
+            {['server', 'severity', 'none'].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setGroupMode(mode)}
+                style={{
+                  flex: 1,
+                  background: groupMode === mode ? 'rgba(255,255,255,0.03)' : 'transparent',
+                  border: groupMode === mode ? '1px solid var(--border-color)' : '1px solid transparent',
+                  color: groupMode === mode ? 'var(--text-primary)' : 'var(--text-muted)',
+                  fontSize: '0.7rem',
+                  padding: '4px',
+                  borderRadius: '3px',
+                  cursor: 'pointer',
+                  fontWeight: groupMode === mode ? 700 : 500,
+                  textTransform: 'capitalize',
+                  transition: 'var(--transition)'
+                }}
+              >
+                {mode === 'none' ? 'List' : `By ${mode}`}
+              </button>
+            ))}
           </div>
         )}
       </div>
 
       {/* Alert Lists */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingRight: '2px' }}>
         {realAlerts.length > 0 ? (
           Object.keys(grouped).map(groupKey => (
-            <div key={groupKey} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div key={groupKey} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {groupMode !== 'none' && (
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  borderBottom: '1px solid var(--border-color)',
-                  paddingBottom: '6px',
-                  marginTop: '4px'
+                  gap: '6px',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+                  paddingBottom: '4px',
+                  marginTop: '2px'
                 }}>
+                  <Server size={10} color="var(--text-muted)" />
                   <span style={{
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
+                    fontSize: '0.7rem',
+                    fontWeight: 800,
                     color: 'var(--text-secondary)',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+                    letterSpacing: '0.04em'
                   }}>
                     {groupKey}
                   </span>
                   <span style={{
-                    fontSize: '0.7rem',
+                    fontSize: '0.62rem',
                     color: 'var(--text-muted)',
                     background: 'rgba(255,255,255,0.03)',
-                    padding: '1px 6px',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-color)'
+                    padding: '0 5px',
+                    borderRadius: '3px',
+                    border: '1px solid var(--border-color)',
+                    fontWeight: 700
                   }}>
                     {grouped[groupKey].length}
                   </span>
@@ -205,6 +210,7 @@ export default function SecurityFeed() {
                 const fingerprint = alert.fingerprint || alert.activeAt + alert.labels?.alertname;
                 const isExpanded = !!expandedAlerts[fingerprint];
                 const isCritical = getAlertSeverity(alert).toLowerCase() === 'critical';
+                const alertHost = getAlertHost(alert);
 
                 return (
                   <div
@@ -212,11 +218,12 @@ export default function SecurityFeed() {
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
-                      background: isCritical ? 'rgba(239, 68, 68, 0.03)' : 'rgba(245, 158, 11, 0.03)',
-                      border: `1px solid ${isCritical ? 'rgba(239, 68, 68, 0.15)' : 'rgba(245, 158, 11, 0.15)'}`,
-                      borderRadius: 'var(--radius-sm)',
+                      background: isCritical ? 'rgba(239, 68, 68, 0.02)' : 'rgba(245, 158, 11, 0.02)',
+                      border: `1px solid ${isCritical ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)'}`,
+                      borderLeft: `3px solid ${isCritical ? 'var(--status-danger)' : 'var(--status-warning)'}`,
+                      borderRadius: '4px',
                       overflow: 'hidden',
-                      transition: 'var(--transition)'
+                      transition: 'background 0.15s'
                     }}
                   >
                     {/* Collapsed Header */}
@@ -224,120 +231,110 @@ export default function SecurityFeed() {
                       onClick={() => toggleExpand(fingerprint)}
                       style={{
                         display: 'flex',
-                        gap: '12px',
+                        gap: '10px',
                         alignItems: 'center',
-                        padding: '12px',
+                        padding: '8px 10px',
                         cursor: 'pointer',
                         userSelect: 'none'
                       }}
                       className="alert-header-row"
                     >
                       <div style={{
-                        padding: '6px',
+                        padding: '4px',
                         background: isCritical ? 'var(--status-danger-bg)' : 'var(--status-warning-bg)',
-                        borderRadius: '6px',
+                        borderRadius: '4px',
                         flexShrink: 0
                       }}>
-                        <Flame size={14} color={isCritical ? 'var(--status-danger)' : 'var(--status-warning)'} />
+                        <Flame size={12} color={isCritical ? 'var(--status-danger)' : 'var(--status-warning)'} />
                       </div>
 
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
                           <span style={{
                             fontSize: '0.75rem',
-                            fontWeight: 700,
+                            fontWeight: 750,
                             color: isCritical ? 'var(--status-danger)' : 'var(--status-warning)',
                             textTransform: 'uppercase',
-                            letterSpacing: '0.02em',
+                            letterSpacing: '0.01em',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap'
                           }}>
-                            {alert.labels?.alertname}
+                            {alert.labels?.alertname || 'Security Event'}
                           </span>
                         </div>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {alert.labels?.host_name || 'System Alert'}
+                        <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: '1px' }}>
+                          {alertHost}
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Clock size={10} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <Clock size={9} />
                           {formatDuration(alert.activeAt)}
                         </span>
-                        {isExpanded ? <ChevronUp size={14} color="var(--text-muted)" /> : <ChevronDown size={14} color="var(--text-muted)" />}
+                        {isExpanded ? <ChevronUp size={12} color="var(--text-muted)" /> : <ChevronDown size={12} color="var(--text-muted)" />}
                       </div>
                     </div>
 
                     {/* Expanded Detail Panel (No data loss) */}
                     {isExpanded && (
                       <div style={{
-                        padding: '12px',
-                        borderTop: `1px solid ${isCritical ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)'}`,
-                        background: 'rgba(0,0,0,0.1)',
+                        padding: '10px',
+                        borderTop: `1px solid ${isCritical ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)'}`,
+                        background: 'rgba(0,0,0,0.15)',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '10px'
+                        gap: '8px'
                       }}>
                         {/* Summary & Description Annotations */}
                         {(alert.annotations?.summary || alert.annotations?.description) && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             {alert.annotations.summary && (
-                              <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
-                                <Info size={12} style={{ marginTop: '2px', flexShrink: 0 }} />
+                              <div style={{ fontSize: '0.76rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'flex-start', gap: '4px' }}>
+                                <Info size={11} style={{ marginTop: '1.5px', flexShrink: 0, color: 'var(--accent)' }} />
                                 <span>{alert.annotations.summary}</span>
                               </div>
                             )}
                             {alert.annotations.description && (
-                              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0, paddingLeft: '18px' }}>
+                              <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', lineHeight: 1.35, margin: 0, paddingLeft: '15px' }}>
                                 {alert.annotations.description}
                               </p>
                             )}
                           </div>
                         )}
 
-                        {/* Raw Labels (Dynamic Metadata Pills) */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '4px' }}>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Alert Metadata</span>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                            {Object.entries(alert.labels || {}).map(([key, val]) => (
-                              <span
-                                key={key}
-                                style={{
-                                  fontSize: '0.7rem',
-                                  background: 'rgba(255, 255, 255, 0.03)',
-                                  border: '1px solid var(--border-color)',
-                                  padding: '2px 6px',
-                                  borderRadius: '4px',
-                                  color: 'var(--text-secondary)'
-                                }}
-                              >
-                                <strong>{key}:</strong> {val}
-                              </span>
-                            ))}
+                        {/* Filtered Labels (Dynamic Metadata Pills) */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '2px' }}>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Alert Context</span>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                            {Object.entries(alert.labels || {})
+                              .filter(([k]) => !['alertname', 'ruleType', 'source', 'severity'].includes(k))
+                              .map(([key, val]) => (
+                                <span
+                                  key={key}
+                                  style={{
+                                    fontSize: '0.68rem',
+                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    border: '1px solid var(--border-color)',
+                                    padding: '1px 5px',
+                                    borderRadius: '3px',
+                                    color: 'var(--text-secondary)'
+                                  }}
+                                >
+                                  <strong>{key}:</strong> {val}
+                                </span>
+                              ))}
                             {alert.activeAt && (
                               <span style={{
-                                fontSize: '0.7rem',
+                                fontSize: '0.68rem',
                                 background: 'rgba(255, 255, 255, 0.03)',
                                 border: '1px solid var(--border-color)',
-                                padding: '2px 6px',
-                                borderRadius: '4px',
+                                padding: '1px 5px',
+                                borderRadius: '3px',
                                 color: 'var(--text-secondary)'
                               }}>
-                                <strong>activeAt:</strong> {new Date(alert.activeAt).toLocaleString()}
-                              </span>
-                            )}
-                            {alert.state && (
-                              <span style={{
-                                fontSize: '0.7rem',
-                                background: 'rgba(255, 255, 255, 0.03)',
-                                border: '1px solid var(--border-color)',
-                                padding: '2px 6px',
-                                borderRadius: '4px',
-                                color: 'var(--text-secondary)'
-                              }}>
-                                <strong>state:</strong> {alert.state}
+                                <strong>triggered:</strong> {new Date(alert.activeAt).toLocaleString()}
                               </span>
                             )}
                           </div>
@@ -350,12 +347,16 @@ export default function SecurityFeed() {
             </div>
           ))
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1, padding: '32px 0' }}>
-            <div style={{ padding: '16px', background: 'var(--status-healthy-bg)', borderRadius: '50%', marginBottom: '16px', border: '1px solid rgba(16, 185, 129, 0.15)' }}>
-              <ShieldCheck size={28} color="var(--status-healthy)" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', flex: 1, padding: '24px 0' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+              <div className="radar-ping" />
+              <div className="radar-circle" />
+              <div style={{ padding: '12px', background: 'var(--status-healthy-bg)', borderRadius: '50%', border: '1px solid rgba(16, 185, 129, 0.15)', zIndex: 2 }}>
+                <ShieldCheck size={22} color="var(--status-healthy)" />
+              </div>
             </div>
-            <span style={{ fontSize: '0.9rem', color: 'var(--status-healthy)', fontWeight: 600 }}>Secure State</span>
-            <span className="text-muted" style={{ fontSize: '0.75rem', marginTop: '4px', textAlign: 'center' }}>No active threats detected.</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--status-healthy)', fontWeight: 800 }}>ACTIVE DEFENSE SECURE</span>
+            <span className="text-muted" style={{ fontSize: '0.72rem', marginTop: '2px', textAlign: 'center' }}>All systems monitored. No active threats detected.</span>
           </div>
         )}
       </div>
@@ -363,6 +364,34 @@ export default function SecurityFeed() {
       <style>{`
         .alert-header-row:hover {
           background: rgba(255, 255, 255, 0.015);
+        }
+        
+        /* Pulse Radar Animation */
+        .radar-ping {
+          position: absolute;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background: rgba(16, 185, 129, 0.15);
+          animation: radar-ping-anim 2s infinite ease-out;
+          z-index: 1;
+        }
+        .radar-circle {
+          position: absolute;
+          width: 75px;
+          height: 75px;
+          border-radius: 50%;
+          border: 1px dashed rgba(16, 185, 129, 0.2);
+          animation: spin 30s linear infinite;
+          z-index: 1;
+        }
+        
+        @keyframes radar-ping-anim {
+          0% { transform: scale(0.6); opacity: 0.8; }
+          100% { transform: scale(1.6); opacity: 0; }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>

@@ -22,9 +22,22 @@ async function getMetrics(req, res) {
 
 async function getAiSummary(req, res) {
   try {
-    const { servers } = req.body;
-    const aiSummary = await aiService.generateHealthSummary(servers);
+    const { servers, logs } = req.body;
+    const aiSummary = await aiService.generateHealthSummary(servers, logs);
     return res.json({ aiSummary });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+async function askAi(req, res) {
+  try {
+    const { question, servers, alerts, logs } = req.body;
+    if (!question) {
+      return res.status(400).json({ error: 'Missing question in request body' });
+    }
+    const result = await aiService.askQuestion(question, servers, alerts, logs);
+    return res.json(result);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -32,5 +45,6 @@ async function getAiSummary(req, res) {
 
 module.exports = {
   getMetrics,
-  getAiSummary
+  getAiSummary,
+  askAi
 };

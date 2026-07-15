@@ -19,4 +19,18 @@ router.get('/alerts', async (req, res) => {
   }
 });
 
+router.get('/logs', async (req, res) => {
+  try {
+    const { startTime, endTime } = req.query;
+    const logs = await signozService.fetchLogs(
+      startTime ? parseInt(startTime) : null,
+      endTime ? parseInt(endTime) : null
+    );
+    res.json(logs);
+  } catch (error) {
+    console.error('Error in /logs route:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

@@ -1,7 +1,7 @@
 // Friendly names map for raw hostnames
 export const FRIENDLY_NAMES = {
-  'instance-20260630-1713': 'Oracle Master',
-  'Database-Server-Oracle': 'Oracle Master',
+  'instance-20260630-1713': 'Oracle database server',
+  'Database-Server-Oracle': 'Oracle database server',
   'srv1213878': 'Orbithyre',
   'srv1176513': 'Gaplytiq',
   'srv1055295': 'Dalai'

@@ -34,7 +34,7 @@ Sentinel should answer these three questions **instantly**:
 | Question | What it covers |
 |---|---|
 | ✅ Is every server healthy? | CPU, RAM, Disk, Uptime, Docker, Processes |
-| 🔒 Is every service secure? | Attacks, Malware, Rootkits, File Integrity, Firewalls |
+| 🔒 Is every service secure? | Attacks, Malware, Firewalls |
 | ⚡ Is there anything requiring immediate action? | Alerts, Incidents, Expiring Certs, Failed Backups |
 
 ---
@@ -154,15 +154,6 @@ Centralized security dashboard combining multiple tools.
 - Infected Files & Scan Duration
 - Scheduled nightly
 
-#### Rootkit Detection (rkhunter)
-- Rootkit Warnings & Critical Findings
-- Hidden Files & System Changes
-- Weekly scans
-
-#### File Integrity Monitoring (AIDE)
-- SSH Configuration Changes
-- System File & Executable Changes
-- Deleted & Newly Created Files
 
 #### Failed Login Detection
 - Failed SSH Logins
@@ -225,13 +216,13 @@ To ensure AI agents and developers never forget the layout, here is the exact lo
 - **Sentinel Backend API** (Internal): `http://localhost:3001` inside Docker network — proxies metric queries to SigNoz
 - **GitHub Repo**: `https://github.com/dalai-lab/sentinel`
 
-#### Monitored Fleet (Telemetry Agents Deployed)
+#### Monitored Servers (Telemetry Agents Deployed)
 
 All 4 servers have `node_exporter` (Port 9100) and `otelcol` installed and running as systemd services. They continuously scrape CPU, RAM, and system metrics and ship them to `https://telemetry.dalai.in/v1/metrics`.
 
 | # | Name | IP | Hostname | Role |
 |---|---|---|---|---|
-| 1 | **Oracle Master** | `80.225.241.81` | `instance-20260630-1713` | Central Hub — runs SigNoz, Supabase (multiple projects), Sentinel Dashboard |
+| 1 | **Oracle database server** | `80.225.241.81` | `instance-20260630-1713` | Central Hub — runs SigNoz, Supabase (multiple projects), Sentinel Dashboard |
 | 2 | **Orbithyre** | `31.97.235.136` | `srv1213878` | Web server — hosts the OrbitHyre enterprise platform |
 | 3 | **Gaplytiq** | `72.61.235.141` | `srv1176513` | Web server — hosts the Gaplytiq platform |
 | 4 | **Dalai** | `168.231.122.248` | `srv1055295` | Web server — hosts Dalai.in and related services |
@@ -400,7 +391,7 @@ Real-time notifications for all critical events.
 |---|---|
 | **Infrastructure** | High CPU, High RAM, Disk Almost Full |
 | **Availability** | Website Down, Database Offline, Docker Stopped |
-| **Security** | Malware Found, Rootkit Found, File Modified, Excessive Failed Logins |
+| **Security** | Malware Found, Excessive Failed Logins |
 | **Certificates** | SSL Expiring |
 | **Backups** | Backup Failed |
 
@@ -478,7 +469,7 @@ Sentinel automatically detects new resources with minimal configuration.
 | **Docker** | Engine Stopped, Restart Loops |
 | **Web** | Website Slow/Down, DNS Failure, SSL Expiring/Invalid |
 | **Database** | Locks, Database Offline |
-| **Security** | Malware, Rootkit, Unexpected File Changes, Unexpected Open Ports, High Failed Logins |
+| **Security** | Malware, Unexpected Open Ports, High Failed Logins |
 | **Operations** | Backup Failure |
 
 ---
@@ -526,8 +517,6 @@ Sentinel automatically detects new resources with minimal configuration.
 | Docker Metrics | Container Monitoring |
 | CrowdSec | Threat Detection |
 | ClamAV | Malware Scanning |
-| AIDE | File Integrity |
-| rkhunter | Rootkit Detection |
 
 ### Infrastructure
 - Docker Compose
@@ -559,7 +548,7 @@ Each production server runs only:
 - Log Collection Agent
 
 Scheduled (not always running):
-- ClamAV · AIDE · rkhunter
+- ClamAV
 
 ### Oracle VPS (Central Hub)
 
@@ -590,13 +579,11 @@ Runs all heavy components:
 
 ### 🚀 Phase 2 — Production
 
-- [ ] Malware Detection (ClamAV)
-- [ ] Rootkit Detection (rkhunter)
-- [ ] File Integrity Monitoring (AIDE)
+- [x] Malware Detection (ClamAV)
 - [ ] Backup Monitoring
 - [ ] Database Monitoring
 - [ ] Incident Timeline
-- [ ] AI Daily Summaries
+- [x] AI Daily Summaries
 
 ### 🔮 Phase 3 — Advanced
 

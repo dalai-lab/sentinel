@@ -30,7 +30,7 @@ async function provisionDefaultAlerts() {
       labels: { severity: "critical", source: "sentinel" },
       annotations: {
         summary: "CPU above 90% on {{ $labels.host_name }}",
-        description: "Fleet server is CPU critical. Immediate attention required."
+        description: "Server is CPU critical. Immediate attention required."
       },
       disabled: false,
       preferredChannels: []

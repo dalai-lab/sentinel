@@ -1,4 +1,5 @@
 const signozService = require('../services/signoz.service');
+const aiService = require('../services/ai.service');
 const config = require('../config/env');
 
 async function getMetrics(req, res) {
@@ -19,6 +20,17 @@ async function getMetrics(req, res) {
   }
 }
 
+async function getAiSummary(req, res) {
+  try {
+    const { servers } = req.body;
+    const aiSummary = await aiService.generateHealthSummary(servers);
+    return res.json({ aiSummary });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
-  getMetrics
+  getMetrics,
+  getAiSummary
 };

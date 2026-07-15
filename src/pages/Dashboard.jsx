@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ServerCard from '../components/ServerCard';
@@ -10,6 +11,7 @@ export default function Dashboard() {
     { id: 1, name: 'Database-Server-Oracle', ip: '80.225.241.81', cpu: 0, ram: 0, status: 'connecting' }
   ]);
   const [apiError, setApiError] = useState(null);
+  const [aiSummary, setAiSummary] = useState('Sentinel AI is analyzing your fleet telemetry...');
 
   useEffect(() => {
     async function loadData() {
@@ -51,6 +53,21 @@ export default function Dashboard() {
           
           setServers(activeServers);
           setApiError(null);
+
+          // Now fetch the AI summary asynchronously without blocking the UI rendering of the servers
+          try {
+            const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ servers: activeServers })
+            });
+            const aiData = await aiRes.json();
+            if (aiData.aiSummary) {
+              setAiSummary(aiData.aiSummary);
+            }
+          } catch (err) {
+            console.error('Failed to fetch AI summary', err);
+          }
         }
       }
     }
@@ -71,11 +88,39 @@ export default function Dashboard() {
           <p className="text-muted" style={{ fontSize: '0.95rem' }}>Real-time telemetry and health scores across your fleet.</p>
         </div>
 
-        {apiError === 'waiting_for_token' && (
-          <div style={{ padding: '16px', background: 'rgba(245, 166, 35, 0.1)', border: '1px solid var(--status-warning)', borderRadius: 'var(--radius-sm)', marginBottom: '24px', color: 'var(--status-warning)' }}>
-            <strong>Action Required:</strong> Please add your SigNoz JWT Token in <code>src/api/signoz.js</code> to see live metrics from your Database Server!
+        {/* AI Health Banner */}
+        <div style={{
+          padding: '16px 20px',
+          background: 'rgba(99, 102, 241, 0.08)',
+          border: '1px solid rgba(99, 102, 241, 0.3)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: '32px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          boxShadow: '0 4px 20px rgba(99, 102, 241, 0.1)'
+        }}>
+          <div style={{
+            background: 'rgba(99, 102, 241, 0.2)',
+            padding: '10px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Sparkles size={24} color="#818cf8" />
           </div>
-        )}
+          <div style={{ flex: 1 }}>
+            <h4 style={{ margin: 0, marginBottom: '4px', color: '#818cf8', fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.02em' }}>
+              AUTONOMOUS AI ANALYSIS
+            </h4>
+            <p style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.05rem', lineHeight: 1.4 }}>
+              {aiSummary}
+            </p>
+          </div>
+        </div>
+
+
 
         {apiError && apiError !== 'waiting_for_token' && (
           <div style={{ padding: '16px', background: 'rgba(255, 74, 74, 0.1)', border: '1px solid var(--status-danger)', borderRadius: 'var(--radius-sm)', marginBottom: '24px', color: 'var(--status-danger)' }}>

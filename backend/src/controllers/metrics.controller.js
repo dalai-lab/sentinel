@@ -20,11 +20,35 @@ async function getMetrics(req, res) {
   }
 }
 
+const aiManagerService = require('../services/aiManager.service');
+
 async function getAiSummary(req, res) {
   try {
     const { servers, logs } = req.body;
     const aiSummary = await aiService.generateHealthSummary(servers, logs);
     return res.json({ aiSummary });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+async function getLatestAiSummary(req, res) {
+  try {
+    const summary = aiManagerService.getLatestSummary();
+    if (!summary) {
+      return res.status(503).json({ error: 'AI Summary is still generating.' });
+    }
+    // Summary is already an object from cached JSON.parse
+    return res.json({ aiSummary: JSON.stringify(summary) });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+async function forceAiSummary(req, res) {
+  try {
+    const summary = await aiManagerService.forceRun();
+    return res.json({ aiSummary: JSON.stringify(summary) });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -46,5 +70,7 @@ async function askAi(req, res) {
 module.exports = {
   getMetrics,
   getAiSummary,
+  getLatestAiSummary,
+  forceAiSummary,
   askAi
 };

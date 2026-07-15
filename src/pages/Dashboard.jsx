@@ -173,34 +173,24 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function loadAiAdvice() {
-      const currentServers = serversRef.current;
-      // Skip if telemetry is not loaded yet
-      if (!currentServers || currentServers.length === 0 || currentServers[0].status === 'connecting') return;
-
       try {
-        // Fetch recent logs first to give AI full contextual awareness
-        const logsRes = await fetch('http://localhost:3001/api/metrics/logs');
-        const logsData = await logsRes.json();
-        const logs = Array.isArray(logsData) ? logsData : [];
-        setRecentLogs(logs);
-
-        const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ servers: currentServers, logs: logs.slice(0, 50) })
-        });
+        const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary/latest');
+        if (aiRes.status === 503) {
+          // AI is still generating, skip update
+          return;
+        }
         const aiData = await aiRes.json();
         if (aiData.aiSummary) {
           setAiCopilotData(parseAiData(aiData.aiSummary));
         }
       } catch (err) {
-        console.error('Failed to fetch AI summary', err);
+        console.error('Failed to fetch latest AI summary', err);
       }
     }
 
-    // Run AI advice fetch on mount or when telemetry first becomes online
-    const timer = setTimeout(loadAiAdvice, 3000); // minor delay to allow first metrics to populate
-    const interval = setInterval(loadAiAdvice, 300000); // Poll every 5 minutes (300k ms)
+    // Poll the fast, cached backend endpoint every 15 seconds (costs 0 tokens)
+    const timer = setTimeout(loadAiAdvice, 3000); // minor delay to allow backend to boot
+    const interval = setInterval(loadAiAdvice, 15000); 
 
     return () => {
       clearTimeout(timer);

@@ -1,40 +1,39 @@
 import React from 'react';
 import { Cpu, HardDrive, Database, Clock, Server, Globe, AlertTriangle } from 'lucide-react';
 
-// Reimagined Premium Continuous Progress Bar (Normal bar but better)
+// Reimagined AAA-Grade Premium Progress Bar
 function PremiumProgressBar({ value, warningThreshold = 85 }) {
   const parsedValue = parseFloat(value) || 0;
 
   const getStatusColor = (val) => {
-    if (val > warningThreshold) return 'var(--status-danger)';
-    if (val > 70) return 'var(--status-warning)';
-    return 'var(--status-healthy)';
+    if (val > warningThreshold) return '#ef4444'; // var(--status-danger)
+    if (val > 70) return '#f59e0b'; // var(--status-warning)
+    return '#10b981'; // var(--status-healthy)
   };
 
   const activeColor = getStatusColor(parsedValue);
 
   return (
     <div style={{
-      height: '6px',
-      background: 'rgba(255, 255, 255, 0.02)',
-      border: '1px solid rgba(255, 255, 255, 0.04)',
-      borderRadius: '3px',
+      height: '8px',
+      background: 'rgba(255, 255, 255, 0.03)',
+      border: '1px solid rgba(255, 255, 255, 0.05)',
+      borderRadius: '4px',
       overflow: 'hidden',
       position: 'relative',
-      marginTop: '4px'
+      marginTop: '6px',
+      boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
     }}>
       <div
         style={{
           height: '100%',
           width: `${parsedValue}%`,
           background: `linear-gradient(90deg, ${activeColor}bb 0%, ${activeColor} 100%)`,
-          boxShadow: `0 0 8px ${activeColor}30`,
-          borderRadius: '3px',
+          boxShadow: `0 0 10px ${activeColor}80`,
+          borderRadius: '4px',
           transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-          position: 'relative',
-          overflow: 'hidden'
+          position: 'relative'
         }}
-        className="progress-fill-animate"
       />
     </div>
   );
@@ -252,32 +251,6 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
         @keyframes warnPulse {
           from { opacity: 0.4; transform: scale(0.9); }
           to { opacity: 1; transform: scale(1.1); }
-        }
-
-        .progress-fill-animate::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-image: linear-gradient(
-            135deg,
-            rgba(255, 255, 255, 0.1) 25%,
-            transparent 25%,
-            transparent 50%,
-            rgba(255, 255, 255, 0.1) 50%,
-            rgba(255, 255, 255, 0.1) 75%,
-            transparent 75%,
-            transparent
-          );
-          background-size: 15px 15px;
-          animation: moveStripes 1.2s linear infinite;
-          opacity: 0.35;
-        }
-        @keyframes moveStripes {
-          0% { background-position: 0 0; }
-          100% { background-position: 15px 0; }
         }
       `}</style>
     </div>

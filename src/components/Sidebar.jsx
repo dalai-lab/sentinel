@@ -6,8 +6,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
     { name: 'Overview', id: 'overview', icon: LayoutDashboard },
     { name: 'Servers', id: 'servers', icon: Server },
     { name: 'Logs & Traces', id: 'logs', icon: Activity },
-    { name: 'SSH Logins', id: 'ssh', icon: Key },
-    { name: 'Settings', id: 'settings', icon: Settings },
+    { name: 'SSH Logins', id: 'ssh', icon: Key }
   ];
 
   const handleNavClick = (id) => {

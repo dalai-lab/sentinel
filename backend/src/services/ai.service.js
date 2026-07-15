@@ -88,11 +88,13 @@ ${formattedLogs.length > 0 ? formattedLogs.join('\n') : 'No recent logs availabl
 
 --- OBJECTIVE ---
 Output a single, valid JSON object containing your analysis. Keep the language natural, helpful, and friendly (NOT overly technical or full of dry SRE jargon).
-Avoid generic descriptions. Reference actual IP addresses, usernames, or servers if they appear in logs or telemetry.
+Avoid generic descriptions. Reference actual IP addresses, usernames, AND SPECIFIC SERVER NAMES if they appear in logs or telemetry.
+If an alert says it occurred on "unknown host", YOU MUST check the recent logs to find which server recently logged that specific event, and use that server name in your report! Never say "unknown host".
+IMPORTANT: Failed login attempts or brute-force scanning (like trying to guess username 'zabbix' or 'root') are normal background noise and spam. IGNORE THEM for alerts. ONLY raise a warning/alert or highlight a security threat in your headline/mood if someone ACTUALLY logged in successfully (e.g., successful SSH authentication/accepted password). If there is only failed brute-force scanning spam, report the system health as normal/healthy.
 
 Expected JSON schema:
 {
-  "headline": "A single punchy, user-friendly headline summarizing the overall health or security status. (e.g., 'Everything is calm today, but a bot scan from France was blocked.')",
+  "headline": "A single punchy, user-friendly headline summarizing the overall health or security status. MUST include the affected Server Name. (e.g., 'Suspicious login attempt blocked on Oracle DB Server from IP 23.134.76.12.')",
   "mood": "Choose exactly one: 'healthy' (all fine), 'warning' (minor issues or suspicious scans), 'critical' (high CPU, alerts firing, or massive attacks)",
   "insights": [
     "Insight 1 in plain English (e.g., 'Oracle DB server has ultra-low resource usage at 4% CPU.')",

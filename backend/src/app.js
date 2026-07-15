@@ -18,4 +18,9 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', configured: !!config.SIGNOZ_API_KEY });
 });
 
+const aiManagerService = require('./services/aiManager.service');
+
+// Start background AI manager
+aiManagerService.start();
+
 module.exports = app;

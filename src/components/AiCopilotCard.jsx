@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 
 export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onCommandCopy }) {
   const [question, setQuestion] = useState('');
@@ -69,6 +69,22 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
     setCopied(true);
     if (onCommandCopy) onCommandCopy(cmd);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleForceRefresh = async () => {
+    setLoading(true);
+    try {
+      // Hit the force backend endpoint
+      await fetch('http://localhost:3001/api/metrics/ai-summary/force', {
+        method: 'POST'
+      });
+      // The dashboard will pick up the fresh data in its next 15s poll, 
+      // or we could manually trigger a state update here if we passed down a callback.
+    } catch (e) {
+      console.error('Failed to force refresh', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Helper to format chat message text containing markdown code blocks
@@ -145,8 +161,18 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
             <Sparkles size={14} color="var(--accent)" />
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.01em' }}>
+            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
               SENTINEL AI COPILOT
+              <button 
+                onClick={handleForceRefresh}
+                disabled={loading}
+                title="Force AI to regenerate now"
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 0, 
+                  display: 'flex', alignItems: 'center', color: 'var(--text-muted)'
+                }}>
+                <RefreshCw size={12} className={loading ? "spin-animation" : ""} />
+              </button>
             </h4>
           </div>
         </div>

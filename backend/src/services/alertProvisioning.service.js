@@ -14,21 +14,14 @@ async function provisionDefaultAlerts() {
     {
       alert: "Sentinel: CPU Critical (>90%)",
       alertType: "METRIC_BASED_ALERT",
-      ruleType: "threshold_rule",
+      ruleType: "promql_rule",
       version: "v5",
-      evalWindow: "5m0s",
-      frequency: "1m0s",
+      evalWindow: "5m",
+      frequency: "1m",
       condition: {
         compositeQuery: {
           queryType: "promql",
-          panelType: "graph",
-          promQueries: {
-            A: {
-              name: "A",
-              query: "100 - (avg by (host_name) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
-              disabled: false
-            }
-          }
+          promqlQuery: "100 - (avg by (host_name) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)"
         },
         op: "1",
         target: 90,
@@ -45,21 +38,14 @@ async function provisionDefaultAlerts() {
     {
       alert: "Sentinel: Disk Critical (>85%)",
       alertType: "METRIC_BASED_ALERT",
-      ruleType: "threshold_rule",
+      ruleType: "promql_rule",
       version: "v5",
-      evalWindow: "5m0s",
-      frequency: "1m0s",
+      evalWindow: "5m",
+      frequency: "1m",
       condition: {
         compositeQuery: {
           queryType: "promql",
-          panelType: "graph",
-          promQueries: {
-            A: {
-              name: "A",
-              query: "100 - ((avg by (host_name) (node_filesystem_avail_bytes{mountpoint=\"/\"}) * 100) / avg by (host_name) (node_filesystem_size_bytes{mountpoint=\"/\"}))",
-              disabled: false
-            }
-          }
+          promqlQuery: "100 - ((avg by (host_name) (node_filesystem_avail_bytes{mountpoint=\"/\"}) * 100) / avg by (host_name) (node_filesystem_size_bytes{mountpoint=\"/\"}))"
         },
         op: "1",
         target: 85,

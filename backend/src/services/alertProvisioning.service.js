@@ -12,16 +12,66 @@ async function provisionDefaultAlerts() {
 
   const alertsToProvision = [
     {
-      alert: "CPU_Critical_90",
-      expr: "100 - (avg by (host_name) (rate(node_cpu_seconds_total{mode='idle'}[1m])) * 100) > 90",
-      labels: { severity: "critical" },
-      annotations: { summary: "CPU is above 90% for {{ $labels.host_name }}" }
+      alert: "Sentinel: CPU Critical (>90%)",
+      alertType: "METRIC_BASED_ALERT",
+      ruleType: "threshold_rule",
+      version: "v5",
+      evalWindow: "5m0s",
+      frequency: "1m0s",
+      condition: {
+        compositeQuery: {
+          queryType: "promql",
+          panelType: "graph",
+          promQueries: {
+            A: {
+              name: "A",
+              query: "100 - (avg by (host_name) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+              disabled: false
+            }
+          }
+        },
+        op: "1",
+        target: 90,
+        matchType: "4"
+      },
+      labels: { severity: "critical", source: "sentinel" },
+      annotations: {
+        summary: "CPU above 90% on {{ $labels.host_name }}",
+        description: "Fleet server is CPU critical. Immediate attention required."
+      },
+      disabled: false,
+      preferredChannels: []
     },
     {
-      alert: "CrowdSec_Ban_Detected",
-      expr: "rate(crowdsec_bans_total[5m]) > 0",
-      labels: { severity: "warning" },
-      annotations: { summary: "CrowdSec has banned an IP on {{ $labels.host_name }}" }
+      alert: "Sentinel: Disk Critical (>85%)",
+      alertType: "METRIC_BASED_ALERT",
+      ruleType: "threshold_rule",
+      version: "v5",
+      evalWindow: "5m0s",
+      frequency: "1m0s",
+      condition: {
+        compositeQuery: {
+          queryType: "promql",
+          panelType: "graph",
+          promQueries: {
+            A: {
+              name: "A",
+              query: "100 - ((avg by (host_name) (node_filesystem_avail_bytes{mountpoint=\"/\"}) * 100) / avg by (host_name) (node_filesystem_size_bytes{mountpoint=\"/\"}))",
+              disabled: false
+            }
+          }
+        },
+        op: "1",
+        target: 85,
+        matchType: "4"
+      },
+      labels: { severity: "critical", source: "sentinel" },
+      annotations: {
+        summary: "Disk above 85% on {{ $labels.host_name }}",
+        description: "Server storage is critically full."
+      },
+      disabled: false,
+      preferredChannels: []
     }
   ];
 
@@ -29,25 +79,23 @@ async function provisionDefaultAlerts() {
 
   for (const rule of alertsToProvision) {
     try {
-      // Depending on the SigNoz version, the Rules API is typically at /api/v1/rules
-      // We send the alert definition to ensure the backend is fully synchronized with the agent capabilities.
       const response = await fetch(`${config.SIGNOZ_URL}/api/v1/rules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.SIGNOZ_API_KEY}`
+          'SIGNOZ-API-KEY': config.SIGNOZ_API_KEY
         },
         body: JSON.stringify(rule)
       });
 
+      const text = await response.text();
       if (response.ok) {
-        console.log(`[ALERTS] Successfully provisioned alert: ${rule.alert}`);
+        console.log(`[ALERTS] ✅ Successfully provisioned alert: ${rule.alert}`);
       } else {
-        // If the API endpoint differs or rule already exists, we fail gracefully to prevent crashing
-        console.log(`[ALERTS] Rule ${rule.alert} provision status: ${response.status} (May already exist)`);
+        console.log(`[ALERTS] ⚠️ Rule "${rule.alert}" status: ${response.status} — ${text.slice(0, 120)}`);
       }
     } catch (error) {
-      console.log(`[ALERTS] Error provisioning ${rule.alert}: ${error.message}`);
+      console.log(`[ALERTS] ❌ Error provisioning ${rule.alert}: ${error.message}`);
     }
   }
 }

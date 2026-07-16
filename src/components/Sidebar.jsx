@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Server, Activity, Settings, X, Terminal, Key, Shield, LineChart, Map, Network } from 'lucide-react';
+import { LayoutDashboard, Server, Activity, Settings, X, Terminal, Key, Shield, LineChart, Map, Network, ShieldAlert } from 'lucide-react';
 
 export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
   const categories = [
@@ -14,7 +14,8 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
       items: [
         { name: 'Servers', id: 'servers', icon: Server },
         { name: 'Graphs', id: 'graphs', icon: LineChart },
-        { name: 'Logs & Traces', id: 'logs', icon: Activity }
+        { name: 'Logs & Traces', id: 'logs', icon: Activity },
+        { name: 'Alerts', id: 'alerts', icon: ShieldAlert }
       ]
     },
     {

@@ -5,9 +5,16 @@ import LogConsoleFilters from './LogConsole/LogConsoleFilters';
 import LogConsoleRow from './LogConsole/LogConsoleRow';
 import TraceVisualizer from './LogConsole/TraceVisualizer';
 
-export default function LogConsole() {
+export default function LogConsole({ globalSearch = '' }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+  // Sync with globalSearch if provided
+  useEffect(() => {
+    if (globalSearch !== undefined && globalSearch !== searchQuery) {
+      setSearchQuery(globalSearch);
+    }
+  }, [globalSearch]);
 
   useEffect(() => {
     const handler = setTimeout(() => {

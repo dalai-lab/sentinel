@@ -22,7 +22,7 @@ const TIME_WINDOWS = [
 
 
 
-export default function ThreatMapView() {
+export default function ThreatMapView({ globalSearch = '' }) {
   const [logs, setLogs] = useState([]);
   const [geoData, setGeoData] = useState({});
   const [loading, setLoading] = useState(true);
@@ -82,9 +82,24 @@ export default function ThreatMapView() {
     }
   }
 
+  const filteredLogs = useMemo(() => {
+    if (!globalSearch) return logs;
+    const q = globalSearch.toLowerCase();
+    return logs.filter(log => {
+      const matchIp = log.ip.includes(q);
+      const matchHost = log.hostFriendly && log.hostFriendly.toLowerCase().includes(q);
+      const geo = geoData[log.ip];
+      const matchGeo = geo && (
+        geo.country?.toLowerCase().includes(q) ||
+        geo.city?.toLowerCase().includes(q)
+      );
+      return matchIp || matchHost || matchGeo;
+    });
+  }, [logs, globalSearch, geoData]);
+
   const attackerMap = useMemo(() => {
     const m = {};
-    logs.forEach(log => {
+    filteredLogs.forEach(log => {
       if (!m[log.ip]) m[log.ip] = { ip: log.ip, hits: 0, targets: new Set(), geo: geoData[log.ip] || null };
       m[log.ip].hits += 1;
       if (log.hostFriendly) m[log.ip].targets.add(log.hostFriendly);

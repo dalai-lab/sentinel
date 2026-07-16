@@ -5,7 +5,7 @@ import LogFilters from './SshLogins/LogFilters';
 import SshEventRow from './SshLogins/SshEventRow';
 import ActiveSessionsPanel from './SshLogins/ActiveSessionsPanel';
 
-export default function SshLoginsCard({ topThreat }) {
+export default function SshLoginsCard({ topThreat, globalSearch = '' }) {
   const { allEvents, crowdSecEvents, ipGeo, loading, fetchingOlder, hasMore, loadOlderLogs } = useSshLogs();
 
   const [activeTab, setActiveTab] = useState('all');
@@ -16,6 +16,13 @@ export default function SshLoginsCard({ topThreat }) {
   const [visibleCount, setVisibleCount] = useState(25);
 
   const observerTarget = useRef(null);
+
+  // Sync with globalSearch if provided
+  useEffect(() => {
+    if (globalSearch !== undefined && globalSearch !== searchQuery) {
+      setSearchQuery(globalSearch);
+    }
+  }, [globalSearch]);
 
   // Reset visibleCount when filters change
   useEffect(() => {

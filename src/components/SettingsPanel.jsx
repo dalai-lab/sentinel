@@ -4,7 +4,7 @@ import AlertSettings from './AlertSettings';
 import EmailSettings from './EmailSettings';
 import TelegramSettings from './TelegramSettings';
 
-export default function SettingsPanel() {
+export default function SettingsPanel({ globalSearch = '' }) {
 
   const [isSaved, setIsSaved] = useState(false);
 
@@ -13,6 +13,12 @@ export default function SettingsPanel() {
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };
+
+  const term = globalSearch.toLowerCase();
+  const showAlerts = !term || 'alerts'.includes(term) || 'alert settings'.includes(term) || 'signoz'.includes(term);
+  const showEmail = !term || 'email'.includes(term) || 'smtp'.includes(term) || 'mail'.includes(term);
+  const showTelegram = !term || 'telegram'.includes(term) || 'bot'.includes(term) || 'chat'.includes(term);
+  const noneMatch = !showAlerts && !showEmail && !showTelegram;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', minHeight: '100%', paddingBottom: '30px', animation: 'fadeIn 0.4s ease' }}>
@@ -25,9 +31,18 @@ export default function SettingsPanel() {
         </div>
       </div>
 
-      <AlertSettings />
-      <EmailSettings />
-      <TelegramSettings />
+      {showAlerts && <AlertSettings />}
+      {showEmail && <EmailSettings />}
+      {showTelegram && <TelegramSettings />}
+
+      {noneMatch && (
+        <div style={{
+          padding: '40px', textAlign: 'center', color: 'var(--text-muted)',
+          fontSize: '0.74rem', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-md)'
+        }}>
+          No settings configurations match your search.
+        </div>
+      )}
 
       {isSaved && (
         <div style={{

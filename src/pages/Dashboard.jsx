@@ -12,6 +12,7 @@ import AiCopilotCard from '../components/AiCopilotCard';
 import AntivirusScansCard from '../components/AntivirusScansCard';
 import OverviewScansWidget from '../components/OverviewScansWidget';
 import AlertCenterWidget from '../components/AlertCenterWidget';
+import AlertCenterCard from '../components/AlertCenterCard';
 import GraphsView from '../components/GraphsView';
 import ThreatMapView from '../components/ThreatMapView';
 import ServerDetailView from '../components/ServerDetailView';
@@ -432,10 +433,10 @@ export default function Dashboard() {
                       />
                     </div>
                     <div className={activeMobileWidget === 'alerts' ? 'active-tab-widget' : ''}>
-                      <AlertCenterWidget />
+                      <AlertCenterWidget onNavigate={() => setActiveTab('alerts')} />
                     </div>
                     <div className={activeMobileWidget === 'scans' ? 'active-tab-widget' : ''}>
-                      <OverviewScansWidget />
+                      <OverviewScansWidget onNavigate={() => setActiveTab('scans')} />
                     </div>
                   </div>
               </div>
@@ -447,23 +448,26 @@ export default function Dashboard() {
               <GraphsView 
                 initialServer={initialGraphServer} 
                 initialMetric={initialGraphMetric} 
+                globalSearch={globalSearch}
                 onBack={graphBackServer ? () => {
                   setSelectedServerName(graphBackServer);
                   setGraphBackServer(null);
                 } : null}
               />
             )}
-            {activeTab === 'threatmap' && <ThreatMapView />}
+            {activeTab === 'threatmap' && <ThreatMapView globalSearch={globalSearch} />}
 
-            {activeTab === 'servers' && <ServerList servers={filteredServers} onSelectServer={setSelectedServerName} />}
+            {activeTab === 'servers' && <ServerList servers={filteredServers} onSelectServer={setSelectedServerName} globalSearch={globalSearch} />}
 
-            {activeTab === 'logs' && <LogConsole />}
+            {activeTab === 'logs' && <LogConsole globalSearch={globalSearch} />}
 
-            {activeTab === 'ssh' && <SshLoginsCard topThreat={aiCopilotData.top_threat} />}
+            {activeTab === 'ssh' && <SshLoginsCard topThreat={aiCopilotData.top_threat} globalSearch={globalSearch} />}
             
-            {activeTab === 'scans' && <AntivirusScansCard />}
+            {activeTab === 'scans' && <AntivirusScansCard globalSearch={globalSearch} />}
 
-            {activeTab === 'settings' && <SettingsPanel />}
+            {activeTab === 'alerts' && <AlertCenterCard globalSearch={globalSearch} />}
+
+            {activeTab === 'settings' && <SettingsPanel globalSearch={globalSearch} />}
           </>
         )}
       </main>

@@ -71,13 +71,15 @@ function fmtVal(v, unit) {
 }
 
 // ── Build per-metric chartData ───────────────────────────────────────────────
-function buildChartData(rawSeries, timeRange, serverFilter) {
+function buildChartData(rawSeries, timeRange, serverFilter, globalSearch = '') {
   const timeMap = {};
   const hostsSet = new Set();
 
   (rawSeries || []).forEach(series => {
     const host = getFriendlyName(series.metric?.host_name);
     if (serverFilter !== 'all' && host !== serverFilter) return;
+    if (globalSearch && !host.toLowerCase().includes(globalSearch.toLowerCase())) return;
+    
     hostsSet.add(host);
     series.values?.forEach(([ts, val]) => {
       const key = Math.floor(ts);
@@ -143,10 +145,10 @@ function CustomTooltip({ active, payload, label, unit }) {
 }
 
 // ── Single Metric Panel ────────────────────────────────────────────────────────
-function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isExpanded }) {
+function MetricPanel({ metric, rawSeries, timeRange, serverFilter, globalSearch, onExpand, isExpanded }) {
   const { data: chartData, hosts } = useMemo(
-    () => buildChartData(rawSeries, timeRange, serverFilter),
-    [rawSeries, timeRange, serverFilter]
+    () => buildChartData(rawSeries, timeRange, serverFilter, globalSearch),
+    [rawSeries, timeRange, serverFilter, globalSearch]
   );
 
   const stats = useMemo(() => computeStats(chartData, hosts), [chartData, hosts]);
@@ -298,7 +300,7 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
-export default function GraphsView({ initialServer = 'all', initialMetric = null, onBack }) {
+export default function GraphsView({ initialServer = 'all', initialMetric = null, onBack, globalSearch = '' }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState(3600);
@@ -452,6 +454,7 @@ export default function GraphsView({ initialServer = 'all', initialMetric = null
               rawSeries={data?.[metric.id] || []}
               timeRange={timeRange}
               serverFilter={serverFilter}
+              globalSearch={globalSearch}
               isExpanded={!!expandedMetric}
               onExpand={() => setExpandedMetric(expandedMetric === metric.id ? null : metric.id)}
             />

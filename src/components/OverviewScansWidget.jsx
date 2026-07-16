@@ -3,7 +3,7 @@ import { ShieldAlert, ShieldCheck } from 'lucide-react';
 import { fetchLatestScans } from '../api/signoz';
 import { getFriendlyName } from '../utils/serverMapping';
 
-export default function OverviewScansWidget() {
+export default function OverviewScansWidget({ onNavigate }) {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +30,9 @@ export default function OverviewScansWidget() {
   }, []);
 
   return (
-    <div style={{
+    <div 
+      onClick={onNavigate}
+      style={{
       background: 'var(--color-rgb-255-255-255-0-005)',
       border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
@@ -39,8 +41,23 @@ export default function OverviewScansWidget() {
       flexDirection: 'column',
       gap: '16px',
       height: '380px',
-      overflow: 'hidden'
-    }}>
+      overflow: 'hidden',
+      cursor: onNavigate ? 'pointer' : 'default',
+      transition: 'all 0.2s ease',
+    }}
+    onMouseEnter={(e) => {
+      if (onNavigate) {
+        e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-02)';
+        e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-08)';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (onNavigate) {
+        e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-005)';
+        e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-03)';
+      }
+    }}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)', paddingBottom: '12px' }}>
         <h3 style={{ margin: 0, fontSize: '0.76rem', fontWeight: 500, color: 'var(--text-primary)' }}>Recent Scans</h3>
       </div>

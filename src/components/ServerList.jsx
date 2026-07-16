@@ -142,9 +142,14 @@ const SERVER_DETAILS = {
 
 const ROLE_COLORS = { 'Central Hub': 'var(--color-hex-8b5cf6)', 'Web Server': 'var(--color-hex-06b6d4)' };
 
-export default function ServerList({ servers, onSelectServer }) {
+export default function ServerList({ servers, onSelectServer, globalSearch = '' }) {
   const onlineCount = (servers || []).filter(s => s.status === 'online').length;
-  const details = Object.entries(SERVER_DETAILS);
+  
+  const details = Object.entries(SERVER_DETAILS).filter(([name, info]) => {
+    if (!globalSearch) return true;
+    const term = globalSearch.toLowerCase();
+    return name.toLowerCase().includes(term) || info.ip.includes(term);
+  });
 
   const [metricsHistory, setMetricsHistory] = React.useState({});
 

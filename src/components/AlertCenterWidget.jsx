@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldAlert, AlertTriangle, Cpu, HardDrive, Server, Shield, CheckCircle2, Clock } from 'lucide-react';
 import { fetchAlerts, acknowledgeAlert } from '../api/alerts';
 
-export default function AlertCenterWidget() {
+export default function AlertCenterWidget({ onNavigate }) {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +23,8 @@ export default function AlertCenterWidget() {
     return () => clearInterval(int);
   }, []);
 
-  const handleAcknowledge = async (id) => {
+  const handleAcknowledge = async (id, e) => {
+    e.stopPropagation(); // Prevent navigating when clicking Acknowledge button
     setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'acknowledged' } : a));
     try {
       await acknowledgeAlert(id);
@@ -50,7 +51,9 @@ export default function AlertCenterWidget() {
   };
 
   return (
-    <div style={{
+    <div 
+      onClick={onNavigate}
+      style={{
       background: 'var(--color-rgb-255-255-255-0-005)',
       border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
@@ -59,8 +62,23 @@ export default function AlertCenterWidget() {
       flexDirection: 'column',
       gap: '16px',
       height: '380px',
-      overflow: 'hidden'
-    }}>
+      overflow: 'hidden',
+      cursor: onNavigate ? 'pointer' : 'default',
+      transition: 'all 0.2s ease',
+    }}
+    onMouseEnter={(e) => {
+      if (onNavigate) {
+        e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-02)';
+        e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-08)';
+      }
+    }}
+    onMouseLeave={(e) => {
+      if (onNavigate) {
+        e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-005)';
+        e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-03)';
+      }
+    }}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)', paddingBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ 
@@ -154,7 +172,7 @@ export default function AlertCenterWidget() {
                     </div>
                   </div>
                   <button 
-                    onClick={() => handleAcknowledge(alert.id)}
+                    onClick={(e) => handleAcknowledge(alert.id, e)}
                     style={{
                       background: 'var(--color-rgb-255-255-255-0-02)',
                       border: '1px solid var(--color-rgb-255-255-255-0-03)',

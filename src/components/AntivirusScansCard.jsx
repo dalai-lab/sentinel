@@ -83,16 +83,18 @@ function ThreatIntelPanel({ threatName }) {
 
   const sev = intel ? (SEV_STYLES[intel.severity] || SEV_STYLES.medium) : null;
   const detCount = (intel?.detectionCount != null && intel?.totalEngines != null)
-    ? `${intel.detectionCount} / ${intel.totalEngines} engines`
+    ? `${intel.detectionCount} / ${intel.totalEngines}`
     : null;
   const detRate = intel?.detectionRate != null ? `${intel.detectionRate}%` : null;
 
   return (
     <div style={{
-      background: 'rgba(239,68,68,0.025)',
-      border: '1px solid rgba(239,68,68,0.12)',
-      borderRadius: '6px',
+      background: 'rgba(9, 9, 11, 0.6)',
+      border: '1px solid rgba(239, 68, 68, 0.15)',
+      borderRadius: 'var(--radius-sm)',
       overflow: 'hidden',
+      backdropFilter: 'blur(8px)',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
     }}>
       {/* Clickable row */}
       <button
@@ -100,23 +102,22 @@ function ThreatIntelPanel({ threatName }) {
         onClick={handleToggle}
         style={{
           width: '100%', background: 'transparent', border: 'none',
-          padding: '9px 12px', display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', cursor: 'pointer', gap: '8px'
+          padding: '10px 12px', display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', cursor: 'pointer', gap: '8px',
+          outline: 'none'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-          <span style={{ fontSize: '0.85rem', flexShrink: 0 }}>
-            {intel ? intel.categoryIcon : '🦠'}
-          </span>
-          <div style={{ minWidth: 0 }}>
+          <ShieldAlert size={13} color="var(--status-danger)" style={{ flexShrink: 0 }} />
+          <div style={{ minWidth: 0, textAlign: 'left' }}>
             <div style={{
-              fontFamily: 'monospace', fontSize: '0.68rem', fontWeight: 600,
+              fontFamily: 'var(--font-mono, monospace)', fontSize: '0.68rem', fontWeight: 600,
               color: '#ef4444', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'
             }}>
               {threatName}
             </div>
             {intel && (
-              <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', marginTop: '1px' }}>
+              <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', marginTop: '2px' }}>
                 {intel.platform} · {intel.category}
                 {intel.family && intel.family !== threatName ? ` · ${intel.family}` : ''}
               </div>
@@ -128,7 +129,7 @@ function ThreatIntelPanel({ threatName }) {
           {intel && (
             <span style={{
               fontSize: '0.55rem', fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: '0.05em', padding: '2px 7px', borderRadius: '4px',
+              letterSpacing: '0.05em', padding: '2px 6px', borderRadius: '3px',
               background: sev.bg, border: `1px solid ${sev.border}`, color: sev.text
             }}>
               {intel.severity}
@@ -137,9 +138,9 @@ function ThreatIntelPanel({ threatName }) {
           {detRate && (
             <span style={{
               fontSize: '0.6rem', fontWeight: 600, color: 'var(--text-secondary)',
-              background: 'var(--color-rgb-255-255-255-0-01)',
-              border: '1px solid var(--color-rgb-255-255-255-0-03)',
-              padding: '2px 7px', borderRadius: '4px'
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.05)',
+              padding: '2px 6px', borderRadius: '3px'
             }}>
               {detRate} detected
             </span>
@@ -159,7 +160,7 @@ function ThreatIntelPanel({ threatName }) {
           {loading && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.7rem', padding: '8px 0' }}>
               <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} />
-              Fetching VirusTotal intelligence…
+              Querying signature details…
             </div>
           )}
           {error && <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', padding: '4px 0' }}>{error}</div>}
@@ -169,18 +170,18 @@ function ThreatIntelPanel({ threatName }) {
               {/* 2×2 info grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px', marginTop: '8px' }}>
                 {[
-                  { label: 'Platform', value: intel.platform },
-                  { label: 'Category', value: intel.category },
-                  { label: 'Severity', value: intel.severity.toUpperCase(), color: sev?.text },
-                  { label: 'Detections', value: detCount || (intel.sourceMode === 'offline' ? 'Offline analysis' : 'N/A') },
+                  { label: 'Platform target', value: intel.platform },
+                  { label: 'Threat category', value: intel.category },
+                  { label: 'Severity rating', value: intel.severity.toUpperCase(), color: sev?.text },
+                  { label: 'Engine matches', value: detCount || (intel.sourceMode === 'offline' ? 'Signature Database' : 'N/A') },
                 ].map(({ label, value, color }) => (
                   <div key={label} style={{
-                    background: 'var(--color-rgb-255-255-255-0-01)',
-                    border: '1px solid var(--color-rgb-255-255-255-0-02)',
-                    borderRadius: '5px', padding: '7px 10px'
+                    background: 'rgba(255,255,255,0.01)',
+                    border: '1px solid rgba(255,255,255,0.02)',
+                    borderRadius: '4px', padding: '6px 8px'
                   }}>
-                    <div style={{ fontSize: '0.56rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 650, letterSpacing: '0.04em', marginBottom: '3px' }}>{label}</div>
-                    <div style={{ fontSize: '0.74rem', fontWeight: 600, color: color || 'var(--text-primary)' }}>{value}</div>
+                    <div style={{ fontSize: '0.54rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em', marginBottom: '2px' }}>{label}</div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: color || 'var(--text-primary)' }}>{value}</div>
                   </div>
                 ))}
               </div>
@@ -188,13 +189,13 @@ function ThreatIntelPanel({ threatName }) {
               {/* Tags */}
               {intel.tags && intel.tags.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', alignItems: 'center' }}>
-                  <Tag size={11} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                  <Tag size={10} color="var(--text-muted)" style={{ flexShrink: 0 }} />
                   {intel.tags.map(tag => (
                     <span key={tag} style={{
-                      fontSize: '0.58rem', fontWeight: 500,
-                      padding: '2px 8px', borderRadius: '4px',
-                      background: 'var(--color-rgb-255-255-255-0-01)',
-                      border: '1px solid var(--color-rgb-255-255-255-0-03)',
+                      fontSize: '0.56rem', fontWeight: 500,
+                      padding: '1px 6px', borderRadius: '3px',
+                      background: 'rgba(255,255,255,0.01)',
+                      border: '1px solid rgba(255,255,255,0.04)',
                       color: 'var(--text-secondary)'
                     }}>
                       {tag}
@@ -204,9 +205,9 @@ function ThreatIntelPanel({ threatName }) {
               )}
 
               {/* Source + VT link */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '8px', marginTop: '2px' }}>
                 <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)' }}>
-                  {intel.sourceMode === 'live' ? '🟢 Live VirusTotal data' : '🟡 Offline signature analysis'}
+                  {intel.sourceMode === 'live' ? 'Live VirusTotal lookup matching' : 'Local signature database lookup'}
                 </span>
                 <a
                   href={intel.vtLink}
@@ -216,10 +217,12 @@ function ThreatIntelPanel({ threatName }) {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '4px',
                     fontSize: '0.62rem', fontWeight: 600, color: '#60a5fa',
-                    textDecoration: 'none'
+                    textDecoration: 'none', transition: 'color 0.15s ease'
                   }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#93c5fd'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#60a5fa'; }}
                 >
-                  View on VirusTotal <ExternalLink size={10} />
+                  Verify on VirusTotal <ExternalLink size={10} />
                 </a>
               </div>
             </>
@@ -236,12 +239,13 @@ function InfectedFileRow({ item }) {
   const path = item?.path ?? item; // backwards compat plain strings
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <div style={{
-        fontFamily: 'monospace', fontSize: '0.64rem', color: '#ef4444',
-        background: 'rgba(239,68,68,0.05)', padding: '5px 8px',
-        borderRadius: '4px', display: 'flex', justifyContent: 'space-between',
-        alignItems: 'center', gap: '8px'
+        fontFamily: 'var(--font-mono, monospace)', fontSize: '0.64rem', color: '#ef4444',
+        background: 'rgba(239, 68, 68, 0.02)', padding: '6px 10px',
+        borderLeft: '2px solid var(--status-danger)',
+        borderRadius: '2px', display: 'flex', justifyContent: 'space-between',
+        alignItems: 'center', gap: '12px'
       }}>
         <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={path}>
           {path}
@@ -251,19 +255,23 @@ function InfectedFileRow({ item }) {
             type="button"
             onClick={() => setShowThreat(s => !s)}
             style={{
-              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+              background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.15)',
               color: '#ef4444', fontSize: '0.55rem', fontWeight: 700,
-              padding: '2px 7px', borderRadius: '3px', cursor: 'pointer',
+              padding: '2px 8px', borderRadius: '3px', cursor: 'pointer',
               flexShrink: 0, letterSpacing: '0.04em', textTransform: 'uppercase',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap', transition: 'all 0.15s ease'
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)'; }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'; }}
           >
-            {showThreat ? 'Hide Intel' : '🔍 Threat Intel'}
+            {showThreat ? 'Hide Intel' : 'Threat Intel'}
           </button>
         )}
       </div>
       {showThreat && item?.threatName && (
-        <ThreatIntelPanel threatName={item.threatName} />
+        <div style={{ paddingLeft: '8px' }}>
+          <ThreatIntelPanel threatName={item.threatName} />
+        </div>
       )}
     </div>
   );
@@ -277,7 +285,7 @@ function ScanCard({ scan }) {
   const [showInfectedList, setShowInfectedList] = useState(true);
 
   const statusColor = infected ? 'var(--status-danger)' : 'var(--status-healthy)';
-  const borderColor = infected ? 'var(--color-rgb-239-68-68-0-15)' : 'var(--border-color)';
+  const borderColor = infected ? 'rgba(239, 68, 68, 0.15)' : 'var(--border-color)';
   const StatusIcon = infected ? ShieldAlert : ShieldCheck;
   const statusLabel = infected ? 'Infected' : 'Clean';
 
@@ -299,9 +307,10 @@ function ScanCard({ scan }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            background: 'var(--color-rgb-255-255-255-0-01)',
-            border: '1px solid var(--color-rgb-255-255-255-0-02)',
-            borderRadius: 'var(--radius-sm)', padding: '8px', display: 'flex'
+            background: infected ? 'rgba(239, 68, 68, 0.03)' : 'rgba(16, 185, 129, 0.03)',
+            border: `1px solid ${infected ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)'}`,
+            borderRadius: 'var(--radius-sm)', padding: '8px', display: 'flex',
+            boxShadow: infected ? '0 0 12px rgba(239, 68, 68, 0.05)' : 'none'
           }}>
             <StatusIcon size={14} color={statusColor} />
           </div>
@@ -311,23 +320,36 @@ function ScanCard({ scan }) {
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-          <span style={{
-            background: 'var(--color-rgb-255-255-255-0-01)',
-            border: '1px solid var(--color-rgb-255-255-255-0-02)',
-            color: statusColor, fontSize: '0.62rem', fontWeight: 500,
-            padding: '2px 8px', borderRadius: '4px',
-            letterSpacing: '0.04em', textTransform: 'uppercase'
-          }}>
-            {statusLabel}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span className={infected ? "pulse-dot" : ""} style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: statusColor
+            }} />
+            <span style={{
+              color: statusColor, fontSize: '0.62rem', fontWeight: 600,
+              letterSpacing: '0.06em', textTransform: 'uppercase'
+            }}>
+              {statusLabel}
+            </span>
+          </div>
           <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
             <Clock size={10} /> {formatFriendlyDateTime(scan.timestamp)}
           </div>
         </div>
       </div>
 
-      {/* Metrics grid 3×2 */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+      {/* Metrics grid 2×3 */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '1px',
+        background: 'var(--border-color)',
+        borderRadius: 'var(--radius-sm)',
+        overflow: 'hidden',
+        border: '1px solid var(--border-color)'
+      }}>
         {[
           { label: 'Files Scanned', value: scannedNum.toLocaleString(), icon: File, color: 'var(--text-secondary)' },
           { label: 'Directories', value: scan.scannedDirectories || 'N/A', icon: Database, color: 'var(--color-hex-60a5fa)' },
@@ -337,22 +359,26 @@ function ScanCard({ scan }) {
           { label: 'Engine', value: scan.engineVersion ? `ClamAV v${scan.engineVersion}` : 'ClamAV', icon: Shield, color: 'var(--text-muted)' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} style={{
-            background: 'var(--color-rgb-255-255-255-0-01)',
-            border: '1px solid var(--color-rgb-255-255-255-0-02)',
-            borderRadius: 'var(--radius-sm)', padding: '10px 12px'
+            background: 'var(--bg-secondary)',
+            padding: '10px 12px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '3px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '2px' }}>
-              <Icon size={11} color={color} />
-              <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 650, letterSpacing: '0.04em' }}>{label}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Icon size={11} color={color} style={{ opacity: 0.8 }} />
+              <span style={{ fontSize: '0.56rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}>{label}</span>
             </div>
-            <div style={{ fontSize: '0.78rem', fontWeight: 500, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{value}</div>
+            <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={value}>
+              {value}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Scan window + Virus DB strip */}
       {(scan.startDate || scan.knownViruses) && (
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', borderTop: '1px solid var(--color-rgb-255-255-255-0-02)', paddingTop: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap', borderTop: '1px solid var(--color-rgb-255-255-255-0-02)', paddingTop: '10px' }}>
           {scan.knownViruses && (
             <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', display: 'flex', gap: '4px' }}>
               <span>Virus DB:</span>
@@ -371,7 +397,7 @@ function ScanCard({ scan }) {
       {/* Infected files — collapsible with per-threat VT intel */}
       {infected && scan.infectedFilesList && scan.infectedFilesList.length > 0 && (
         <div style={{
-          background: 'rgba(239,68,68,0.02)',
+          background: 'rgba(239,68,68,0.01)',
           border: '1px solid rgba(239,68,68,0.12)',
           borderRadius: 'var(--radius-sm)', overflow: 'hidden'
         }}>
@@ -379,25 +405,25 @@ function ScanCard({ scan }) {
             type="button"
             onClick={() => setShowInfectedList(!showInfectedList)}
             style={{
-              width: '100%', background: 'transparent', border: 'none',
-              padding: '8px 12px', display: 'flex', alignItems: 'center',
+              width: '100%', background: 'rgba(239, 68, 68, 0.02)', border: 'none',
+              borderBottom: showInfectedList ? '1px solid rgba(239, 68, 68, 0.08)' : 'none',
+              padding: '10px 12px', display: 'flex', alignItems: 'center',
               justifyContent: 'space-between', cursor: 'pointer',
               color: 'var(--status-danger)', fontSize: '0.65rem',
-              fontWeight: 600, textTransform: 'uppercase'
+              fontWeight: 600, textTransform: 'uppercase', transition: 'all 0.15s ease'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
               <AlertTriangle size={11} />
-              <span>{scan.infectedFiles} Infection{scan.infectedFiles !== 1 ? 's' : ''} — click 🔍 Threat Intel for VirusTotal analysis</span>
+              <span>{scan.infectedFiles} Infection{scan.infectedFiles !== 1 ? 's' : ''} Identified</span>
             </div>
             {showInfectedList ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
           </button>
 
           {showInfectedList && (
             <div style={{
-              padding: '0 12px 12px 12px',
-              display: 'flex', flexDirection: 'column', gap: '6px',
-              borderTop: '1px solid rgba(239,68,68,0.05)'
+              padding: '12px',
+              display: 'flex', flexDirection: 'column', gap: '8px'
             }}>
               {scan.infectedFilesList.slice(0, 10).map((item, idx) => (
                 <InfectedFileRow key={idx} item={item} />
@@ -415,7 +441,7 @@ function ScanCard({ scan }) {
   );
 }
 
-export default function AntivirusScansCard() {
+export default function AntivirusScansCard({ globalSearch = '' }) {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -442,11 +468,18 @@ export default function AntivirusScansCard() {
     return () => clearInterval(int);
   }, []);
 
-  const cleanCount    = scans.filter(s => s.infectedFiles === 0).length;
-  const infectedCount = scans.filter(s => s.infectedFiles > 0).length;
-  const totalFiles    = scans.reduce((acc, s) => acc + (parseInt(s.scannedFiles) || 0), 0);
-  const totalThreats  = scans.reduce((acc, s) => acc + (s.infectedFiles || 0), 0);
-  const lastScanAge   = scans.length > 0 ? formatRelativeAge(Math.max(...scans.map(s => s.timestamp))) : 'N/A';
+  const filteredScans = scans.filter(s => {
+    if (!globalSearch) return true;
+    const term = globalSearch.toLowerCase();
+    const name = getFriendlyName(s.host).toLowerCase();
+    return name.includes(term) || s.host.toLowerCase().includes(term);
+  });
+
+  const cleanCount    = filteredScans.filter(s => s.infectedFiles === 0).length;
+  const infectedCount = filteredScans.filter(s => s.infectedFiles > 0).length;
+  const totalFiles    = filteredScans.reduce((acc, s) => acc + (parseInt(s.scannedFiles) || 0), 0);
+  const totalThreats  = filteredScans.reduce((acc, s) => acc + (s.infectedFiles || 0), 0);
+  const lastScanAge   = filteredScans.length > 0 ? formatRelativeAge(Math.max(...filteredScans.map(s => s.timestamp))) : 'N/A';
   const isFleetSecure = totalThreats === 0;
 
   return (
@@ -530,7 +563,7 @@ export default function AntivirusScansCard() {
         {/* Fleet stats grid */}
         <div className="fleet-stats-grid" style={{ height: '100%', marginBottom: 0 }}>
           {[
-            { icon: Server,      label: 'Audited Nodes',  value: scans.length,                  color: 'var(--text-muted)',        sub: 'active client connections' },
+            { icon: Server,      label: 'Audited Nodes',  value: filteredScans.length,                  color: 'var(--text-muted)',        sub: 'active client connections' },
             { icon: ShieldCheck, label: 'Healthy Nodes',  value: cleanCount,                    color: 'var(--status-healthy)',    sub: 'reporting healthy audits' },
             { icon: ShieldAlert, label: 'Infected Nodes', value: infectedCount,                 color: infectedCount > 0 ? 'var(--status-danger)' : 'var(--text-muted)', sub: infectedCount > 0 ? `${totalThreats} total infections` : 'secure state' },
             { icon: File,        label: 'Files Scanned',  value: totalFiles.toLocaleString(),   color: 'var(--color-hex-60a5fa)', sub: `last check: ${lastScanAge}` },
@@ -554,11 +587,11 @@ export default function AntivirusScansCard() {
         <h4 style={{ fontSize: '0.72rem', fontWeight: 650, color: 'var(--text-secondary)', letterSpacing: '0.04em', textTransform: 'uppercase', margin: 0 }}>
           Server Scan Reports
         </h4>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '14px' }}>
-          {loading && scans.length === 0 && ([1, 2, 3, 4].map(i => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '20px' }}>
+          {loading && filteredScans.length === 0 && ([1, 2, 3, 4].map(i => (
             <div key={i} className="shimmer-card" style={{ height: '140px' }} />
           )))}
-          {!loading && scans.length === 0 && (
+          {!loading && filteredScans.length === 0 && (
             <div style={{
               gridColumn: '1 / -1', textAlign: 'center', padding: '40px',
               color: 'var(--text-muted)', fontSize: '0.74rem',
@@ -567,7 +600,7 @@ export default function AntivirusScansCard() {
               No active antivirus scan records detected.
             </div>
           )}
-          {scans.map((scan, i) => <ScanCard key={i} scan={scan} />)}
+          {filteredScans.map((scan, i) => <ScanCard key={i} scan={scan} />)}
         </div>
       </div>
 
@@ -576,6 +609,13 @@ export default function AntivirusScansCard() {
         @keyframes spin { 100% { transform: rotate(360deg); } }
         @media (max-width: 768px) {
           .antivirus-hero-container { grid-template-columns: 1fr !important; }
+        }
+        .pulse-dot {
+          animation: pulse-dot-anim 2s infinite;
+        }
+        @keyframes pulse-dot-anim {
+          0%, 100% { opacity: 0.45; }
+          50% { opacity: 1; }
         }
       `}</style>
     </div>

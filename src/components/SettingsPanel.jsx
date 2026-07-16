@@ -14,11 +14,13 @@ export default function SettingsPanel() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '30px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>System Configurations</h2>
-          <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>Configure telemetry thresholds, email forwarding dispatches, and SRE rules.</p>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', paddingBottom: '30px', animation: 'fadeIn 0.4s ease' }}>
+      {/* Page Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>System</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Configurations</h2>
         </div>
       </div>
 

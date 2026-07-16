@@ -21,24 +21,24 @@ const METRICS = [
   {
     id: 'cpu', label: 'CPU Usage', unit: '%', icon: Cpu,
     color: 'var(--status-healthy)',
-    desc: 'Processor load across all cores',
+    desc: 'Processor load across all active servers',
     thresh: 85,
   },
   {
-    id: 'mem', label: 'Memory', unit: '%', icon: Activity,
+    id: 'mem', label: 'Memory Usage', unit: '%', icon: Activity,
     color: '#a78bfa',
-    desc: 'RAM utilisation',
+    desc: 'RAM utilisation across fleet',
     thresh: 90,
   },
   {
     id: 'disk', label: 'Disk Usage', unit: '%', icon: HardDrive,
-    color: 'var(--status-warning)',
+    color: '#38bdf8',
     desc: 'Root filesystem consumption',
     thresh: 90,
   },
   {
     id: 'netRecv', label: 'Network In', unit: 'B/s', icon: Wifi,
-    color: '#38bdf8',
+    color: '#f59e0b',
     desc: 'Inbound bandwidth per server',
     thresh: null,
   },
@@ -47,8 +47,8 @@ const METRICS = [
 const SERVER_COLORS = {
   'Oracle database server': 'var(--status-healthy)',
   'Orbithyre':              '#a78bfa',
-  'Gaplytiq':               'var(--status-warning)',
-  'Dalai':                  '#38bdf8',
+  'Gaplytiq':               '#38bdf8',
+  'Dalai':                  '#f59e0b',
 };
 
 function fmtBytes(v) {
@@ -64,7 +64,7 @@ function fmtVal(v, unit) {
   return `${parseFloat(v).toFixed(1)}${unit}`;
 }
 
-// ── Build per-metric chartData (all hosts merged into single timeline) ────────
+// ── Build per-metric chartData ───────────────────────────────────────────────
 function buildChartData(rawSeries, timeRange, serverFilter) {
   const timeMap = {};
   const hostsSet = new Set();
@@ -102,7 +102,7 @@ function computeStats(chartData, hosts) {
     const peak = Math.max(...vals);
     const last = vals[vals.length - 1];
     const first = vals[0];
-    const trend = last - first; // positive = rising
+    const trend = last - first;
     return [host, { avg, peak, last, trend }];
   }));
 }
@@ -112,20 +112,24 @@ function CustomTooltip({ active, payload, label, unit }) {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border-color)',
+      background: '#09090b',
+      border: '1px solid rgba(255,255,255,0.05)',
       borderRadius: 'var(--radius-sm)',
       padding: '8px 12px',
-      minWidth: '160px',
+      boxShadow: '0 10px 30px -10px rgba(0,0,0,0.7)',
+      minWidth: '150px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px'
     }}>
-      <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '6px', fontWeight: 600 }}>{label}</div>
+      <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 500 }}>{label}</div>
       {payload.map(p => (
-        <div key={p.dataKey} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '2px' }}>
+        <div key={p.dataKey} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: p.color }} />
-            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{p.dataKey}</span>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: p.color, display: 'inline-block' }} />
+            <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>{p.dataKey}</span>
           </div>
-          <span style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-primary)' }}>{fmtVal(p.value, unit)}</span>
+          <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-primary)' }}>{fmtVal(p.value, unit)}</span>
         </div>
       ))}
     </div>
@@ -140,11 +144,9 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
   );
 
   const stats = useMemo(() => computeStats(chartData, hosts), [chartData, hosts]);
-
   const Icon = metric.icon;
   const isEmpty = chartData.length === 0;
 
-  // Fleet-level averages for the stat strip
   const fleetLast = hosts.length > 0
     ? hosts.reduce((acc, h) => acc + (stats[h]?.last || 0), 0) / hosts.filter(h => stats[h]).length
     : null;
@@ -156,98 +158,90 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
     : 0;
 
   const isCritical = metric.thresh && fleetLast > metric.thresh;
-  const borderAccent = isCritical ? 'rgba(239, 68, 68, 0.2)' : 'var(--border-color)';
 
   return (
     <div style={{
-      background: 'var(--bg-card)',
-      border: `1px solid ${borderAccent}`,
-      borderRadius: 'var(--radius-lg)',
-      padding: '16px',
+      background: 'rgba(255,255,255,0.005)',
+      border: isCritical ? '1px solid rgba(239, 68, 68, 0.15)' : '1px solid rgba(255,255,255,0.03)',
+      borderRadius: 'var(--radius-md)',
+      padding: '20px 24px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '14px',
-      position: 'relative',
-      overflow: 'hidden',
+      gap: '16px',
+      position: 'relative'
     }}>
       {/* Header row */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px' }}>
-            <Icon size={14} color="var(--text-secondary)" />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ color: 'var(--text-secondary)' }}>
+            <Icon size={14} />
           </div>
           <div>
-            <div style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-primary)' }}>{metric.label}</div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>{metric.desc}</div>
+            <div style={{ fontWeight: 500, fontSize: '0.82rem', color: 'var(--text-primary)' }}>{metric.label}</div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{metric.desc}</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isCritical && (
-            <div style={{ background: 'rgba(239,68,68,0.05)', color: 'var(--status-danger)', fontSize: '0.62rem', fontWeight: 650, padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.2)' }}>
-              OVER THRESHOLD
-            </div>
+            <span style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--status-danger)', fontSize: '0.6rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+              Warning Thresh
+            </span>
           )}
-          <button onClick={onExpand} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', borderRadius: '4px', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          <button onClick={onExpand} style={panelBtnStyle} aria-label="Toggle Expand">
             {isExpanded ? <X size={12} /> : <Maximize2 size={12} />}
           </button>
         </div>
       </div>
 
-      {/* Fleet-level stat strip */}
+      {/* Fleet-level stats row */}
       {fleetLast != null && (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
           {[
-            { label: 'Current Avg', value: fmtVal(fleetLast, metric.unit), color: 'var(--text-primary)' },
-            { label: 'Peak', value: fmtVal(fleetPeak, metric.unit), color: 'var(--text-secondary)' },
+            { label: 'Current Avg', value: fmtVal(fleetLast, metric.unit) },
+            { label: 'Fleet Peak', value: fmtVal(fleetPeak, metric.unit) },
             {
-              label: 'Trend',
+              label: 'Fleet Trend',
               value: (
                 <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: fleetTrend > 0.5 ? 'var(--status-danger)' : fleetTrend < -0.5 ? 'var(--status-healthy)' : 'var(--text-muted)' }}>
                   {fleetTrend > 0.5 ? <TrendingUp size={11} /> : fleetTrend < -0.5 ? <TrendingDown size={11} /> : <Minus size={11} />}
                   {fleetTrend > 0 ? '+' : ''}{fmtVal(fleetTrend, metric.unit)}
                 </span>
-              ),
-              color: 'var(--text-secondary)',
+              )
             },
-          ].map(({ label, value, color }) => (
-            <div key={label} style={{ flex: 1, background: 'rgba(255,255,255,0.01)', borderRadius: 'var(--radius-sm)', padding: '6px 8px', border: '1px solid var(--border-color)' }}>
-              <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.04em', marginBottom: '2px' }}>{label}</div>
-              <div style={{ fontSize: '0.78rem', fontWeight: 600, color }}>{value}</div>
+          ].map(({ label, value }) => (
+            <div key={label} style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.003)' }}>
+              <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 650, letterSpacing: '0.04em' }}>{label}</div>
+              <div style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-secondary)', marginTop: '2px' }}>{value}</div>
             </div>
           ))}
         </div>
       )}
 
       {/* Chart */}
-      <div style={{ height: isExpanded ? 340 : 160, position: 'relative' }}>
+      <div style={{ height: isExpanded ? 340 : 180, position: 'relative' }}>
         {isEmpty ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
-            No data for selected range
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+            No telemetry data found for range
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
-              <CartesianGrid strokeDasharray="1 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
-              <XAxis
-                dataKey="time" tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
-                tickLine={false} axisLine={false} tickMargin={8}
-                interval="preserveStartEnd"
-              />
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: -25 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
+              <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
               <YAxis
-                tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
-                tickLine={false} axisLine={false} tickMargin={4} width={40}
+                stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false}
                 tickFormatter={v => metric.unit === 'B/s' ? fmtBytes(v) : `${v}${metric.unit}`}
               />
-              <Tooltip content={<CustomTooltip unit={metric.unit} />} />
+              <Tooltip content={<CustomTooltip unit={metric.unit} />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
               {metric.thresh && (
-                <ReferenceLine y={metric.thresh} stroke="rgba(239,68,68,0.3)" strokeDasharray="3 3" strokeWidth={1} />
+                <ReferenceLine y={metric.thresh} stroke="rgba(239,68,68,0.2)" strokeDasharray="3 3" />
               )}
               {hosts.map(host => {
                 const c = SERVER_COLORS[host] || metric.color;
                 return (
                   <Area
-                    key={host} type="monotoneX" dataKey={host}
-                    stroke={c} strokeWidth={1.5}
+                    key={host} type="monotone" dataKey={host}
+                    stroke={c} strokeWidth={1.2}
                     fill="none"
                     dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: c }}
                   />
@@ -258,17 +252,17 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
         )}
       </div>
 
-      {/* Per-server current values */}
+      {/* Per-server current values pills */}
       {hosts.length > 0 && (
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.015)', paddingTop: '12px' }}>
           {hosts.map(host => {
             const s = stats[host];
             const c = SERVER_COLORS[host] || metric.color;
             if (!s) return null;
             return (
-              <div key={host} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.01)', borderRadius: '4px', padding: '3px 6px', border: '1px solid var(--border-color)' }}>
-                <div style={{ width: 5, height: 5, borderRadius: '50%', background: c, flexShrink: 0 }} />
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{host}</span>
+              <div key={host} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '4px 8px' }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: c }} />
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>{host}:</span>
                 <span style={{ fontSize: '0.68rem', fontWeight: 600, color: metric.thresh && s.last > metric.thresh ? 'var(--status-danger)' : 'var(--text-primary)' }}>
                   {fmtVal(s.last, metric.unit)}
                 </span>
@@ -309,23 +303,27 @@ export default function GraphsView() {
   const visibleMetrics = expandedMetric ? METRICS.filter(m => m.id === expandedMetric) : METRICS;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: '100%', paddingBottom: '20px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.4s ease' }}>
 
-      {/* ── Header ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <h2 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-            <Activity size={18} color="var(--text-secondary)" /> Telemetry Analytics
+      {/* ── Header Row ── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Infrastructure</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            Telemetry Analytics
           </h2>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-            {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : 'Loading…'}
-            {' · Auto-refreshes every 60s'}
-          </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-          {/* Time range pill buttons */}
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {lastUpdated && (
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
+          )}
+
+          {/* Time range picker */}
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
             {TIME_RANGES.map(t => (
               <button
                 key={t.id}
@@ -336,9 +334,9 @@ export default function GraphsView() {
                   color: timeRange === t.id ? 'var(--bg-primary)' : 'var(--text-secondary)',
                   padding: '5px 12px', 
                   cursor: 'pointer', 
-                  fontSize: '0.72rem', 
-                  fontWeight: 600,
-                  transition: 'all 0.15s',
+                  fontSize: '0.7rem', 
+                  fontWeight: 500,
+                  transition: 'all 0.15s ease',
                 }}
               >
                 {t.label}
@@ -350,7 +348,7 @@ export default function GraphsView() {
           <select
             value={serverFilter}
             onChange={e => setServerFilter(e.target.value)}
-            style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '5px 10px', borderRadius: '4px', outline: 'none', cursor: 'pointer', fontSize: '0.74rem' }}
+            style={selectFilterStyle}
           >
             <option value="all">All Servers</option>
             {SERVERS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -358,67 +356,51 @@ export default function GraphsView() {
 
           <button
             onClick={load}
-            style={{ background: 'var(--text-primary)', border: 'none', color: 'var(--bg-primary)', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '0.72rem' }}
+            style={refreshBtnStyle}
+            disabled={loading}
           >
-            <RefreshCw size={12} className={loading ? 'spin' : ''} /> Refresh
+            <RefreshCw size={12} className={loading ? 'spin-animation' : ''} />
+            Refresh
           </button>
         </div>
       </div>
 
-      {/* ── Server color legend ── */}
-      <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+      {/* ── Server Color Legend row ── */}
+      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
         {SERVERS.map(s => (
-          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: SERVER_COLORS[s] }} />
+          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: SERVER_COLORS[s], display: 'inline-block' }} />
             <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{s}</span>
           </div>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ width: 20, height: 1, borderTop: '1px dashed rgba(239,68,68,0.5)' }} />
-          <span style={{ fontSize: '0.68rem', color: 'rgba(239,68,68,0.7)' }}>Alert threshold</span>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ width: 16, height: 1, borderTop: '1px dashed rgba(239,68,68,0.4)' }} />
+          <span style={{ fontSize: '0.68rem', color: 'rgba(239,68,68,0.6)' }}>Alert threshold</span>
         </div>
       </div>
 
-      {/* ── Metric grid ── */}
-      {loading && !data && (
+      {/* ── Metric Grid ── */}
+      {loading && !data ? (
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '16px',
-          flex: 1,
-          minHeight: 0,
+          gap: '16px'
         }}>
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="shimmer-card" style={{ height: '300px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', gap: '8px', width: '50%' }}>
-                  <div className="shimmer-bar" style={{ width: '28px', height: '28px' }} />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    <div className="shimmer-bar" style={{ width: '80%', height: '12px' }} />
-                    <div className="shimmer-bar" style={{ width: '40%', height: '8px' }} />
-                  </div>
-                </div>
-                <div className="shimmer-bar" style={{ width: '40px', height: '20px' }} />
-              </div>
-              <div className="shimmer-bar" style={{ flex: 1, width: '100%', borderRadius: 'var(--radius-md)' }} />
-            </div>
+            <div key={i} className="shimmer-card" style={{ height: '300px' }} />
           ))}
         </div>
-      )}
-
-      {data && (
+      ) : (
         <div style={{
           display: 'grid',
           gridTemplateColumns: expandedMetric ? '1fr' : 'repeat(2, 1fr)',
-          gap: '16px',
-          flex: 1,
-          minHeight: 0,
+          gap: '20px'
         }}>
           {visibleMetrics.map(metric => (
             <MetricPanel
               key={metric.id}
               metric={metric}
-              rawSeries={data[metric.id] || []}
+              rawSeries={data?.[metric.id] || []}
               timeRange={timeRange}
               serverFilter={serverFilter}
               isExpanded={!!expandedMetric}
@@ -427,12 +409,48 @@ export default function GraphsView() {
           ))}
         </div>
       )}
-
-      <style>{`
-        .spin { animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        button:hover { opacity: 0.9; }
-      `}</style>
     </div>
   );
 }
+
+// ── Inline Styles ─────────────────────────────────────────────────────────────
+const panelBtnStyle = {
+  background: 'rgba(255,255,255,0.01)',
+  border: '1px solid rgba(255,255,255,0.03)',
+  color: 'var(--text-secondary)',
+  borderRadius: 'var(--radius-sm)',
+  padding: '5px',
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.2s ease'
+};
+
+const selectFilterStyle = {
+  background: 'rgba(255,255,255,0.02)',
+  border: '1px solid rgba(255,255,255,0.03)',
+  color: 'var(--text-primary)',
+  padding: '6px 12px',
+  borderRadius: 'var(--radius-sm)',
+  outline: 'none',
+  cursor: 'pointer',
+  fontSize: '0.72rem',
+  fontWeight: 500
+};
+
+const refreshBtnStyle = {
+  background: 'rgba(255,255,255,0.02)',
+  border: '1px solid rgba(255,255,255,0.03)',
+  color: 'var(--text-secondary)',
+  padding: '6px 12px',
+  borderRadius: 'var(--radius-sm)',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '6px',
+  fontSize: '0.72rem',
+  fontWeight: 500,
+  transition: 'all 0.2s ease'
+};
+

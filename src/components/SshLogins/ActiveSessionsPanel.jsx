@@ -40,13 +40,13 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
     .slice(0, 3);
 
   return (
-    <div className="ssh-sidebar custom-scrollbar" style={{ width: '300px', display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto', maxHeight: '100%' }}>
+    <div className="ssh-sidebar custom-scrollbar" style={{ width: '300px', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto', maxHeight: '100%' }}>
       
       {/* Top Attacking Countries */}
       {topCountries.length > 0 && (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
-            <Activity size={12} color="var(--text-secondary)" />
+        <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
+            <Activity size={12} color="var(--text-muted)" />
             Top Attacking Countries
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -66,8 +66,8 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       )}
 
       {/* Top Targeted Accounts */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
           <User size={12} color="var(--status-danger)" />
           Top Targeted Accounts
         </div>
@@ -75,7 +75,7 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
           {topAccounts.map(([acc, hits]) => (
             <div key={acc} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{acc}</span>
-              <span style={{ fontSize: '0.74rem', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '0.58rem' }}>hits</span></span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '0.58rem', fontWeight: 400, color: 'var(--text-muted)' }}>hits</span></span>
             </div>
           ))}
           {topAccounts.length === 0 && <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>No failed logins.</span>}
@@ -83,8 +83,8 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       </div>
 
       {/* Top Attacker IPs */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
           <AlertTriangle size={12} color="var(--status-danger)" />
           Top Attacker IPs
         </div>
@@ -102,7 +102,7 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
                     </div>
                   )}
                 </div>
-                <span style={{ fontSize: '0.74rem', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '0.58rem' }}>hits</span></span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '0.58rem', fontWeight: 400, color: 'var(--text-muted)' }}>hits</span></span>
               </div>
             );
           })}
@@ -111,13 +111,13 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       </div>
 
       {/* Active Sessions */}
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
+      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
             <ShieldCheck size={12} color="var(--status-healthy)" />
             Active Sessions
           </div>
-          <span style={{ background: 'rgba(16,185,129,0.05)', color: 'var(--status-healthy)', border: '1px solid rgba(16,185,129,0.2)', padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', fontWeight: 600 }}>
+          <span style={{ background: 'rgba(16,185,129,0.04)', color: 'var(--status-healthy)', border: '1px solid rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', fontWeight: 600 }}>
             {activeSessions.length}
           </span>
         </div>

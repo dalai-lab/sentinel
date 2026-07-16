@@ -14,12 +14,14 @@ import OverviewScansWidget from '../components/OverviewScansWidget';
 import AlertCenterWidget from '../components/AlertCenterWidget';
 import GraphsView from '../components/GraphsView';
 import ThreatMapView from '../components/ThreatMapView';
+import ServerDetailView from '../components/ServerDetailView';
 import { fetchServerMetrics } from '../api/signoz';
 import { fetchAlerts } from '../api/alerts';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedServerName, setSelectedServerName] = useState(null);
   const [globalSearch, setGlobalSearch] = useState('');
   const [servers, setServers] = useState([
     { id: 1, name: 'Oracle database server', ip: '80.225.241.81', cpu: 0, ram: 0, status: 'connecting' }
@@ -223,7 +225,10 @@ export default function Dashboard() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setSelectedServerName(null);
+          setActiveTab(tab);
+        }}
       />
 
       <main className="main-content">
@@ -234,7 +239,14 @@ export default function Dashboard() {
         />
 
         {/* Dynamic Views Router */}
-        {activeTab === 'overview' && (
+        {selectedServerName ? (
+          <ServerDetailView
+            serverName={selectedServerName}
+            onBack={() => setSelectedServerName(null)}
+          />
+        ) : (
+          <>
+            {activeTab === 'overview' && (
           <>
             <div style={{ marginBottom: '20px' }}>
               <h1 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '4px', color: 'var(--text-primary)' }}>Infrastructure Overview</h1>
@@ -306,53 +318,49 @@ export default function Dashboard() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   
                   {/* ── Fleet stat tiles ── */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                  {/* Fleet Stats Strip in Premium Design Language */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.03)', marginBottom: '0px' }}>
                     {[
                       {
                         label: 'Servers Online', 
                         value: `${onlineServersCount}`, 
                         sub: `of ${totalServersCount} nodes`,
-                        icon: Server, color: 'var(--text-primary)',
+                        icon: Server, 
+                        color: onlineServersCount > 0 ? 'var(--status-healthy)' : 'var(--text-muted)'
                       },
                       {
                         label: 'Fleet Avg CPU', 
                         value: `${avgCpu}%`, 
-                        sub: 'across all servers',
-                        icon: Cpu, color: 'var(--text-primary)',
+                        sub: 'across all active nodes',
+                        icon: Cpu, 
+                        color: 'var(--text-muted)'
                       },
                       {
                         label: 'Active Threats', 
                         value: activeAlertsCount, 
                         sub: activeAlertsCount > 0 ? 'requires attention' : 'all clear',
                         icon: ShieldAlert, 
-                        color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)',
+                        color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-muted)'
                       },
                       {
                         label: 'Platform State', 
-                        value: activeAlertsCount > 0 ? 'DEGRADED' : 'NOMINAL', 
-                        sub: 'overall health',
+                        value: activeAlertsCount > 0 ? 'Degraded' : 'Nominal', 
+                        sub: 'overall fleet state',
                         icon: CheckCircle,
-                        color: activeAlertsCount > 0 ? 'var(--status-warning)' : 'var(--status-healthy)',
-                      },
+                        color: activeAlertsCount > 0 ? 'var(--status-warning)' : 'var(--status-healthy)'
+                      }
                     ].map(({ label, value, sub, icon: Icon, color }) => (
-                      <div key={label} style={{
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: 'var(--radius-md)',
-                        padding: '16px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        minHeight: '110px'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</span>
-                          <Icon size={14} color={color} style={{ opacity: 0.8 }} />
+                      <div key={label} style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{label}</span>
+                          <Icon size={14} color={color} />
                         </div>
-                        <div>
-                          <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2, marginBottom: '2px', letterSpacing: '-0.01em' }}>{value}</div>
-                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                          <span style={{ fontSize: '1.75rem', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+                            {value}
+                          </span>
                         </div>
+                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</span>
                       </div>
                     ))}
                   </div>
@@ -360,7 +368,7 @@ export default function Dashboard() {
                   {/* Server Telemetry Cards Container */}
                   <div className="servers-container">
                     {filteredServers.map(server => (
-                      <ServerCard key={server.id} {...server} />
+                      <ServerCard key={server.id} {...server} onClick={() => setSelectedServerName(server.name)} />
                     ))}
                   </div>
 
@@ -377,24 +385,25 @@ export default function Dashboard() {
                     <AlertCenterWidget />
                     <OverviewScansWidget />
                   </div>
-
               </div>
             )}
+            </>
+          )}
+
+            {activeTab === 'graphs' && <GraphsView />}
+            {activeTab === 'threatmap' && <ThreatMapView />}
+
+            {activeTab === 'servers' && <ServerList servers={filteredServers} onSelectServer={setSelectedServerName} />}
+
+            {activeTab === 'logs' && <LogConsole />}
+
+            {activeTab === 'ssh' && <SshLoginsCard topThreat={aiCopilotData.top_threat} />}
+            
+            {activeTab === 'scans' && <AntivirusScansCard />}
+
+            {activeTab === 'settings' && <SettingsPanel />}
           </>
         )}
-
-        {activeTab === 'graphs' && <GraphsView />}
-        {activeTab === 'threatmap' && <ThreatMapView />}
-
-        {activeTab === 'servers' && <ServerList servers={filteredServers} />}
-
-        {activeTab === 'logs' && <LogConsole />}
-
-        {activeTab === 'ssh' && <SshLoginsCard topThreat={aiCopilotData.top_threat} />}
-        
-        {activeTab === 'scans' && <AntivirusScansCard />}
-
-        {activeTab === 'settings' && <SettingsPanel />}
       </main>
 
       <style>{`

@@ -140,30 +140,30 @@ export default function EmailSettings() {
 
   if (loading || !settings) {
     return (
-      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '24px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem' }}>
-        <RefreshCw size={14} className="spin" /> Loading email alert configurations...
+      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '24px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem' }}>
+        <RefreshCw size={12} className="spin" /> Loading email alert configurations...
       </div>
     );
   }
 
   return (
     <div style={{
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border-color)',
-      borderRadius: 'var(--radius-lg)',
-      padding: '20px',
+      background: 'rgba(255,255,255,0.005)',
+      border: '1px solid rgba(255,255,255,0.03)',
+      borderRadius: 'var(--radius-md)',
+      padding: '20px 24px',
       display: 'flex',
       flexDirection: 'column',
       gap: '20px'
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
-              <Mail size={14} color="var(--text-secondary)" />
+            <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+              <Mail size={14} color="var(--text-muted)" />
             </div>
-            <h3 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>Email Notifications</h3>
+            <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-primary)' }}>Email Notifications</h3>
           </div>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.74rem' }}>
             Assign email recipients to receive alert reports, security notifications, and incident dispatches.
@@ -176,10 +176,10 @@ export default function EmailSettings() {
             onClick={handleToggleMasterEnable}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: settings.enabled ? 'rgba(16,185,129,0.05)' : 'rgba(255,255,255,0.01)',
-              border: `1px solid ${settings.enabled ? 'rgba(16,185,129,0.2)' : 'var(--border-color)'}`,
+              background: settings.enabled ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.015)',
+              border: `1px solid ${settings.enabled ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)'}`,
               color: settings.enabled ? 'var(--status-healthy)' : 'var(--text-muted)',
-              padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600
+              padding: '4px 10px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 500
             }}
           >
             {settings.enabled ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
@@ -193,12 +193,12 @@ export default function EmailSettings() {
             title="Send all current active alerts to all configured recipients"
             style={{
               display: 'flex', alignItems: 'center', gap: '5px',
-              background: activeAlertCount > 0 ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.01)',
-              border: `1px solid ${activeAlertCount > 0 ? 'rgba(239,68,68,0.25)' : 'var(--border-color)'}`,
+              background: activeAlertCount > 0 ? 'rgba(239,68,68,0.04)' : 'rgba(255,255,255,0.015)',
+              border: `1px solid ${activeAlertCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.03)'}`,
               color: activeAlertCount > 0 ? 'var(--status-danger)' : 'var(--text-muted)',
-              padding: '5px 12px', borderRadius: '4px',
+              padding: '5px 12px', borderRadius: 'var(--radius-sm)',
               cursor: (sendingActive || !settings.enabled) ? 'default' : 'pointer',
-              fontSize: '0.72rem', fontWeight: 600,
+              fontSize: '0.72rem', fontWeight: 500,
               opacity: (sendingActive || !settings.enabled) ? 0.5 : 1
             }}
           >
@@ -213,8 +213,8 @@ export default function EmailSettings() {
             style={{
               display: 'flex', alignItems: 'center', gap: '4px',
               background: 'var(--text-primary)', border: 'none', color: 'var(--bg-primary)',
-              padding: '5px 12px', borderRadius: '4px', cursor: testing ? 'default' : 'pointer',
-              fontSize: '0.72rem', fontWeight: 600, opacity: (testing || !settings.enabled) ? 0.5 : 1
+              padding: '5px 12px', borderRadius: 'var(--radius-sm)', cursor: testing ? 'default' : 'pointer',
+              fontSize: '0.72rem', fontWeight: 500, opacity: (testing || !settings.enabled) ? 0.5 : 1
             }}
           >
             <Send size={11} />
@@ -226,7 +226,7 @@ export default function EmailSettings() {
       {/* Connection Info Banner */}
       <div style={{
         background: 'rgba(255,255,255,0.01)',
-        border: '1px solid var(--border-color)',
+        border: '1px solid rgba(255,255,255,0.02)',
         borderRadius: 'var(--radius-sm)',
         padding: '10px 14px',
         display: 'flex',
@@ -240,26 +240,26 @@ export default function EmailSettings() {
           <span style={{ color: 'var(--text-muted)' }}>•</span>
           <span><strong>From Email:</strong> info@orbithyre.com</span>
         </div>
-        <span style={{ color: 'var(--status-healthy)', fontWeight: 600, fontSize: '0.65rem', background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)', padding: '1px 6px', borderRadius: '3px' }}>
+        <span style={{ color: 'var(--status-healthy)', fontWeight: 500, fontSize: '0.65rem', background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '3px' }}>
           ✓ Connected
         </span>
       </div>
 
       {/* Notifications Feedback */}
       {testSuccess && (
-        <div style={{ background: 'rgba(16,185,129,0.05)', border: '1px solid rgba(16,185,129,0.2)', color: 'var(--status-healthy)', padding: '8px 12px', borderRadius: '4px', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', color: 'var(--status-healthy)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Check size={14} /> {testSuccess}
         </div>
       )}
       {errorMsg && (
-        <div style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--status-danger)', padding: '8px 12px', borderRadius: '4px', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)', color: 'var(--status-danger)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <AlertCircle size={14} /> {errorMsg}
         </div>
       )}
 
       {/* Add Recipient Form */}
       <form onSubmit={handleAddRecipient} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1', minWidth: '160px', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0 8px' }}>
+        <div style={{ flex: '1', minWidth: '160px', background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
           <input
             type="text"
             placeholder="Recipient Name (e.g. Sales Desk)"
@@ -268,7 +268,7 @@ export default function EmailSettings() {
             style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', padding: '6px 4px', width: '100%', outline: 'none', fontSize: '0.74rem' }}
           />
         </div>
-        <div style={{ flex: '1.5', minWidth: '220px', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0 8px' }}>
+        <div style={{ flex: '1.5', minWidth: '220px', background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
           <input
             type="email"
             placeholder="Email Address (e.g. sales@orbithyre.com)"
@@ -281,8 +281,8 @@ export default function EmailSettings() {
         <button
           type="submit"
           style={{
-            background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
-            padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px'
+            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', color: 'var(--text-primary)',
+            padding: '6px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px'
           }}
         >
           <Plus size={12} /> Add Recipient
@@ -296,24 +296,24 @@ export default function EmailSettings() {
         </div>
 
         {(!settings.recipients || settings.recipients.length === 0) ? (
-          <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.74rem', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
+          <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.74rem', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)' }}>
             No recipients configured. Add email addresses above to begin receiving alert dispatches.
           </div>
         ) : (
-          <div style={{ border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
             {settings.recipients.map((rcp, idx) => (
               <div
                 key={rcp.id || idx}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '8px 12px', borderBottom: idx < settings.recipients.length - 1 ? '1px solid var(--border-color)' : 'none',
-                  background: rcp.active ? 'transparent' : 'rgba(255,255,255,0.01)', opacity: rcp.active ? 1 : 0.6
+                  padding: '8px 12px', borderBottom: idx < settings.recipients.length - 1 ? '1px solid rgba(255,255,255,0.015)' : 'none',
+                  background: rcp.active ? 'transparent' : 'rgba(255,255,255,0.005)', opacity: rcp.active ? 1 : 0.6
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Mail size={12} color={rcp.active ? 'var(--status-healthy)' : 'var(--text-muted)'} />
                   <div>
-                    <span style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-primary)', marginRight: '6px' }}>{rcp.name}</span>
+                    <span style={{ fontSize: '0.74rem', fontWeight: 500, color: 'var(--text-primary)', marginRight: '6px' }}>{rcp.name}</span>
                     <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>&lt;{rcp.email}&gt;</span>
                   </div>
                 </div>
@@ -322,7 +322,7 @@ export default function EmailSettings() {
                   <button
                     type="button"
                     onClick={() => handleSendTest(rcp.email)}
-                    style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', padding: '2px 8px', borderRadius: '3px', fontSize: '0.65rem', cursor: 'pointer' }}
+                    style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', color: 'var(--text-secondary)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.65rem', cursor: 'pointer' }}
                     title="Send test to this address"
                   >
                     Test Mail
@@ -332,10 +332,10 @@ export default function EmailSettings() {
                     type="button"
                     onClick={() => handleToggle(rcp.id)}
                     style={{
-                      background: rcp.active ? 'rgba(16,185,129,0.05)' : 'rgba(255,255,255,0.01)',
-                      border: `1px solid ${rcp.active ? 'rgba(16,185,129,0.2)' : 'var(--border-color)'}`,
+                      background: rcp.active ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.015)',
+                      border: `1px solid ${rcp.active ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)'}`,
                       color: rcp.active ? 'var(--status-healthy)' : 'var(--text-muted)',
-                      padding: '2px 6px', borderRadius: '3px', fontSize: '0.62rem', fontWeight: 600, cursor: 'pointer'
+                      padding: '2px 6px', borderRadius: 'var(--radius-sm)', fontSize: '0.62rem', fontWeight: 500, cursor: 'pointer'
                     }}
                   >
                     {rcp.active ? 'Active' : 'Paused'}
@@ -357,7 +357,7 @@ export default function EmailSettings() {
       </div>
 
       {/* Severity Trigger Selection */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '14px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '14px' }}>
         <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Alert Severity Dispatch Triggers
         </div>
@@ -375,7 +375,7 @@ export default function EmailSettings() {
                 onChange={e => handleSeverityChange(sev.key, e.target.checked)}
                 style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
               />
-              <span style={{ fontWeight: settings.severities?.[sev.key] ? 600 : 400 }}>{sev.label}</span>
+              <span style={{ fontWeight: settings.severities?.[sev.key] ? 500 : 400 }}>{sev.label}</span>
             </label>
           ))}
         </div>

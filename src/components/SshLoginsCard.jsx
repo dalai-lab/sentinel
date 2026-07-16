@@ -116,16 +116,16 @@ export default function SshLoginsCard({ topThreat }) {
       </div>
     );
   }
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)', padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', animation: 'fadeIn 0.4s ease' }}>
       
-      {/* Header & Filters */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
-          <User size={14} color="var(--text-secondary)" />
+      {/* Page Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Security</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>SSH Access Logs</h2>
         </div>
-        <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>Access Logs Feed</h3>
       </div>
       
       <LogFilters 
@@ -139,7 +139,7 @@ export default function SshLoginsCard({ topThreat }) {
       <div style={{ display: 'flex', gap: '20px', flex: 1, overflow: 'hidden' }}>
         
         {/* Main Event Feed */}
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.15)' }} className="custom-scrollbar">
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)', background: 'rgba(255,255,255,0.005)' }} className="custom-scrollbar">
           {filteredEvents.slice(0, visibleCount).map((event, idx) => (
             <SshEventRow 
               key={`${event.rawTs}-${idx}`} 
@@ -151,7 +151,7 @@ export default function SshLoginsCard({ topThreat }) {
 
           {/* Empty State */}
           {filteredEvents.length === 0 && (
-            <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)' }}>
+            <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.74rem' }}>
               No logs match the current filters.
             </div>
           )}
@@ -172,26 +172,23 @@ export default function SshLoginsCard({ topThreat }) {
                 }}
                 disabled={fetchingOlder}
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  padding: '10px 24px',
-                  borderRadius: '24px',
-                  color: 'var(--text-color)',
-                  fontSize: '13px',
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.03)',
+                  padding: '8px 20px',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '0.72rem',
                   fontWeight: 500,
                   cursor: fetchingOlder ? 'default' : 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  gap: '6px',
+                  transition: 'all 0.15s ease'
                 }}
-                onMouseEnter={e => { if(!fetchingOlder) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
-                onMouseLeave={e => { if(!fetchingOlder) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
               >
                 {fetchingOlder ? (
                   <>
-                    <div className="spinner" style={{ width: '14px', height: '14px', borderWidth: '2px' }}></div>
+                    <div className="spinner" style={{ width: '12px', height: '12px', borderWidth: '1.5px' }}></div>
                     Loading older events...
                   </>
                 ) : 'Load More Events'}
@@ -201,7 +198,7 @@ export default function SshLoginsCard({ topThreat }) {
           
           {/* End of Data Indicator */}
           {!hasMore && visibleCount >= filteredEvents.length && filteredEvents.length > 0 && (
-            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.7rem' }}>
               You have reached the end of the log history.
             </div>
           )}

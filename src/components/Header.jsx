@@ -67,25 +67,6 @@ export default function Header({ onMenuToggle, search, onSearchChange }) {
           />
         </div>
 
-        {/* Health status pill */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '5px 10px',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-sm)',
-          background: 'rgba(255,255,255,0.01)'
-        }}>
-          <span style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--status-healthy)',
-            display: 'inline-block'
-          }} />
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.78rem', fontWeight: 500 }}>All systems operational</span>
-        </div>
       </div>
 
       <style>{`

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp, RefreshCw, Activity } from 'lucide-react';
+import { Send, AlertTriangle, ShieldCheck, Copy, Check, Info, Command, MessageSquare, ChevronDown, ChevronUp, RefreshCw, Activity } from 'lucide-react';
 
 export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onCommandCopy, onRefreshAiAdvice }) {
   const [question, setQuestion] = useState('');
@@ -10,25 +10,22 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
   const moodColors = {
     healthy: {
-      color: '#10b981',
-      bg: 'rgba(16, 185, 129, 0.08)',
-      border: 'rgba(16, 185, 129, 0.2)',
-      glow: 'rgba(16, 185, 129, 0.3)',
-      icon: <ShieldCheck size={16} color="#10b981" />
+      color: 'var(--status-healthy)',
+      bg: 'rgba(16, 185, 129, 0.04)',
+      border: 'rgba(16, 185, 129, 0.15)',
+      icon: <ShieldCheck size={14} color="var(--status-healthy)" />
     },
     warning: {
-      color: '#f59e0b',
-      bg: 'rgba(245, 158, 11, 0.08)',
-      border: 'rgba(245, 158, 11, 0.2)',
-      glow: 'rgba(245, 158, 11, 0.3)',
-      icon: <AlertTriangle size={16} color="#f59e0b" />
+      color: 'var(--status-warning)',
+      bg: 'rgba(245, 158, 11, 0.04)',
+      border: 'rgba(245, 158, 11, 0.15)',
+      icon: <AlertTriangle size={14} color="var(--status-warning)" />
     },
     critical: {
-      color: '#ef4444',
-      bg: 'rgba(239, 68, 68, 0.08)',
-      border: 'rgba(239, 68, 68, 0.2)',
-      glow: 'rgba(239, 68, 68, 0.3)',
-      icon: <AlertTriangle size={16} color="#ef4444" />
+      color: 'var(--status-danger)',
+      bg: 'rgba(239, 68, 68, 0.04)',
+      border: 'rgba(239, 68, 68, 0.15)',
+      icon: <AlertTriangle size={14} color="var(--status-danger)" />
     }
   };
 
@@ -74,7 +71,6 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
   const handleForceRefresh = async () => {
     setLoading(true);
     try {
-      // Hit the force backend endpoint
       await fetch('http://localhost:3001/api/metrics/ai-summary/force', {
         method: 'POST'
       });
@@ -100,7 +96,6 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
     }
   };
 
-  // Helper to format chat message text containing markdown code blocks
   const formatChatText = (text) => {
     if (!text) return null;
     const parts = text.split(/(```[\s\S]*?```)/g);
@@ -112,9 +107,9 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         const code = lines.slice(1, -1).join('\n');
         return (
           <div key={idx} style={{
-            background: 'rgba(0, 0, 0, 0.35)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '6px',
+            background: 'rgba(0, 0, 0, 0.2)',
+            border: '1px solid rgba(255,255,255,0.03)',
+            borderRadius: 'var(--radius-sm)',
             padding: '10px 12px',
             margin: '8px 0',
             fontFamily: 'var(--font-mono, monospace)',
@@ -143,10 +138,10 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
   return (
     <div style={{
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border-color)',
+      background: 'rgba(255,255,255,0.005)',
+      border: '1px solid rgba(255,255,255,0.03)',
       borderRadius: 'var(--radius-md)',
-      padding: '16px',
+      padding: '20px 24px',
       height: '380px',
       display: 'flex',
       flexDirection: 'column',
@@ -160,58 +155,46 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '10px',
-        borderBottom: '1px solid var(--border-color)',
-        paddingBottom: '10px',
-        marginBottom: '14px',
+        borderBottom: '1px solid rgba(255,255,255,0.015)',
+        paddingBottom: '12px',
+        marginBottom: '16px',
         flexShrink: 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            color: 'var(--text-secondary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Activity size={12} />
+          <div style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}>
+            <Activity size={13} />
           </div>
-          <div>
-            <h4 style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase' }}>
-              System Briefing
-              <button 
-                onClick={handleForceRefresh}
-                disabled={loading}
-                title="Force AI to regenerate now"
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer', padding: 0, 
-                  display: 'flex', alignItems: 'center', color: 'var(--text-muted)'
-                }}>
-                <RefreshCw size={11} className={loading ? "spin-animation" : ""} />
-              </button>
-            </h4>
-          </div>
+          <h4 style={{ margin: 0, fontSize: '0.76rem', fontWeight: 500, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            System Briefing
+            <button 
+              onClick={handleForceRefresh}
+              disabled={loading}
+              title="Force AI to regenerate now"
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer', padding: 0, 
+                display: 'flex', alignItems: 'center', color: 'var(--text-muted)'
+              }}>
+              <RefreshCw size={11} className={loading ? "spin-animation" : ""} />
+            </button>
+          </h4>
         </div>
 
-        {/* Mood Orb Status */}
+        {/* Mood Status Badge */}
         <div style={{
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'center',
           gap: '5px',
           padding: '3px 8px',
-          border: `1px solid var(--border-color)`,
+          border: `1px solid ${currentMood.border}`,
+          background: currentMood.bg,
           borderRadius: 'var(--radius-sm)',
-          fontSize: '0.65rem',
+          fontSize: '0.62rem',
           fontWeight: 600,
           color: currentMood.color,
           textTransform: 'uppercase',
-          letterSpacing: '0.04em',
-          background: 'rgba(255,255,255,0.01)'
+          letterSpacing: '0.04em'
         }}>
-          <div className="mood-orb" style={{
-            width: '5px',
-            height: '5px',
-            borderRadius: '50%',
-            backgroundColor: currentMood.color
-          }} />
+          <span style={{ display: 'inline-flex' }}>{currentMood.icon}</span>
           {mood}
         </div>
       </div>
@@ -222,18 +205,18 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         <div style={{ marginBottom: '4px' }}>
           <h2 style={{
             fontSize: '0.95rem',
-            fontWeight: 600,
+            fontWeight: 500,
             color: 'var(--text-primary)',
             lineHeight: 1.3,
-            margin: '0 0 4px 0',
+            margin: '0 0 6px 0',
             letterSpacing: '-0.01em'
           }}>
             {aiData.headline}
           </h2>
           <p style={{
-            fontSize: '0.76rem',
+            fontSize: '0.74rem',
             color: 'var(--text-secondary)',
-            lineHeight: 1.35,
+            lineHeight: 1.4,
             margin: 0
           }}>
             {aiData.daily_digest}
@@ -246,17 +229,17 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
             background: 'rgba(239, 68, 68, 0.02)',
             border: '1px solid rgba(239, 68, 68, 0.1)',
             borderRadius: 'var(--radius-sm)',
-            padding: '6px 10px',
+            padding: '8px 12px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '8px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
               <AlertTriangle size={12} color="var(--status-danger)" style={{ flexShrink: 0 }} />
-              <div style={{ fontSize: '0.74rem', color: 'var(--text-primary)' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 <span style={{ color: 'var(--status-danger)', marginRight: '3px', fontWeight: 600 }}>Active Alert:</span>
-                Suspicious activity logged: <span className="text-mono" style={{ background: 'rgba(255,255,255,0.03)', padding: '1px 3px', borderRadius: '3px', fontSize: '0.7rem' }}>{aiData.top_threat}</span>
+                Suspicious activity logged: <span className="text-mono" style={{ background: 'rgba(255,255,255,0.03)', padding: '1px 4px', borderRadius: '3px', fontSize: '0.68rem' }}>{aiData.top_threat}</span>
               </div>
             </div>
             <button 
@@ -264,14 +247,13 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
               disabled={loading}
               style={{
                 background: 'rgba(239, 68, 68, 0.05)',
-                border: '1px solid rgba(239, 68, 68, 0.2)',
-                borderRadius: '3px',
+                border: '1px solid rgba(239, 68, 68, 0.15)',
+                borderRadius: 'var(--radius-sm)',
                 color: 'var(--status-danger)',
                 fontSize: '0.65rem',
-                fontWeight: 600,
+                fontWeight: 500,
                 padding: '3px 8px',
-                cursor: 'pointer',
-                transition: 'var(--transition)'
+                cursor: 'pointer'
               }}
             >
               Clear
@@ -287,20 +269,20 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         }}>
           {/* Diagnostics & Insights */}
           <div>
-            <h5 style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em', margin: '0 0 4px 0' }}>
+            <h5 style={{ fontSize: '0.62rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em', margin: '0 0 6px 0' }}>
               Observations
             </h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {aiData.insights && aiData.insights.map((insight, idx) => (
                 <div key={idx} style={{
                   display: 'flex',
                   alignItems: 'flex-start',
-                  gap: '5px',
-                  fontSize: '0.74rem',
+                  gap: '6px',
+                  fontSize: '0.72rem',
                   color: 'var(--text-secondary)',
-                  lineHeight: 1.3
+                  lineHeight: 1.35
                 }}>
-                  <Info size={11} style={{ marginTop: '2px', flexShrink: 0, color: 'var(--text-muted)' }} />
+                  <Info size={11} style={{ marginTop: '2.5px', flexShrink: 0, color: 'var(--text-muted)' }} />
                   <span>{insight}</span>
                 </div>
               ))}
@@ -309,18 +291,18 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
           {/* Advice & Remediation */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.01)',
-            border: '1px solid var(--border-color)',
+            background: 'rgba(255, 255, 255, 0.008)',
+            border: '1px solid rgba(255,255,255,0.02)',
             borderRadius: 'var(--radius-sm)',
-            padding: '10px'
+            padding: '10px 12px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
               <Command size={11} color="var(--status-warning)" />
-              <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--status-warning)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+              <span style={{ fontSize: '0.62rem', fontWeight: 600, color: 'var(--status-warning)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
                 Suggested Action
               </span>
             </div>
-            <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: '0 0 6px 0', lineHeight: 1.3 }}>
+            <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', margin: '0 0 8px 0', lineHeight: 1.35 }}>
               {aiData.tip}
             </p>
 
@@ -329,10 +311,10 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '3px',
-                padding: '4px 8px',
+                background: 'rgba(255, 255, 255, 0.015)',
+                border: '1px solid rgba(255,255,255,0.02)',
+                borderRadius: 'var(--radius-sm)',
+                padding: '5px 10px',
                 cursor: 'pointer'
               }}
                 onClick={() => copyCommand(aiData.command)}
@@ -358,9 +340,9 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
         {/* Ask Copilot Interactive Section */}
         <div style={{
-          borderTop: '1px solid var(--border-color)',
-          paddingTop: '8px',
-          marginTop: '4px'
+          borderTop: '1px solid rgba(255,255,255,0.015)',
+          paddingTop: '10px',
+          marginTop: '6px'
         }}>
           {/* Toggle Button for chat */}
           <button
@@ -372,10 +354,10 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
               cursor: 'pointer',
               padding: '2px 0',
               fontSize: '0.72rem',
-              fontWeight: 600,
+              fontWeight: 500,
               display: 'flex',
               alignItems: 'center',
-              gap: '5px',
+              gap: '6px',
               outline: 'none'
             }}
           >
@@ -398,23 +380,23 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                   padding: '6px',
                   background: 'rgba(255,255,255,0.01)',
                   borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-color)'
+                  border: '1px solid rgba(255,255,255,0.02)'
                 }}>
                   {chatHistory.map((chat, idx) => (
                     <div key={idx} style={{
                       alignSelf: chat.sender === 'user' ? 'flex-end' : 'flex-start',
-                      background: chat.sender === 'user' ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
-                      border: '1px solid var(--border-color)',
+                      background: chat.sender === 'user' ? 'rgba(255, 255, 255, 0.02)' : 'transparent',
+                      border: '1px solid rgba(255,255,255,0.02)',
                       borderRadius: '4px',
-                      padding: '5px 8px',
+                      padding: '6px 10px',
                       maxWidth: '90%',
-                      fontSize: '0.74rem',
+                      fontSize: '0.72rem',
                       lineHeight: 1.35,
                       color: 'var(--text-secondary)'
                     }}>
                       <div style={{
                         fontSize: '0.58rem',
-                        fontWeight: 600,
+                        fontWeight: 650,
                         color: chat.sender === 'user' ? 'var(--text-primary)' : 'var(--text-muted)',
                         marginBottom: '2px',
                         textTransform: 'uppercase'
@@ -428,7 +410,7 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
               )}
 
               {/* Ask Form Input */}
-              <form onSubmit={handleAsk} style={{ display: 'flex', gap: '4px' }}>
+              <form onSubmit={handleAsk} style={{ display: 'flex', gap: '6px' }}>
                 <input
                   type="text"
                   placeholder="Ask Copilot a question..."
@@ -438,9 +420,9 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                   style={{
                     flex: 1,
                     background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '3px',
-                    padding: '5px 8px',
+                    border: '1px solid rgba(255,255,255,0.03)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 10px',
                     fontSize: '0.74rem',
                     color: 'var(--text-primary)',
                     outline: 'none'
@@ -453,15 +435,15 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                     background: 'var(--text-primary)',
                     color: 'var(--bg-primary)',
                     border: 'none',
-                    borderRadius: '3px',
-                    padding: '5px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 12px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: question.trim() ? 'pointer' : 'not-allowed',
                     opacity: question.trim() ? 1 : 0.5,
                     fontSize: '0.72rem',
-                    fontWeight: 600
+                    fontWeight: 500
                   }}
                 >
                   Send

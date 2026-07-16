@@ -183,7 +183,7 @@ export default function Dashboard() {
 
   async function loadAiAdvice() {
     try {
-      const aiRes = await fetch('http://localhost:3001/api/metrics/ai-summary/latest');
+      const aiRes = await fetch('/api/metrics/ai-summary/latest');
       if (aiRes.status === 503) {
         // AI is still generating, skip update
         return;

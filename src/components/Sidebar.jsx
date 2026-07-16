@@ -13,6 +13,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
     {
       title: 'Intelligence',
       items: [
+        { name: 'Antivirus Scans', id: 'scans', icon: Shield },
         { name: 'Logs & Traces', id: 'logs', icon: Activity },
         { name: 'SSH Logins', id: 'ssh', icon: Key }
       ]

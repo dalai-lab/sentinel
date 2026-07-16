@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { fetchRealLogs } from '../api/signoz';
 
-export function useAppLogs() {
+export function useAppLogs(searchQuery = '') {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingOlder, setFetchingOlder] = useState(false);
@@ -11,13 +11,14 @@ export function useAppLogs() {
   const isFetchingRef = useRef(false);
   const hasMoreRef = useRef(true);
 
-  const loadLogs = useCallback(async () => {
+  const loadLogs = useCallback(async (isReset = false, currentSearch = searchQuery) => {
     if (isFetchingRef.current) return;
     try {
+      isFetchingRef.current = true;
       setLoading(true);
       const now = Date.now();
       const pastHour = now - 60 * 60 * 1000;
-      const data = await fetchRealLogs(pastHour, now);
+      const data = await fetchRealLogs(pastHour, now, null, currentSearch);
       
       if (Array.isArray(data)) {
         const enriched = data.map((l, i) => {
@@ -39,7 +40,7 @@ export function useAppLogs() {
         }).sort((a, b) => a.rawTs - b.rawTs); // Sort oldest first (ascending, newest at bottom)
         
         setLogs(prev => {
-          if (prev.length === 0) {
+          if (isReset || prev.length === 0) {
             if (enriched.length > 0) setCurrentStart(enriched[enriched.length - 1].rawTs);
             return enriched;
           }
@@ -53,6 +54,7 @@ export function useAppLogs() {
       console.error('Failed to load real logs:', err);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
     }
   }, []);
 
@@ -63,7 +65,7 @@ export function useAppLogs() {
       setFetchingOlder(true);
       
       const targetStart = currentStart - 24 * 60 * 60 * 1000;
-      const data = await fetchRealLogs(targetStart, currentStart);
+      const data = await fetchRealLogs(targetStart, currentStart, null, searchQuery);
       
       if (!Array.isArray(data) || data.length === 0) {
         hasMoreRef.current = false;
@@ -108,17 +110,24 @@ export function useAppLogs() {
       isFetchingRef.current = false;
       setFetchingOlder(false);
     }
-  }, [currentStart, loading]);
+  }, [currentStart, loading, searchQuery]);
 
   useEffect(() => {
     loadLogs();
   }, [loadLogs]);
 
   useEffect(() => {
+    setLogs([]);
+    hasMoreRef.current = true;
+    setCurrentStart(Date.now() - 60 * 60 * 1000);
+    loadLogs(true, searchQuery);
+  }, [searchQuery, loadLogs]);
+
+  useEffect(() => {
     if (!isLive) return;
-    const interval = setInterval(loadLogs, 5000);
+    const interval = setInterval(() => loadLogs(false, searchQuery), 5000);
     return () => clearInterval(interval);
-  }, [isLive, loadLogs]);
+  }, [isLive, loadLogs, searchQuery]);
 
   return {
     logs,
@@ -128,8 +137,6 @@ export function useAppLogs() {
     isLive,
     setIsLive,
     loadOlderLogs,
-    refreshLogs: loadLogs
+    refreshLogs: () => loadLogs(false, searchQuery)
   };
 }
-
-

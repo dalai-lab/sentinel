@@ -105,13 +105,14 @@ export async function fetchActiveAlerts() {
   }
 }
 
-export async function fetchRealLogs(startTime, endTime, type) {
+export async function fetchRealLogs(startTime, endTime, type, search) {
   try {
     let url = `${BACKEND_URL}/logs`;
     const params = [];
     if (startTime) params.push(`startTime=${startTime}`);
     if (endTime) params.push(`endTime=${endTime}`);
     if (type) params.push(`type=${type}`);
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
     if (params.length > 0) url += `?${params.join('&')}`;
 
     const response = await fetch(url, {
@@ -122,6 +123,17 @@ export async function fetchRealLogs(startTime, endTime, type) {
     return await response.json();
   } catch (error) {
     console.error("Backend API Logs Error:", error);
+    return [];
+  }
+}
+
+export async function fetchLatestScans() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/scans`);
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (err) {
+    console.error('Failed to fetch scans:', err);
     return [];
   }
 }

@@ -37,11 +37,12 @@ router.get('/alerts', async (req, res) => {
 
 router.get('/logs', async (req, res) => {
   try {
-    const { startTime, endTime, type } = req.query;
+    const { startTime, endTime, type, search } = req.query;
     const logs = await signozService.fetchLogs(
       startTime ? parseInt(startTime) : null,
       endTime ? parseInt(endTime) : null,
-      type
+      type,
+      search
     );
     res.json(logs);
   } catch (error) {
@@ -58,6 +59,16 @@ router.post('/ip-info', async (req, res) => {
     res.json(geoMap);
   } catch (error) {
     console.error('Error in /ip-info route:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/scans', async (req, res) => {
+  try {
+    const scans = await signozService.fetchLatestScans();
+    res.json(scans);
+  } catch (error) {
+    console.error('Error in /scans route:', error);
     res.status(500).json({ error: error.message });
   }
 });

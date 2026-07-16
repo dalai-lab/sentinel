@@ -71,8 +71,9 @@ HOSTNAME=$(hostname)
 echo "[5/6] Installing Security Tools (CrowdSec, ClamAV, rsyslog)..."
 apt-get update
 # Install security tools non-interactively
-DEBIAN_FRONTEND=noninteractive apt-get install -y crowdsec clamav rsyslog
+DEBIAN_FRONTEND=noninteractive apt-get install -y crowdsec clamav rsyslog cron
 systemctl enable --now rsyslog
+systemctl enable --now cron
 
 echo "[6/6] Configuring Security Scans and Log Shipping..."
 # Create log directories/files to ensure OTEL collector doesn't fail on startup

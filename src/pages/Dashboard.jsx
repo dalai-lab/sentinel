@@ -9,6 +9,8 @@ import ServerList from '../components/ServerList';
 import LogConsole from '../components/LogConsole';
 import SettingsPanel from '../components/SettingsPanel';
 import AiCopilotCard from '../components/AiCopilotCard';
+import AntivirusScansCard from '../components/AntivirusScansCard';
+import OverviewScansWidget from '../components/OverviewScansWidget';
 import { fetchServerMetrics, fetchActiveAlerts } from '../api/signoz';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
@@ -336,6 +338,9 @@ export default function Dashboard() {
                   onRefreshAiAdvice={loadAiAdvice}
                 />
                 
+                <div className="security-feed-panel" style={{ width: '100%', flex: 1 }}>
+                  <OverviewScansWidget />
+                </div>
                 <div className="security-feed-panel" style={{ width: '100%' }}>
                   <SecurityFeed />
                 </div>
@@ -350,6 +355,8 @@ export default function Dashboard() {
         {activeTab === 'logs' && <LogConsole />}
 
         {activeTab === 'ssh' && <SshLoginsCard topThreat={aiCopilotData.top_threat} />}
+        
+        {activeTab === 'scans' && <AntivirusScansCard />}
 
         {activeTab === 'settings' && <SettingsPanel />}
       </main>

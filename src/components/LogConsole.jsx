@@ -6,11 +6,20 @@ import LogConsoleRow from './LogConsole/LogConsoleRow';
 import TraceVisualizer from './LogConsole/TraceVisualizer';
 
 export default function LogConsole() {
-  const { logs, loading, fetchingOlder, hasMore, isLive, setIsLive, loadOlderLogs, refreshLogs } = useAppLogs();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  const { logs, loading, fetchingOlder, hasMore, isLive, setIsLive, loadOlderLogs, refreshLogs } = useAppLogs(debouncedSearchQuery);
 
   const [levelFilter, setLevelFilter] = useState('ALL');
   const [serviceFilter, setServiceFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [inspectingTrace, setInspectingTrace] = useState(null);
   
   const [visibleCount, setVisibleCount] = useState(50);

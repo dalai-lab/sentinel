@@ -89,10 +89,29 @@ export default function SshLoginsCard({ topThreat }) {
   // Loading Skeleton
   if (loading && allEvents.length === 0 && crowdSecEvents.length === 0) {
     return (
-      <div style={{ height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
-        <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-          <div className="spinner"></div>
-          <div style={{ fontSize: '0.78rem' }}>Loading access logs...</div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px', height: '600px' }}>
+        <div className="shimmer-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="shimmer-bar" style={{ width: '80px', height: '24px' }} />
+            <div className="shimmer-bar" style={{ width: '100px', height: '24px' }} />
+          </div>
+          <div className="shimmer-bar" style={{ width: '100%', height: '36px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-color)' }}>
+                <div style={{ display: 'flex', gap: '10px', width: '40%' }}>
+                  <div className="shimmer-bar" style={{ width: '18px', height: '18px', borderRadius: '50%' }} />
+                  <div className="shimmer-bar" style={{ width: '70%', height: '12px' }} />
+                </div>
+                <div className="shimmer-bar" style={{ width: '20%', height: '12px' }} />
+                <div className="shimmer-bar" style={{ width: '15%', height: '12px' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="shimmer-card" style={{ height: '240px' }} />
+          <div className="shimmer-card" style={{ flex: 1 }} />
         </div>
       </div>
     );

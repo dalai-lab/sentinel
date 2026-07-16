@@ -169,10 +169,10 @@ export default function ThreatMapView() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <h2 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
-            <Map size={18} color="var(--text-secondary)" /> Brute-Force Intelligence Center
+            <Map size={18} color="var(--text-secondary)" /> Brute-Force Logins Map
           </h2>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-            Real-time SSH brute-force attack intelligence, attacker profiling, and geographic distribution.
+            Real-time view of blocked unauthorized logins and their country of origin.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -196,102 +196,110 @@ export default function ThreatMapView() {
         <StatCard icon={TrendingUp} label="Top Origin" value={topCountry} color="#8b5cf6" sub={topCountries[0] ? `${topCountries[0].hits} attempts` : ''} />
         <StatCard icon={Server} label="Most Targeted" value={mostTargeted} color="#06b6d4" sub={targetMap[mostTargeted] ? `${targetMap[mostTargeted]} hits` : ''} />
       </div>
-
       {/* Main content: Map + Side panels */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px', flex: 1, minHeight: 0 }}>
-        
-        {/* World Map */}
-        <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-lg)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          {loading && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', zIndex: 10 }}>
-              <RefreshCw size={24} className="spin" color="var(--text-primary)" />
-            </div>
-          )}
-          <ComposableMap projectionConfig={{ scale: 160, center: [20, 10] }} style={{ width: '100%', height: '100%' }}>
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map(geo => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="rgba(255, 255, 255, 0.03)"
-                    stroke="rgba(255, 255, 255, 0.08)"
-                    strokeWidth={0.5}
-                    style={{
-                      default: { outline: 'none' },
-                      hover: { fill: 'rgba(255, 255, 255, 0.08)', outline: 'none' },
-                      pressed: { outline: 'none' },
-                    }}
-                  />
-                ))
-              }
-            </Geographies>
-
-            {/* Server target markers */}
-            {Object.entries(SERVER_LOCATIONS).map(([name, coords]) => (
-              <Marker key={name} coordinates={[coords.lon, coords.lat]}>
-                <circle r={5} fill="#4f46e5" />
-                <circle r={12} fill="#4f46e5" opacity={0.15} />
-                <text textAnchor="middle" y={-10} style={{ fill: 'var(--text-secondary)', fontSize: '8px', fontWeight: 600, pointerEvents: 'none' }}>
-                  {coords.label}
-                </text>
-              </Marker>
-            ))}
-
-            {/* Attacker markers — bubble sized by hits */}
-            {markers.map((m, i) => {
-              const r = 3 + (m.hits / maxHits) * 8; // radius 3–11
-              const isSelected = selectedOrigin === m.ip;
-              return (
-                <Marker key={m.ip} coordinates={[m.geo.lon, m.geo.lat]} onClick={() => setSelectedOrigin(isSelected ? null : m.ip)}>
-                  <circle r={r} fill={isSelected ? 'var(--status-warning)' : 'var(--status-danger)'} opacity={0.8} style={{ cursor: 'pointer' }} />
-                  {m.hits > 10 && (
-                    <circle r={r + 4} fill="var(--status-danger)" opacity={0.12} />
-                  )}
-                </Marker>
-              );
-            })}
-          </ComposableMap>
-
-          {/* Map Legend */}
-          <div style={{ position: 'absolute', bottom: '12px', left: '12px', display: 'flex', gap: '12px', alignItems: 'center', background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--status-danger)', display: 'inline-block' }} /> Attacker (volume bubble)</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4f46e5', display: 'inline-block' }} /> Server Hub</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--status-warning)', display: 'inline-block' }} /> Selected</span>
+      {loading && logs.length === 0 ? (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px', flex: 1, minHeight: 0 }}>
+          <div className="shimmer-card" style={{ height: '100%', borderRadius: 'var(--radius-lg)' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="shimmer-card" style={{ height: '200px', borderRadius: 'var(--radius-md)' }} />
+            <div className="shimmer-card" style={{ flex: 1, borderRadius: 'var(--radius-md)' }} />
           </div>
-
-          {/* Selected IP detail popup */}
-          {selectedOrigin && attackerMap[selectedOrigin] && (() => {
-            const atk = attackerMap[selectedOrigin];
-            const geo = atk.geo || {};
-            return (
-              <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', minWidth: '200px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <div style={{ color: 'var(--status-danger)', fontWeight: 600, fontSize: '0.62rem', textTransform: 'uppercase' }}>Attacker Profile</div>
-                  <button onClick={() => setSelectedOrigin(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', lineHeight: 1 }}>✕</button>
-                </div>
-                <div style={{ fontFamily: 'monospace', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem', marginBottom: '6px' }}>{selectedOrigin}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
-                  {geo.country && <span>🌍 {geo.city ? `${geo.city}, ` : ''}{geo.country}</span>}
-                  {geo.isp && <span>🏢 {geo.isp}</span>}
-                  <span style={{ color: 'var(--status-danger)', fontWeight: 600 }}>⚡ {atk.hits} attempts</span>
-                  {Array.from(atk.targets || []).length > 0 && (
-                    <span>🎯 Targeting: {Array.from(atk.targets).join(', ')}</span>
-                  )}
-                </div>
-              </div>
-            );
-          })()}
         </div>
-
-        {/* Right sidebar: Country table + Top attackers */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto' }} className="custom-scrollbar">
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px', flex: 1, minHeight: 0 }}>
+          
+          {/* World Map */}
+          <div style={{
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-lg)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            {loading && (
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', zIndex: 10 }}>
+                <RefreshCw size={24} className="spin" color="var(--text-primary)" />
+              </div>
+            )}
+            <ComposableMap projectionConfig={{ scale: 160, center: [20, 10] }} style={{ width: '100%', height: '100%' }}>
+              <Geographies geography={geoUrl}>
+                {({ geographies }) =>
+                  geographies.map(geo => (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill="rgba(255, 255, 255, 0.03)"
+                      stroke="rgba(255, 255, 255, 0.08)"
+                      strokeWidth={0.5}
+                      style={{
+                        default: { outline: 'none' },
+                        hover: { fill: 'rgba(255, 255, 255, 0.08)', outline: 'none' },
+                        pressed: { outline: 'none' },
+                      }}
+                    />
+                  ))
+                }
+              </Geographies>
+  
+              {/* Server target markers */}
+              {Object.entries(SERVER_LOCATIONS).map(([name, coords]) => (
+                <Marker key={name} coordinates={[coords.lon, coords.lat]}>
+                  <circle r={5} fill="#4f46e5" />
+                  <circle r={12} fill="#4f46e5" opacity={0.15} />
+                  <text textAnchor="middle" y={-10} style={{ fill: 'var(--text-secondary)', fontSize: '8px', fontWeight: 600, pointerEvents: 'none' }}>
+                    {coords.label}
+                  </text>
+                </Marker>
+              ))}
+  
+              {/* Attacker markers — bubble sized by hits */}
+              {markers.map((m, i) => {
+                const r = 3 + (m.hits / maxHits) * 8; // radius 3–11
+                const isSelected = selectedOrigin === m.ip;
+                return (
+                  <Marker key={m.ip} coordinates={[m.geo.lon, m.geo.lat]} onClick={() => setSelectedOrigin(isSelected ? null : m.ip)}>
+                    <circle r={r} fill={isSelected ? 'var(--status-warning)' : 'var(--status-danger)'} opacity={0.8} style={{ cursor: 'pointer' }} />
+                    {m.hits > 10 && (
+                      <circle r={r + 4} fill="var(--status-danger)" opacity={0.12} />
+                    )}
+                  </Marker>
+                );
+              })}
+            </ComposableMap>
+  
+            {/* Map Legend */}
+            <div style={{ position: 'absolute', bottom: '12px', left: '12px', display: 'flex', gap: '12px', alignItems: 'center', background: 'var(--bg-card)', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--status-danger)', display: 'inline-block' }} /> Attacker (volume bubble)</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4f46e5', display: 'inline-block' }} /> Server Hub</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--status-warning)', display: 'inline-block' }} /> Selected</span>
+            </div>
+  
+            {/* Selected IP detail popup */}
+            {selectedOrigin && attackerMap[selectedOrigin] && (() => {
+              const atk = attackerMap[selectedOrigin];
+              const geo = atk.geo || {};
+              return (
+                <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '12px 14px', minWidth: '200px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div style={{ color: 'var(--status-danger)', fontWeight: 600, fontSize: '0.62rem', textTransform: 'uppercase' }}>Attacker Profile</div>
+                    <button onClick={() => setSelectedOrigin(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '12px', lineHeight: 1 }}>✕</button>
+                  </div>
+                  <div style={{ fontFamily: 'monospace', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.88rem', marginBottom: '6px' }}>{selectedOrigin}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                    {geo.country && <span>🌍 {geo.city ? `${geo.city}, ` : ''}{geo.country}</span>}
+                    {geo.isp && <span>🏢 {geo.isp}</span>}
+                    <span style={{ color: 'var(--status-danger)', fontWeight: 600 }}>⚡ {atk.hits} attempts</span>
+                    {Array.from(atk.targets || []).length > 0 && (
+                      <span>🎯 Targeting: {Array.from(atk.targets).join(', ')}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+  
+          {/* Right sidebar: Country table + Top attackers */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto' }} className="custom-scrollbar">
           
           {/* Top Countries */}
           <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
@@ -381,6 +389,7 @@ export default function ThreatMapView() {
           </div>
         </div>
       </div>
+    )}
 
       <style>{`
         .spin { animation: spin 1s linear infinite; }

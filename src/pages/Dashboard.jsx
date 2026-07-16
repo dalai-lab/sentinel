@@ -256,82 +256,130 @@ export default function Dashboard() {
             )}
 
             {/* Main Layout Flow */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                
-                {/* ── Fleet stat tiles ── */}
+            {servers.length === 1 && (servers[0].status === 'connecting' || servers[0].status === 'gathering data...') ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Stat Tiles Shimmer */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
-                  {[
-                    {
-                      label: 'Servers Online', 
-                      value: `${onlineServersCount}`, 
-                      sub: `of ${totalServersCount} nodes`,
-                      icon: Server, color: 'var(--text-primary)',
-                    },
-                    {
-                      label: 'Fleet Avg CPU', 
-                      value: `${avgCpu}%`, 
-                      sub: 'across all servers',
-                      icon: Cpu, color: 'var(--text-primary)',
-                    },
-                    {
-                      label: 'Active Threats', 
-                      value: activeAlertsCount, 
-                      sub: activeAlertsCount > 0 ? 'requires attention' : 'all clear',
-                      icon: ShieldAlert, 
-                      color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)',
-                    },
-                    {
-                      label: 'Platform State', 
-                      value: activeAlertsCount > 0 ? 'DEGRADED' : 'NOMINAL', 
-                      sub: 'overall health',
-                      icon: CheckCircle,
-                      color: activeAlertsCount > 0 ? 'var(--status-warning)' : 'var(--status-healthy)',
-                    },
-                  ].map(({ label, value, sub, icon: Icon, color }) => (
-                    <div key={label} style={{
-                      background: 'var(--bg-card)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: 'var(--radius-md)',
-                      padding: '16px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      minHeight: '110px'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</span>
-                        <Icon size={14} color={color} style={{ opacity: 0.8 }} />
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="shimmer-card" style={{ minHeight: '110px', padding: '16px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <div className="shimmer-bar" style={{ width: '40%', height: '10px' }} />
+                      <div className="shimmer-bar" style={{ width: '60%', height: '24px' }} />
+                      <div className="shimmer-bar" style={{ width: '30%', height: '8px' }} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Server Cards Shimmer */}
+                <div className="servers-container">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="shimmer-card" style={{ minHeight: '180px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', gap: '8px', width: '60%' }}>
+                          <div className="shimmer-bar" style={{ width: '32px', height: '32px' }} />
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                            <div className="shimmer-bar" style={{ width: '80%', height: '12px' }} />
+                            <div className="shimmer-bar" style={{ width: '40%', height: '8px' }} />
+                          </div>
+                        </div>
+                        <div className="shimmer-bar" style={{ width: '60px', height: '18px' }} />
                       </div>
-                      <div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2, marginBottom: '2px', letterSpacing: '-0.01em' }}>{value}</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                        {[1, 2, 3].map(j => (
+                          <div key={j} className="shimmer-card" style={{ height: '54px', padding: '8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', border: '1px dashed var(--border-color)' }}>
+                            <div className="shimmer-bar" style={{ width: '50%', height: '8px' }} />
+                            <div className="shimmer-bar" style={{ width: '30%', height: '12px' }} />
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Server Telemetry Cards Container */}
-                <div className="servers-container">
-                  {filteredServers.map(server => (
-                    <ServerCard key={server.id} {...server} />
-                  ))}
-                </div>
-
-                {/* Bottom Intelligence Grid */}
+                {/* Bottom Grid Shimmer */}
                 <div className="bottom-intelligence-grid">
-                  <AiCopilotCard
-                    aiData={aiCopilotData}
-                    servers={servers}
-                    alerts={activeAlerts}
-                    recentLogs={recentLogs}
-                    onCommandCopy={handleCopyCommand}
-                    onRefreshAiAdvice={loadAiAdvice}
-                  />
-                  <AlertCenterWidget />
-                  <OverviewScansWidget />
+                  <div className="shimmer-card" style={{ height: '380px' }} />
+                  <div className="shimmer-card" style={{ height: '380px' }} />
+                  <div className="shimmer-card" style={{ height: '380px' }} />
                 </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  
+                  {/* ── Fleet stat tiles ── */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                    {[
+                      {
+                        label: 'Servers Online', 
+                        value: `${onlineServersCount}`, 
+                        sub: `of ${totalServersCount} nodes`,
+                        icon: Server, color: 'var(--text-primary)',
+                      },
+                      {
+                        label: 'Fleet Avg CPU', 
+                        value: `${avgCpu}%`, 
+                        sub: 'across all servers',
+                        icon: Cpu, color: 'var(--text-primary)',
+                      },
+                      {
+                        label: 'Active Threats', 
+                        value: activeAlertsCount, 
+                        sub: activeAlertsCount > 0 ? 'requires attention' : 'all clear',
+                        icon: ShieldAlert, 
+                        color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)',
+                      },
+                      {
+                        label: 'Platform State', 
+                        value: activeAlertsCount > 0 ? 'DEGRADED' : 'NOMINAL', 
+                        sub: 'overall health',
+                        icon: CheckCircle,
+                        color: activeAlertsCount > 0 ? 'var(--status-warning)' : 'var(--status-healthy)',
+                      },
+                    ].map(({ label, value, sub, icon: Icon, color }) => (
+                      <div key={label} style={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: 'var(--radius-md)',
+                        padding: '16px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        minHeight: '110px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</span>
+                          <Icon size={14} color={color} style={{ opacity: 0.8 }} />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2, marginBottom: '2px', letterSpacing: '-0.01em' }}>{value}</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-            </div>
+                  {/* Server Telemetry Cards Container */}
+                  <div className="servers-container">
+                    {filteredServers.map(server => (
+                      <ServerCard key={server.id} {...server} />
+                    ))}
+                  </div>
+
+                  {/* Bottom Intelligence Grid */}
+                  <div className="bottom-intelligence-grid">
+                    <AiCopilotCard
+                      aiData={aiCopilotData}
+                      servers={servers}
+                      alerts={activeAlerts}
+                      recentLogs={recentLogs}
+                      onCommandCopy={handleCopyCommand}
+                      onRefreshAiAdvice={loadAiAdvice}
+                    />
+                    <AlertCenterWidget />
+                    <OverviewScansWidget />
+                  </div>
+
+              </div>
+            )}
           </>
         )}
 

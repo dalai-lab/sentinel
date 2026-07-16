@@ -381,9 +381,28 @@ export default function GraphsView() {
 
       {/* ── Metric grid ── */}
       {loading && !data && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '8px', color: 'var(--text-muted)' }}>
-          <RefreshCw size={16} className="spin" />
-          <span>Fetching telemetry data…</span>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '16px',
+          flex: 1,
+          minHeight: 0,
+        }}>
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="shimmer-card" style={{ height: '300px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: '8px', width: '50%' }}>
+                  <div className="shimmer-bar" style={{ width: '28px', height: '28px' }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="shimmer-bar" style={{ width: '80%', height: '12px' }} />
+                    <div className="shimmer-bar" style={{ width: '40%', height: '8px' }} />
+                  </div>
+                </div>
+                <div className="shimmer-bar" style={{ width: '40px', height: '20px' }} />
+              </div>
+              <div className="shimmer-bar" style={{ flex: 1, width: '100%', borderRadius: 'var(--radius-md)' }} />
+            </div>
+          ))}
         </div>
       )}
 

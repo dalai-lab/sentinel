@@ -282,3 +282,28 @@ select option {
   transform: scale(1.2);
 }
 
+/* Shimmer Loading Effect */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-card {
+  background: linear-gradient(90deg, #121215 25%, #1e1e24 50%, #121215 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.shimmer-bar {
+  background: linear-gradient(90deg, #1c1c22 25%, #2d2d35 50%, #1c1c22 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: var(--radius-sm);
+}
+

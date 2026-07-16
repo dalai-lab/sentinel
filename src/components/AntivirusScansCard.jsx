@@ -228,9 +228,28 @@ export default function AntivirusScansCard() {
       {/* Per-server scan cards grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: '16px', overflowY: 'auto', flex: 1, contentVisibility: 'auto' }} className="custom-scrollbar">
         {loading && scans.length === 0 && (
-          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px', color: 'var(--text-muted)', gap: '12px' }}>
-            <RefreshCw size={16} className="spin" /> Loading antivirus reports…
-          </div>
+          [1, 2, 3, 4].map(i => (
+            <div key={i} className="shimmer-card" style={{ height: '142px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px', borderRadius: 'var(--radius-lg)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: '8px', width: '50%' }}>
+                  <div className="shimmer-bar" style={{ width: '28px', height: '28px' }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="shimmer-bar" style={{ width: '70%', height: '10px' }} />
+                    <div className="shimmer-bar" style={{ width: '40%', height: '8px' }} />
+                  </div>
+                </div>
+                <div className="shimmer-bar" style={{ width: '60px', height: '16px' }} />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                {[1, 2, 3, 4].map(j => (
+                  <div key={j} className="shimmer-card" style={{ height: '42px', padding: '6px', border: '1px dashed var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div className="shimmer-bar" style={{ width: '60%', height: '6px' }} />
+                    <div className="shimmer-bar" style={{ width: '40%', height: '8px' }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
         )}
         {!loading && scans.length === 0 && (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '60px', color: 'var(--text-muted)' }}>

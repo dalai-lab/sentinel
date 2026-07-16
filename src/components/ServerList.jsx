@@ -205,7 +205,23 @@ export default function ServerList({ servers }) {
 
       {/* Server cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {details.map(([name, info]) => {
+        {!servers || servers.length === 0 || servers[0].status === 'connecting' || servers[0].status === 'gathering data...' ? (
+          [1, 2, 3, 4].map(i => (
+            <div key={i} className="shimmer-card" style={{ height: '78px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: 'var(--radius-lg)' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '30%' }}>
+                <div className="shimmer-bar" style={{ width: '24px', height: '24px', borderRadius: '50%' }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div className="shimmer-bar" style={{ width: '70%', height: '10px' }} />
+                  <div className="shimmer-bar" style={{ width: '40%', height: '8px' }} />
+                </div>
+              </div>
+              <div className="shimmer-bar" style={{ width: '15%', height: '12px' }} />
+              <div className="shimmer-bar" style={{ width: '15%', height: '12px' }} />
+              <div className="shimmer-bar" style={{ width: '15%', height: '12px' }} />
+            </div>
+          ))
+        ) : (
+          details.map(([name, info]) => {
           const live = (servers || []).find(s => s.ip === info.ip || s.name?.toLowerCase() === name.toLowerCase());
           const isOnline = live?.status === 'online';
           const isCrit = isOnline && (parseFloat(live?.cpu) > 85 || parseFloat(live?.ram) > 85 || parseFloat(live?.disk) > 85);
@@ -349,7 +365,7 @@ export default function ServerList({ servers }) {
               </div>
             </div>
           );
-        })}
+        }))}
       </div>
     </div>
   );

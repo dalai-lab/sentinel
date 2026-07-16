@@ -116,9 +116,14 @@ export default function LogConsole() {
         <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.15)', marginTop: '12px' }} className="custom-scrollbar">
           
           {loading && logs.length === 0 && (
-            <div style={{ padding: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--text-muted)' }}>
-              <div className="spinner"></div>
-              Loading telemetry...
+            <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  <div className="shimmer-bar" style={{ width: '80px', height: '14px' }} />
+                  <div className="shimmer-bar" style={{ width: '60px', height: '14px' }} />
+                  <div className="shimmer-bar" style={{ flex: 1, height: '14px' }} />
+                </div>
+              ))}
             </div>
           )}
 

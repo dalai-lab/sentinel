@@ -1029,14 +1029,24 @@ select option {
 
 /* Mobile-only Viewport Style Overrides (< 768px) */
 @media (max-width: 768px) {
+  html, body, #root {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
   .app-layout {
     display: block !important;
+    height: auto !important;
+    overflow: visible !important;
   }
   
   .main-content {
     padding: 16px !important;
     width: 100% !important;
     max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   .fleet-stats-grid {

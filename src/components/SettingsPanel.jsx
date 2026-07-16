@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
-import { Save, Key, Database } from 'lucide-react';
+import { Save } from 'lucide-react';
+import AlertSettings from './AlertSettings';
 
 export default function SettingsPanel() {
-  const [signozUrl, setSignozUrl] = useState('https://telemetry.dalai.in');
-  const [signozKey, setSignozKey] = useState('sn_key_live_dalai_7823e8f');
-  const [openaiKey, setOpenaiKey] = useState('sk-proj-******************');
-  const [openaiModel, setOpenaiModel] = useState('gpt-4o-mini');
 
   const [isSaved, setIsSaved] = useState(false);
 
@@ -47,6 +44,8 @@ export default function SettingsPanel() {
         </button>
       </div>
 
+      <AlertSettings />
+
       {isSaved && (
         <div style={{
           background: 'var(--status-healthy-bg)',
@@ -61,105 +60,7 @@ export default function SettingsPanel() {
         </div>
       )}
 
-      {/* Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
 
-        {/* SigNoz Configuration Card */}
-        <div className="dashboard-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-            <Database size={16} color="var(--accent)" />
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>SigNoz Exporter Connection</h3>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Connection Endpoint URL</label>
-              <input
-                type="text"
-                value={signozUrl}
-                onChange={(e) => setSignozUrl(e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.2)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  outline: 'none',
-                  fontSize: '0.82rem'
-                }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>SigNoz Read API Key</label>
-              <input
-                type="password"
-                value={signozKey}
-                onChange={(e) => setSignozKey(e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.2)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  outline: 'none',
-                  fontSize: '0.82rem'
-                }}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* AI Copilot Configuration Card */}
-        <div className="dashboard-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
-            <Key size={16} color="var(--accent)" />
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0 }}>OpenAI SRE Model Settings</h3>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>OpenAI Secret API Key</label>
-              <input
-                type="password"
-                value={openaiKey}
-                onChange={(e) => setOpenaiKey(e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.2)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  outline: 'none',
-                  fontSize: '0.82rem'
-                }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <label style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>OpenAI SRE LLM Model</label>
-              <select
-                value={openaiModel}
-                onChange={(e) => setOpenaiModel(e.target.value)}
-                style={{
-                  background: 'rgba(0,0,0,0.2)',
-                  border: '1px solid var(--border-color)',
-                  color: 'var(--text-primary)',
-                  padding: '8px 12px',
-                  borderRadius: '6px',
-                  outline: 'none',
-                  fontSize: '0.82rem',
-                  cursor: 'pointer'
-                }}
-              >
-                <option value="gpt-4o-mini">gpt-4o-mini (Default Fast)</option>
-                <option value="gpt-4o">gpt-4o (High-Precision SRE)</option>
-                <option value="gpt-4">gpt-4 (Standard)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
     </form>
   );
 }

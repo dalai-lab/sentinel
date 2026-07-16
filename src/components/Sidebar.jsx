@@ -17,6 +17,12 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
         { name: 'Logs & Traces', id: 'logs', icon: Activity },
         { name: 'SSH Logins', id: 'ssh', icon: Key }
       ]
+    },
+    {
+      title: 'Configuration',
+      items: [
+        { name: 'Settings', id: 'settings', icon: Settings }
+      ]
     }
   ];
 

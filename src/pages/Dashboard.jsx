@@ -3,7 +3,7 @@ import { Server, ShieldAlert, Cpu, CheckCircle } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ServerCard from '../components/ServerCard';
-import SecurityFeed from '../components/SecurityFeed';
+
 import SshLoginsCard from '../components/SshLoginsCard';
 import ServerList from '../components/ServerList';
 import LogConsole from '../components/LogConsole';
@@ -11,7 +11,9 @@ import SettingsPanel from '../components/SettingsPanel';
 import AiCopilotCard from '../components/AiCopilotCard';
 import AntivirusScansCard from '../components/AntivirusScansCard';
 import OverviewScansWidget from '../components/OverviewScansWidget';
-import { fetchServerMetrics, fetchActiveAlerts } from '../api/signoz';
+import AlertCenterWidget from '../components/AlertCenterWidget';
+import { fetchServerMetrics } from '../api/signoz';
+import { fetchAlerts } from '../api/alerts';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
 
 export default function Dashboard() {
@@ -74,10 +76,10 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadData() {
       const result = await fetchServerMetrics();
-      const alerts = await fetchActiveAlerts().catch(() => []);
+      const alerts = await fetchAlerts().catch(() => []);
 
       if (alerts && Array.isArray(alerts)) {
-        setActiveAlerts(alerts);
+        setActiveAlerts(alerts.filter(a => a.status === 'active'));
       }
 
       if (result.error) {
@@ -342,7 +344,7 @@ export default function Dashboard() {
                   <OverviewScansWidget />
                 </div>
                 <div className="security-feed-panel" style={{ width: '100%' }}>
-                  <SecurityFeed />
+                  <AlertCenterWidget />
                 </div>
               </div>
 

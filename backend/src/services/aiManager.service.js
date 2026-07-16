@@ -1,5 +1,6 @@
 const signozService = require('./signoz.service');
 const aiService = require('./ai.service');
+const alertService = require('./alert.service');
 
 // Friendly names map for raw hostnames (duplicated from frontend for backend context)
 const FRIENDLY_NAMES = {
@@ -105,40 +106,30 @@ class AiManagerService {
   async checkState() {
     try {
       const servers = await this.fetchAndBuildServers();
-      const alerts = await signozService.fetchActiveAlerts();
+      const rawAlerts = alertService.getAlerts();
+      const activeAlerts = rawAlerts.filter(a => a.status === 'active');
       
       let triggerAnalysis = false;
       let triggerReason = '';
 
-      // 1. Event-Driven: Alert Count Increased
-      if (alerts.length > this.lastKnownState.alertCount) {
+      // 1. Event-Driven: Internal Alert Count Increased
+      if (activeAlerts.length > this.lastKnownState.alertCount) {
         triggerAnalysis = true;
-        triggerReason = 'New Active Alert Detected';
+        triggerReason = 'New Active Alert Detected by Internal Engine';
 
-        // Handle security alerts (e.g. ClamAV Malware) and resolve hostnames from logs
-        const logs = await signozService.fetchLogs();
+        // Add incident history for AI context
         const incidentService = require('./incident.service');
         
-        for (const alert of alerts) {
-          const alertName = alert.labels?.alertname || '';
-          if (alertName.toLowerCase().includes('malware') || alertName.toLowerCase().includes('clamav')) {
-            let host = 'unknown host';
-            // Search logs in reverse (newest first) for ClamAV 'FOUND' messages to correlate the host
-            const matchingLog = [...logs].reverse().find(l => l.msg && (l.msg.includes('FOUND') || l.msg.toLowerCase().includes('malware')));
-            if (matchingLog) {
-              host = getFriendlyName(matchingLog.service);
-            }
-
-            incidentService.addIncident({
-              alertname: alertName,
-              severity: alert.labels?.severity || 'critical',
-              host: host,
-              fingerprint: alert.fingerprint || alertName
-            });
-          }
+        for (const alert of activeAlerts) {
+          incidentService.addIncident({
+            alertname: alert.title,
+            severity: alert.severity,
+            host: alert.host,
+            fingerprint: alert.id
+          });
         }
       }
-      this.lastKnownState.alertCount = alerts.length;
+      this.lastKnownState.alertCount = activeAlerts.length;
 
       // 2. Event-Driven: CPU Spikes > 75%
       const currentHighCpuHosts = new Set();

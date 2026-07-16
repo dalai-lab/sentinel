@@ -47,9 +47,9 @@ router.post('/recipients', async (req, res) => {
       });
 
       // Send approval notification asynchronously
-      if (settings.botToken) {
+      if (process.env.TELEGRAM_BOT_TOKEN) {
         const msg = `✅ *Access Granted*\n\nYour request has been approved by the administrator. You are now subscribed to receive real-time Sentinel alerts.`;
-        telegramService.sendTelegramMessage(settings.botToken, chatId, msg).catch(() => {});
+        telegramService.sendTelegramMessage(chatId, msg).catch(() => {});
       }
     }
     res.json({ status: 'success', data: settings.recipients });
@@ -88,10 +88,7 @@ router.put('/recipients/:id/toggle', (req, res) => {
 // Get Pending Chats
 router.post('/pending', async (req, res) => {
   try {
-    // If frontend sent a botToken, save it first before polling
-    if (req.body.botToken) {
-      telegramService.saveSettings({ botToken: req.body.botToken });
-    }
+    // No botToken saving from frontend anymore; environment configuration is used.
 
     const result = await telegramService.getPendingChats();
     res.json(result);
@@ -104,6 +101,16 @@ router.post('/pending', async (req, res) => {
 router.post('/test', async (req, res) => {
   try {
     const result = await telegramService.sendTestMessage();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Send Active Alerts
+router.post('/send-active-alerts', async (req, res) => {
+  try {
+    const result = await telegramService.sendActiveAlerts();
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

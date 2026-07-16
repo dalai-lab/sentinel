@@ -22,7 +22,6 @@ class TelegramService {
   ensureSettingsFile() {
     if (!fs.existsSync(this.settingsPath)) {
       const defaultSettings = {
-        botToken: '',
         active: false,
         lastUpdateId: 0,
         pendingQueue: [], // Array of { chatId, username, timestamp }
@@ -46,19 +45,33 @@ class TelegramService {
           parsed.recipients.push({ id: 'tg_1', name: 'Primary Chat', chatId: parsed.chatId, active: true });
           delete parsed.chatId;
         }
+
+        // Remove plain botToken from object and inject configured flag
+        if (parsed.botToken) delete parsed.botToken;
+        parsed.botTokenConfigured = !!process.env.TELEGRAM_BOT_TOKEN;
+
         return parsed;
       }
     } catch (e) {
       console.error('[TELEGRAM SERVICE] Error loading telegramSettings.json:', e.message);
     }
-    return { botToken: '', active: false, lastUpdateId: 0, pendingQueue: [], recipients: [] };
+    return { active: false, lastUpdateId: 0, pendingQueue: [], recipients: [], botTokenConfigured: !!process.env.TELEGRAM_BOT_TOKEN };
   }
 
   saveSettings(newSettings) {
     try {
       const current = this.getSettings();
-      const updated = { ...current, ...newSettings };
+      const cleanedUpdates = { ...newSettings };
+      delete cleanedUpdates.botToken;
+      delete cleanedUpdates.botTokenConfigured;
+
+      const updated = { ...current, ...cleanedUpdates };
+      delete updated.botToken;
+      delete updated.botTokenConfigured;
+
       fs.writeFileSync(this.settingsPath, JSON.stringify(updated, null, 2), 'utf8');
+      
+      updated.botTokenConfigured = !!process.env.TELEGRAM_BOT_TOKEN;
       return updated;
     } catch (e) {
       console.error('[TELEGRAM SERVICE] Failed to save telegramSettings.json:', e.message);
@@ -81,15 +94,24 @@ class TelegramService {
       `*Details:*\n\`${alert.message}\``;
   }
 
-  async sendTelegramMessage(botToken, chatId, text) {
-    if (!botToken || !chatId) {
+  async sendTelegramMessage(chatId, text) {
+    let token = process.env.TELEGRAM_BOT_TOKEN;
+    let actualChatId = chatId;
+    let actualText = text;
+    if (arguments.length === 3) {
+      token = arguments[0] || process.env.TELEGRAM_BOT_TOKEN;
+      actualChatId = arguments[1];
+      actualText = arguments[2];
+    }
+
+    if (!token || !actualChatId) {
       throw new Error("Missing Telegram botToken or chatId");
     }
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
     try {
       const response = await axios.post(url, {
-        chat_id: chatId,
-        text: text,
+        chat_id: actualChatId,
+        text: actualText,
         parse_mode: 'Markdown'
       });
       return response.data;
@@ -104,8 +126,8 @@ class TelegramService {
     if (!settings.active) {
       return { success: false, message: 'Telegram alerts are disabled.' };
     }
-    if (!settings.botToken) {
-      return { success: false, message: 'Bot Token is missing.' };
+    if (!process.env.TELEGRAM_BOT_TOKEN) {
+      return { success: false, message: 'Bot Token is missing in environment variables.' };
     }
     
     const activeRecipients = settings.recipients.filter(r => r.active && r.chatId);
@@ -118,7 +140,7 @@ class TelegramService {
     let sentCount = 0;
     for (const r of activeRecipients) {
       try {
-        await this.sendTelegramMessage(settings.botToken, r.chatId, testText);
+        await this.sendTelegramMessage(r.chatId, testText);
         sentCount++;
       } catch (e) {
         console.error(`Failed to send test to ${r.name} (${r.chatId})`);
@@ -133,8 +155,9 @@ class TelegramService {
 
   async sendAlertNotification(alert) {
     const settings = this.getSettings();
+    const token = process.env.TELEGRAM_BOT_TOKEN;
     
-    if (!settings.active || !settings.botToken || !settings.recipients || settings.recipients.length === 0) {
+    if (!settings.active || !token || !settings.recipients || settings.recipients.length === 0) {
       return;
     }
 
@@ -155,7 +178,7 @@ class TelegramService {
     let sentAny = false;
     for (const r of activeRecipients) {
       try {
-        await this.sendTelegramMessage(settings.botToken, r.chatId, text);
+        await this.sendTelegramMessage(r.chatId, text);
         sentAny = true;
       } catch (e) {
         console.error(`[TELEGRAM SERVICE] Failed to send alert to ${r.chatId}:`, e.message);
@@ -168,16 +191,58 @@ class TelegramService {
     }
   }
 
-  // Fetch a list of recent unique users who have messaged the bot
-  async getPendingChats() {
-    let settings = this.getSettings();
-    if (!settings.botToken) {
-      return { success: false, message: 'Please save a Bot Token first.' };
+  async sendActiveAlerts() {
+    const settings = this.getSettings();
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!settings.active || !token) {
+      return { success: false, message: 'Telegram alerts are disabled or missing bot token.' };
     }
+
+    const activeRecipients = settings.recipients.filter(r => r.active && r.chatId);
+    if (activeRecipients.length === 0) {
+      return { success: false, message: 'No active chat IDs configured.' };
+    }
+
+    try {
+      const alertService = require('./alert.service');
+      const allAlerts = alertService.getAlerts();
+      const activeAlerts = allAlerts.filter(a => a.status === 'active');
+
+      if (activeAlerts.length === 0) {
+        return { success: true, sent: 0, total: 0, message: 'No active alerts to send.' };
+      }
+
+      let sentCount = 0;
+      for (const alert of activeAlerts) {
+        const text = this.formatAlertMessage(alert);
+        for (const r of activeRecipients) {
+          try {
+            await this.sendTelegramMessage(r.chatId, text);
+          } catch (e) {
+            console.error(`[TELEGRAM SERVICE] Failed to send active alert to ${r.chatId}:`, e.message);
+          }
+        }
+        sentCount++;
+      }
+
+      return { success: true, sent: sentCount, total: activeAlerts.length, message: `Dispatched ${sentCount} active alerts.` };
+    } catch (e) {
+      console.error("[TELEGRAM SERVICE] Error in sendActiveAlerts:", e);
+      throw e;
+    }
+  }
+
+  async getPendingChats() {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) {
+      return { success: false, message: 'TELEGRAM_BOT_TOKEN is not set in environment.' };
+    }
+
+    let settings = this.getSettings();
 
     // Offset +1 to acknowledge and consume updates
     const offset = (settings.lastUpdateId || 0) + 1;
-    const url = `https://api.telegram.org/bot${settings.botToken}/getUpdates?offset=${offset}&timeout=5`;
+    const url = `https://api.telegram.org/bot${token}/getUpdates?offset=${offset}&timeout=5`;
     
     try {
       const response = await axios.get(url);
@@ -209,7 +274,7 @@ class TelegramService {
 
               // Send the auto-reply acknowledging their request
               const replyText = `⏳ *Access Requested*\n\nYour request has been forwarded to the Sentinel Administrator for approval. You will be notified once access is granted.`;
-              await this.sendTelegramMessage(settings.botToken, chatId, replyText).catch(() => {});
+              await this.sendTelegramMessage(chatId, replyText).catch(() => {});
             }
           }
         }

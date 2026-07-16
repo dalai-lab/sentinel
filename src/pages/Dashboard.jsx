@@ -208,6 +208,15 @@ export default function Dashboard() {
     };
   }, []);
 
+  // Reset scroll position to top when activeTab or selectedServerName changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const main = document.querySelector('.main-content');
+    if (main) {
+      main.scrollTop = 0;
+    }
+  }, [activeTab, selectedServerName]);
+
   // Summary Metrics Helper
   const totalServersCount = 4; // Total catalog servers
   const onlineServersCount = servers.filter(s => s.status === 'online').length;

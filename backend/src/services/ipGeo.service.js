@@ -20,32 +20,41 @@ async function lookupIps(ips) {
 
   try {
     // ip-api.com batch endpoint — free, up to 100 IPs per request
-    const payload = uncached.map(ip => ({ query: ip, fields: 'status,country,countryCode,regionName,city,isp,org,query' }));
-    const res = await axios.post('http://ip-api.com/batch', payload, {
-      timeout: 5000,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Chunk the uncached array into batches of 100
+    for (let i = 0; i < uncached.length; i += 100) {
+      const chunk = uncached.slice(i, i + 100);
+      const payload = chunk.map(ip => ({ query: ip, fields: 'status,country,countryCode,regionName,city,isp,org,query' }));
+      
+      const res = await axios.post('http://ip-api.com/batch', payload, {
+        timeout: 5000,
+        headers: { 'Content-Type': 'application/json' }
+      });
 
-    for (const entry of res.data) {
-      if (entry.status === 'success') {
-        const geo = {
-          country: entry.country || '',
-          countryCode: (entry.countryCode || '').toLowerCase(),
-          city: entry.city || '',
-          region: entry.regionName || '',
-          isp: entry.isp || entry.org || '',
-        };
-        cache[entry.query] = geo;
-        result[entry.query] = geo;
-      } else {
-        // Private / reserved IPs
-        const geo = { country: 'Private Network', countryCode: '', city: '', region: '', isp: '' };
-        cache[entry.query] = geo;
-        result[entry.query] = geo;
+      for (const entry of res.data) {
+        if (entry.status === 'success') {
+          const geo = {
+            country: entry.country || '',
+            countryCode: (entry.countryCode || '').toLowerCase(),
+            city: entry.city || '',
+            region: entry.regionName || '',
+            isp: entry.isp || entry.org || '',
+          };
+          cache[entry.query] = geo;
+          result[entry.query] = geo;
+        } else {
+          // Private / reserved IPs
+          const geo = { country: 'Private Network', countryCode: '', city: '', region: '', isp: '' };
+          cache[entry.query] = geo;
+          result[entry.query] = geo;
+        }
       }
     }
   } catch (err) {
-    console.error('[IP GEO] Batch lookup failed:', err.message);
+    if (err.response) {
+      console.error('[IP GEO] Batch lookup failed:', err.response.status, err.response.data);
+    } else {
+      console.error('[IP GEO] Batch lookup failed:', err.message);
+    }
   }
 
   return result;

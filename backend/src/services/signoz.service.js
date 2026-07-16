@@ -35,6 +35,8 @@ async function fetchLogs(startTime, endTime, type) {
   try {
     const end = endTime || Date.now();
     const start = startTime || (end - 60 * 60 * 1000); // 1 hour default
+    const startNano = start * 1000000;
+    const endNano = end * 1000000;
 
     let compositeQuery;
 
@@ -45,7 +47,7 @@ async function fetchLogs(startTime, endTime, type) {
             type: 'clickhouse_sql',
             spec: {
               name: 'A',
-              query: `SELECT timestamp, body, severity_text, resources_string, attributes_string FROM signoz_logs.logs_v2 WHERE body ILIKE '%sshd%' OR body ILIKE '%crowdsec%' ORDER BY timestamp DESC LIMIT 2000`
+              query: `SELECT timestamp, body, severity_text, resources_string, attributes_string FROM signoz_logs.logs_v2 WHERE (body ILIKE '%sshd%' OR body ILIKE '%crowdsec%') AND timestamp >= ${startNano} AND timestamp <= ${endNano} ORDER BY timestamp DESC LIMIT 10000`
             }
           }
         ]

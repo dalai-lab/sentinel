@@ -111,6 +111,11 @@ class EmailService {
       badgeBorder = 'rgba(239,68,68,0.2)';
       badgeColor = '#ef4444';
       badgeText = 'VIRUS DETECTED';
+    } else if (alert.type === 'antivirus_scan_completed') {
+      badgeBg = 'rgba(16,185,129,0.05)';
+      badgeBorder = 'rgba(16,185,129,0.2)';
+      badgeColor = '#10b981';
+      badgeText = 'SCAN COMPLETE';
     }
 
     const timestamp = new Date(alert.timestamp || Date.now()).toUTCString();
@@ -238,11 +243,15 @@ class EmailService {
     const severity = (alert.severity || 'warning').toLowerCase();
     const severityCheck = this.settings.severities || {};
 
-    // Match alert severity filter
-    if (severity === 'critical' && !severityCheck.critical) return;
-    if (severity === 'high' && !severityCheck.high) return;
-    if (severity === 'warning' && !severityCheck.warning) return;
-    if (severity === 'info' && !severityCheck.info) return;
+    // Match alert severity filter.
+    // Exception: antivirus_scan_completed always goes through regardless of the 'info' severity toggle,
+    // since it has its own dedicated toggle (sendAntivirusReportEmail) checked in alert.service.js.
+    if (alert.type !== 'antivirus_scan_completed') {
+      if (severity === 'critical' && !severityCheck.critical) return;
+      if (severity === 'high' && !severityCheck.high) return;
+      if (severity === 'warning' && !severityCheck.warning) return;
+      if (severity === 'info' && !severityCheck.info) return;
+    }
 
     const subject = `[Sentinel ${severity.toUpperCase()}] ${alert.title} - ${alert.host || 'Fleet'}`;
     const html = this.generateAlertHtml(alert);

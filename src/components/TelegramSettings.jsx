@@ -33,7 +33,6 @@ export default function TelegramSettings() {
     }
   };
 
-  // Auto-poll for pending approvals every 5 seconds if token is configured in backend env
   useEffect(() => {
     if (!settings?.botTokenConfigured) return;
     
@@ -209,17 +208,7 @@ export default function TelegramSettings() {
 
   if (loading || !settings) {
     return (
-      <div style={{
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border-color)',
-        borderRadius: 'var(--radius-md)',
-        padding: '24px',
-        color: 'var(--text-muted)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        fontSize: '0.74rem'
-      }}>
+      <div className="dashboard-card" style={{ padding: '24px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem' }}>
         <RefreshCw size={12} className="spin" /> Loading Telegram configurations...
       </div>
     );
@@ -228,202 +217,161 @@ export default function TelegramSettings() {
   const isConnected = settings.active && settings.botTokenConfigured;
 
   return (
-    <div style={{
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border-color)',
-      borderRadius: 'var(--radius-md)',
-      padding: '24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '20px',
-      transition: 'var(--transition)'
-    }}>
+    <div 
+      className="dashboard-card"
+      style={{
+        padding: '20px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
+      }}
+    >
       {/* Header Row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid var(--border-color)',
-            borderRadius: 'var(--radius-md)',
-            padding: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '40px',
-            width: '40px'
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            width: '32px', 
+            height: '32px', 
+            borderRadius: 'var(--radius-sm)', 
+            background: 'var(--color-rgb-255-255-255-0-01)', 
+            border: '1px solid var(--border-color)', 
+            flexShrink: 0
           }}>
-            <MessageCircle size={18} color="var(--text-secondary)" />
+            <MessageCircle size={14} color="var(--text-muted)" />
           </div>
           <div>
-            <h3 style={{ margin: '0 0 4px 0', fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+            <h3 style={{ fontSize: '0.84rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>
               Telegram Notifications
             </h3>
-            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.76rem', lineHeight: '1.4' }}>
+            <p style={{ margin: '4px 0 0 0', color: 'var(--text-muted)', fontSize: '0.74rem', lineHeight: '1.4' }}>
               Dispatch real-time security telemetry and active incident reports directly to Telegram recipients.
             </p>
           </div>
         </div>
 
-        {/* Master Active Status Button */}
-        <button
-          type="button"
-          onClick={handleToggleMasterEnable}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: settings.active ? 'var(--status-healthy-bg)' : 'rgba(255, 255, 255, 0.01)',
-            border: `1px solid ${settings.active ? 'var(--status-healthy)' : 'var(--border-color)'}`,
-            color: settings.active ? 'var(--status-healthy)' : 'var(--text-muted)',
-            padding: '6px 12px',
-            borderRadius: 'var(--radius-sm)',
-            cursor: 'pointer',
-            fontSize: '0.74rem',
-            fontWeight: 500,
-            transition: 'var(--transition)'
-          }}
-        >
-          {settings.active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
-          {settings.active ? 'System Active' : 'System Paused'}
-        </button>
+        {/* Header Action Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={handleToggleMasterEnable}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: settings.active ? 'var(--status-healthy-bg)' : 'var(--color-rgb-255-255-255-0-015)',
+              border: `1px solid ${settings.active ? 'var(--status-healthy)' : 'var(--border-color)'}`,
+              color: settings.active ? 'var(--status-healthy)' : 'var(--text-muted)',
+              padding: '5px 10px',
+              borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              fontSize: '0.72rem',
+              fontWeight: 500,
+              height: '32px',
+              transition: 'var(--transition)'
+            }}
+          >
+            {settings.active ? <ToggleRight size={15} /> : <ToggleLeft size={15} />}
+            {settings.active ? 'Active' : 'Disabled'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSendActiveAlerts}
+            disabled={sendingActive || !settings.active}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              background: activeAlertCount > 0 ? 'var(--status-danger-bg)' : 'var(--color-rgb-255-255-255-0-015)',
+              border: `1px solid ${activeAlertCount > 0 ? 'var(--status-danger)' : 'var(--border-color)'}`,
+              color: activeAlertCount > 0 ? 'var(--status-danger)' : 'var(--text-muted)',
+              padding: '5px 12px',
+              borderRadius: 'var(--radius-sm)',
+              cursor: (sendingActive || !settings.active) ? 'not-allowed' : 'pointer',
+              fontSize: '0.72rem',
+              fontWeight: 500,
+              height: '32px',
+              opacity: (sendingActive || !settings.active) ? 0.5 : 1,
+              transition: 'var(--transition)'
+            }}
+          >
+            <Bell size={11} />
+            {sendingActive ? 'Sending...' : `Send Active Alerts${activeAlertCount > 0 ? ` (${activeAlertCount})` : ''}`}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSendTest}
+            disabled={testing || !settings.active}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              background: 'var(--text-primary)',
+              border: 'none',
+              color: 'var(--bg-primary)',
+              padding: '5px 12px',
+              borderRadius: 'var(--radius-sm)',
+              cursor: (testing || !settings.active) ? 'not-allowed' : 'pointer',
+              fontSize: '0.72rem',
+              fontWeight: 500,
+              opacity: (testing || !settings.active) ? 0.5 : 1,
+              height: '32px',
+              transition: 'var(--transition)'
+            }}
+          >
+            <Send size={11} />
+            {testing ? 'Sending Test...' : 'Send Test Alert'}
+          </button>
+        </div>
       </div>
 
-      {/* Modern Status Badge Strip */}
+      {/* Connection Info Banner */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        background: 'rgba(255, 255, 255, 0.005)',
+        background: 'var(--color-rgb-255-255-255-0-003)',
         border: '1px solid var(--border-color)',
         borderRadius: 'var(--radius-sm)',
         padding: '10px 14px',
         fontSize: '0.72rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Shield size={13} color={settings.botTokenConfigured ? 'var(--status-healthy)' : 'var(--status-danger)'} />
-            <span style={{ color: 'var(--text-secondary)' }}>
-              Token status: <strong style={{ color: 'var(--text-primary)' }}>{settings.botTokenConfigured ? 'Configured (.env)' : 'Missing from .env'}</strong>
-            </span>
-          </div>
-          <span style={{ color: 'var(--border-color)' }}>|</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Shield size={12} color={settings.botTokenConfigured ? 'var(--status-healthy)' : 'var(--status-danger)'} />
           <span style={{ color: 'var(--text-secondary)' }}>
-            Active connections: <strong style={{ color: 'var(--text-primary)' }}>{settings.recipients?.filter(r => r.active).length || 0}</strong>
+            Token Status: <strong style={{ color: 'var(--text-primary)' }}>{settings.botTokenConfigured ? 'Configured (.env)' : 'Missing'}</strong>
+          </span>
+          <span style={{ color: 'var(--text-muted)' }}>|</span>
+          <span style={{ color: 'var(--text-secondary)' }}>
+            Active Connections: <strong style={{ color: 'var(--text-primary)' }}>{settings.recipients?.filter(r => r.active).length || 0}</strong>
           </span>
         </div>
 
         <div>
           {isConnected ? (
-            <span style={{
-              color: 'var(--status-healthy)',
-              fontWeight: 600,
-              fontSize: '0.66rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              background: 'var(--status-healthy-bg)',
-              border: '1px solid rgba(16, 185, 129, 0.12)',
-              padding: '2px 8px',
-              borderRadius: '10px'
-            }}>
+            <span style={{ color: 'var(--status-healthy)', fontWeight: 600, fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.04em', background: 'var(--status-healthy-bg)', border: '1px solid rgba(16, 185, 129, 0.12)', padding: '2px 8px', borderRadius: '10px' }}>
               ● Live
             </span>
           ) : (
-            <span style={{
-              color: settings.active ? 'var(--status-danger)' : 'var(--text-muted)',
-              fontWeight: 600,
-              fontSize: '0.66rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              background: settings.active ? 'var(--status-danger-bg)' : 'rgba(255,255,255,0.01)',
-              border: `1px solid ${settings.active ? 'rgba(239, 68, 68, 0.12)' : 'var(--border-color)'}`,
-              padding: '2px 8px',
-              borderRadius: '10px'
-            }}>
+            <span style={{ color: settings.active ? 'var(--status-danger)' : 'var(--text-muted)', fontWeight: 600, fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.04em', background: settings.active ? 'var(--status-danger-bg)' : 'var(--color-rgb-255-255-255-0-01)', border: `1px solid ${settings.active ? 'rgba(239, 68, 68, 0.12)' : 'var(--border-color)'}`, padding: '2px 8px', borderRadius: '10px' }}>
               ● Offline
             </span>
           )}
         </div>
       </div>
 
-      {/* Action Buttons Strip */}
-      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={handleSendTest}
-          disabled={testing || !settings.active}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: 'var(--text-primary)',
-            border: 'none',
-            color: 'var(--bg-primary)',
-            padding: '7px 14px',
-            borderRadius: 'var(--radius-sm)',
-            cursor: (testing || !settings.active) ? 'default' : 'pointer',
-            fontSize: '0.74rem',
-            fontWeight: 600,
-            opacity: (testing || !settings.active) ? 0.4 : 1,
-            transition: 'var(--transition)'
-          }}
-        >
-          <Send size={12} />
-          {testing ? 'Sending Test...' : 'Dispatch Test Alert'}
-        </button>
-
-        <button
-          type="button"
-          onClick={handleSendActiveAlerts}
-          disabled={sendingActive || !settings.active}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: activeAlertCount > 0 ? 'var(--status-danger-bg)' : 'rgba(255, 255, 255, 0.01)',
-            border: `1px solid ${activeAlertCount > 0 ? 'rgba(239, 68, 68, 0.2)' : 'var(--border-color)'}`,
-            color: activeAlertCount > 0 ? 'var(--status-danger)' : 'var(--text-secondary)',
-            padding: '7px 14px',
-            borderRadius: 'var(--radius-sm)',
-            cursor: (sendingActive || !settings.active) ? 'default' : 'pointer',
-            fontSize: '0.74rem',
-            fontWeight: 500,
-            opacity: (sendingActive || !settings.active) ? 0.4 : 1,
-            transition: 'var(--transition)'
-          }}
-        >
-          <Bell size={12} />
-          {sendingActive ? 'Sending...' : `Broadcast Active Alerts${activeAlertCount > 0 ? ` (${activeAlertCount})` : ''}`}
-        </button>
-      </div>
-
       {/* Error & Success Messages */}
       {successMsg && (
-        <div style={{
-          background: 'var(--status-healthy-bg)',
-          border: '1px solid rgba(16, 185, 129, 0.15)',
-          color: 'var(--status-healthy)',
-          padding: '10px 14px',
-          borderRadius: 'var(--radius-sm)',
-          fontSize: '0.74rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
+        <div style={{ background: 'var(--status-healthy-bg)', border: '1px solid rgba(16, 185, 129, 0.15)', color: 'var(--status-healthy)', padding: '10px 14px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Check size={14} /> {successMsg}
         </div>
       )}
       {errorMsg && (
-        <div style={{
-          background: 'var(--status-danger-bg)',
-          border: '1px solid rgba(239, 68, 68, 0.15)',
-          color: 'var(--status-danger)',
-          padding: '10px 14px',
-          borderRadius: 'var(--radius-sm)',
-          fontSize: '0.74rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
+        <div style={{ background: 'var(--status-danger-bg)', border: '1px solid rgba(239, 68, 68, 0.15)', color: 'var(--status-danger)', padding: '10px 14px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <AlertCircle size={14} /> {errorMsg}
         </div>
       )}
@@ -442,7 +390,7 @@ export default function TelegramSettings() {
             cursor: 'pointer',
             padding: '0 0 10px 0',
             fontSize: '0.78rem',
-            fontWeight: 600,
+            fontWeight: 500,
             color: activeTab === 'configured' ? 'var(--text-primary)' : 'var(--text-muted)',
             borderBottom: activeTab === 'configured' ? '2px solid var(--text-primary)' : '2px solid transparent',
             display: 'flex',
@@ -464,7 +412,7 @@ export default function TelegramSettings() {
             cursor: 'pointer',
             padding: '0 0 10px 0',
             fontSize: '0.78rem',
-            fontWeight: 600,
+            fontWeight: 500,
             color: activeTab === 'pending' ? 'var(--status-warning)' : 'var(--text-muted)',
             borderBottom: activeTab === 'pending' ? '2px solid var(--status-warning)' : '2px solid transparent',
             display: 'flex',
@@ -493,86 +441,33 @@ export default function TelegramSettings() {
       {activeTab === 'configured' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {/* Add Recipient Form Inline */}
-          <form onSubmit={handleAddRecipient} style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px',
-            alignItems: 'center'
-          }}>
-            <div style={{
-              flex: '1',
-              minWidth: '180px',
-              background: 'rgba(255, 255, 255, 0.01)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '0 10px',
-              display: 'flex',
-              alignItems: 'center',
-              height: '34px',
-              transition: 'var(--transition)'
-            }}>
+          <form onSubmit={handleAddRecipient} style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+            <div style={{ flex: '1', minWidth: '180px', background: 'var(--color-rgb-255-255-255-0-015)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '0 10px', height: '34px', display: 'flex', alignItems: 'center' }}>
               <input
                 type="text"
                 placeholder="Recipient label (e.g. SOC Team)"
                 value={newName}
                 onChange={e => setNewName(e.target.value)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-primary)',
-                  width: '100%',
-                  outline: 'none',
-                  fontSize: '0.74rem'
-                }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', width: '100%', outline: 'none', fontSize: '0.74rem' }}
               />
             </div>
 
-            <div style={{
-              flex: '1.2',
-              minWidth: '200px',
-              background: 'rgba(255, 255, 255, 0.01)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--radius-sm)',
-              padding: '0 10px',
-              display: 'flex',
-              alignItems: 'center',
-              height: '34px',
-              transition: 'var(--transition)'
-            }}>
+            <div style={{ flex: '1.2', minWidth: '200px', background: 'var(--color-rgb-255-255-255-0-015)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '0 10px', height: '34px', display: 'flex', alignItems: 'center' }}>
               <input
                 type="text"
                 placeholder="Telegram Chat ID (e.g. 5587057392)"
                 value={newChatId}
                 onChange={e => setNewChatId(e.target.value)}
                 required
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-primary)',
-                  width: '100%',
-                  outline: 'none',
-                  fontSize: '0.74rem',
-                  fontFamily: 'var(--font-mono)'
-                }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', width: '100%', outline: 'none', fontSize: '0.74rem', fontFamily: 'monospace' }}
               />
             </div>
 
             <button
               type="submit"
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-color)',
-                color: 'var(--text-primary)',
-                padding: '0 16px',
-                borderRadius: 'var(--radius-sm)',
-                cursor: 'pointer',
-                fontSize: '0.74rem',
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                height: '34px',
-                transition: 'var(--transition)'
+                background: 'var(--color-rgb-255-255-255-0-02)', border: '1px solid var(--border-color)', color: 'var(--text-primary)',
+                padding: '0 16px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.74rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px', height: '34px', transition: 'var(--transition)'
               }}
             >
               <Plus size={13} /> Add Chat ID
@@ -582,22 +477,11 @@ export default function TelegramSettings() {
           {/* Recipients List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {(!settings.recipients || settings.recipients.length === 0) ? (
-              <div style={{
-                padding: '24px',
-                textAlign: 'center',
-                color: 'var(--text-muted)',
-                fontSize: '0.76rem',
-                border: '1px dashed var(--border-color)',
-                borderRadius: 'var(--radius-sm)'
-              }}>
+              <div style={{ padding: '24px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.76rem', border: '1px dashed var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
                 No Telegram chats configured. Use Pending Approvals or input manually above.
               </div>
             ) : (
-              <div style={{
-                border: '1px solid var(--border-color)',
-                borderRadius: 'var(--radius-sm)',
-                overflow: 'hidden'
-              }}>
+              <div style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
                 {settings.recipients.map((rcp, idx) => (
                   <div
                     key={rcp.id || idx}
@@ -605,20 +489,20 @@ export default function TelegramSettings() {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      padding: '12px 16px',
+                      padding: '10px 14px',
                       borderBottom: idx < settings.recipients.length - 1 ? '1px solid var(--border-color)' : 'none',
-                      background: rcp.active ? 'transparent' : 'rgba(255, 255, 255, 0.002)',
-                      opacity: rcp.active ? 1 : 0.5,
+                      background: rcp.active ? 'transparent' : 'var(--color-rgb-255-255-255-0-003)',
+                      opacity: rcp.active ? 1 : 0.6,
                       transition: 'var(--transition)'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <MessageCircle size={14} color={rcp.active ? 'var(--status-healthy)' : 'var(--text-muted)'} />
                       <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                        <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                        <span style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                           {rcp.name || 'Unnamed Recipient'}
                         </span>
-                        <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
                           {rcp.chatId}
                         </span>
                       </div>
@@ -629,7 +513,7 @@ export default function TelegramSettings() {
                         type="button"
                         onClick={() => handleToggle(rcp.id)}
                         style={{
-                          background: rcp.active ? 'var(--status-healthy-bg)' : 'rgba(255, 255, 255, 0.01)',
+                          background: rcp.active ? 'var(--status-healthy-bg)' : 'var(--color-rgb-255-255-255-0-015)',
                           border: `1px solid ${rcp.active ? 'rgba(16, 185, 129, 0.2)' : 'var(--border-color)'}`,
                           color: rcp.active ? 'var(--status-healthy)' : 'var(--text-muted)',
                           padding: '2px 8px',
@@ -722,7 +606,7 @@ export default function TelegramSettings() {
                       <div style={{ fontSize: '0.76rem', fontWeight: 600, color: 'var(--text-primary)' }}>
                         @{c.username}
                       </div>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
                         Chat ID: {c.chatId}
                       </div>
                     </div>

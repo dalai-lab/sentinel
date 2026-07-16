@@ -179,18 +179,19 @@ async function fetchLatestScans() {
     // Step 2: Fetch the surrounding lines to reconstruct the summary body
     for (const host of Object.keys(latestScansMap)) {
       const tsNano = latestScansMap[host];
-      // Search a 10 second window (OTEL sometimes buffers heavily)
-      const windowEndNano = Number(tsNano) + (10 * 1000 * 1000000);
+      // Search from 24 hours before the summary (to catch long scans) to 15 seconds after
+      const windowStartNano = Number(tsNano) - (24 * 60 * 60 * 1000 * 1000000);
+      const windowEndNano = Number(tsNano) + (15 * 1000 * 1000000);
       
-      const query2 = `SELECT body FROM signoz_logs.logs_v2 WHERE timestamp >= ${tsNano} AND timestamp <= ${windowEndNano} AND resources_string['host.name'] = '${host}' ORDER BY timestamp ASC LIMIT 50`;
+      const query2 = `SELECT body FROM signoz_logs.logs_v2 WHERE timestamp >= ${windowStartNano} AND timestamp <= ${windowEndNano} AND resources_string['host.name'] = '${host}' ORDER BY timestamp DESC LIMIT 2000`;
       
       const compositeQuery2 = {
         queries: [{ type: 'clickhouse_sql', spec: { name: 'A', query: query2 } }]
       };
 
       const payload2 = {
-        start: Math.floor(Number(tsNano)/1000000), 
-        end: Math.floor(windowEndNano/1000000), 
+        start: Math.floor(windowStartNano / 1000000), 
+        end: Math.floor(windowEndNano / 1000000), 
         requestType: 'raw', variables: {}, compositeQuery: compositeQuery2
       };
 
@@ -199,27 +200,74 @@ async function fetchLatestScans() {
           headers: { 'SIGNOZ-API-KEY': config.SIGNOZ_API_KEY, 'Content-Type': 'application/json' }
         });
         
-        const subRows = res2.data?.data?.data?.results[0]?.rows || [];
-        const fullBody = subRows.map(r => r.data.body).join('\n');
+        let subRows = res2.data?.data?.data?.results[0]?.rows || [];
+        // Reverse because we queried DESC to ensure we don't truncate the summary end,
+        // but our parsing logic expects chronological (ASC) order
+        subRows = subRows.reverse();
         
-        const parseField = (regex, defaultVal = '') => {
-          const match = fullBody.match(regex);
-          return match ? match[1].trim() : defaultVal;
-        };
+        const lines = subRows.map(r => r.data.body);
+
+        // ── Find all SCAN SUMMARY block boundaries ──────────────────────────
+        // Lines are ASC (oldest → newest). Each ClamAV scan prints FOUND lines
+        // BEFORE its own SCAN SUMMARY header. Multiple scans may exist in the window.
+        const summaryIndices = lines.reduce((acc, line, idx) => {
+          if (line && line.includes('SCAN SUMMARY')) acc.push(idx);
+          return acc;
+        }, []);
+
+        if (summaryIndices.length === 0) continue;
+
+        // Build all scan blocks: { preSummary, body, pf, infectedCount }
+        // Each block spans from after the PREVIOUS summary to just before the NEXT summary.
+        // Lines are ASC (oldest → newest). FOUND lines appear BEFORE their own SCAN SUMMARY header.
+        const scanBlocks = summaryIndices.map((summaryIdx, i) => {
+          const blockStart = i === 0 ? 0 : summaryIndices[i - 1] + 1;
+          const blockEnd   = i < summaryIndices.length - 1 ? summaryIndices[i + 1] : lines.length;
+          const blockLines = lines.slice(blockStart, blockEnd); // scoped to just this block
+          const preSummary = lines.slice(blockStart, summaryIdx); // FOUND lines before summary header
+          const body = blockLines.join('\n');
+          const pf = (regex, def = '') => { const m = body.match(regex); return m ? m[1].trim() : def; };
+          const infectedCount = parseInt(pf(/Infected files:\s*(\d+)/, '0'));
+          return { summaryIdx, preSummary, body, pf, infectedCount };
+        });
+
+        // Always use the absolute latest scan. This ensures if an admin remediates
+        // a virus and runs a new clean scan, the dashboard immediately updates to clean.
+        const chosen = scanBlocks[scanBlocks.length - 1];
+
+        const { preSummary, body, pf, infectedCount } = chosen;
+
+        // Extract FOUND lines from the chosen scan's pre-summary section only
+        const rawInfectedList = preSummary
+          .filter(line => line && line.includes('FOUND'))
+          .map(line => {
+            const match = line.match(/^(.+?):\s+(.+?)\s+FOUND/);
+            if (!match) return null;
+            return { path: match[1].trim(), threatName: match[2].trim() };
+          })
+          .filter(item => item && item.path.startsWith('/'));
+
+        // Deduplicate by path + threatName
+        const uniqueMap = new Map();
+        rawInfectedList.forEach(item => {
+          uniqueMap.set(`${item.path}::${item.threatName}`, item);
+        });
+        const infectedFilesList = infectedCount > 0 ? Array.from(uniqueMap.values()) : [];
 
         finalScans.push({
           host,
           timestamp: Math.floor(Number(tsNano) / 1000000),
-          knownViruses: parseField(/Known viruses:\s*(.*)/),
-          engineVersion: parseField(/Engine version:\s*(.*)/),
-          scannedDirectories: parseField(/Scanned directories:\s*(.*)/),
-          scannedFiles: parseField(/Scanned files:\s*(.*)/),
-          infectedFiles: parseInt(parseField(/Infected files:\s*(\d+)/, '0')),
-          dataScanned: parseField(/Data scanned:\s*(.*)/),
-          dataRead: parseField(/Data read:\s*(.*)/),
-          timeTaken: parseField(/Time:\s*(.*)/),
-          startDate: parseField(/Start Date:\s*(.*)/),
-          endDate: parseField(/End Date:\s*(.*)/)
+          knownViruses: pf(/Known viruses:\s*(.*)/),
+          engineVersion: pf(/Engine version:\s*(.*)/),
+          scannedDirectories: pf(/Scanned directories:\s*(.*)/),
+          scannedFiles: pf(/Scanned files:\s*(.*)/),
+          infectedFiles: infectedCount,
+          infectedFilesList,
+          dataScanned: pf(/Data scanned:\s*(.*)/),
+          dataRead: pf(/Data read:\s*(.*)/),
+          timeTaken: pf(/Time:\s*(.*)/),
+          startDate: pf(/Start Date:\s*(.*)/),
+          endDate: pf(/End Date:\s*(.*)/)
         });
       } catch (err) {
         console.error(`[METRICS SERVICE] Failed to fetch scan lines for host ${host}:`, err.message);

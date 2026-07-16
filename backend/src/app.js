@@ -5,6 +5,7 @@ const metricsRoutes = require('./routes/metrics.routes');
 const alertsRoutes = require('./routes/alerts.routes');
 const emailRoutes = require('./routes/email.routes');
 const telegramRoutes = require('./routes/telegram.routes');
+const threatRoutes = require('./routes/threat.routes');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use('/api/metrics', metricsRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/telegram', telegramRoutes);
+app.use('/api/threat', threatRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

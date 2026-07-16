@@ -81,12 +81,14 @@ class TelegramService {
 
   formatAlertMessage(alert) {
     let icon = '🔴';
+    let label = 'SENTINEL ALERT';
     if (alert.severity === 'high' || alert.severity === 'warning') icon = '🟠';
-    if (alert.type === 'antivirus') icon = '🦠';
+    if (alert.type === 'antivirus') { icon = '🦠'; label = 'SENTINEL ALERT'; }
+    if (alert.type === 'antivirus_scan_completed') { icon = '🛡️'; label = 'SCAN REPORT'; }
 
     const timestamp = new Date(alert.timestamp || Date.now()).toUTCString();
 
-    return `${icon} *SENTINEL ALERT* ${icon}\n\n` +
+    return `${icon} *${label}* ${icon}\n\n` +
       `*Host:* \`${alert.host}\`\n` +
       `*Type:* ${alert.type.toUpperCase()}\n` +
       `*Severity:* ${alert.severity.toUpperCase()}\n` +

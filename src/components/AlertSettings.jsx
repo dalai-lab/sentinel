@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Server, Cpu, HardDrive, Shield, Filter } from 'lucide-react';
+import { Save, Server, Cpu, HardDrive, Shield, Filter, Bell } from 'lucide-react';
 import { fetchAlertSettings, updateAlertSettings } from '../api/alerts';
 
 const SERVER_LIST = [
@@ -25,7 +25,6 @@ export default function AlertSettings() {
   const loadSettings = async () => {
     try {
       const data = await fetchAlertSettings();
-      // ensure overrides exists
       if (!data.overrides) data.overrides = {};
       setSettings(data);
     } catch (e) {
@@ -37,7 +36,7 @@ export default function AlertSettings() {
     if (settings && selectedScope !== 'global') {
       setIsOverridden(!!settings.overrides[selectedScope]);
     } else {
-      setIsOverridden(true); // global is always "enabled"
+      setIsOverridden(true);
     }
   }, [selectedScope, settings]);
 
@@ -97,7 +96,6 @@ export default function AlertSettings() {
     return <div style={{ color: 'var(--text-muted)', fontSize: '0.74rem' }}>Loading alert settings...</div>;
   }
 
-  // Determine current active values based on scope and override state
   let currentVals = {
     cpuThreshold: settings.cpuThreshold,
     ramThreshold: settings.ramThreshold,
@@ -122,25 +120,41 @@ export default function AlertSettings() {
   const inputsDisabled = selectedScope !== 'global' && !isOverridden;
 
   return (
-    <div style={{
-      background: 'var(--color-rgb-255-255-255-0-005)',
-      border: '1px solid var(--color-rgb-255-255-255-0-03)',
-      borderRadius: 'var(--radius-md)',
-      padding: '20px 24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '20px'
-    }}>
-      <div className="settings-header">
-        <div>
-          <h3 style={{ margin: '0 0 4px 0', fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-primary)' }}>Telemetry Alert Thresholds</h3>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.74rem' }}>
-            Set system resource limits that trigger alerts across global or individual server scopes.
-          </p>
+    <div 
+      className="dashboard-card"
+      style={{
+        padding: '20px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px'
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            width: '32px', 
+            height: '32px', 
+            borderRadius: 'var(--radius-sm)', 
+            background: 'var(--color-rgb-255-255-255-0-01)', 
+            border: '1px solid var(--border-color)', 
+            flexShrink: 0 
+          }}>
+            <Bell size={14} color="var(--text-muted)" />
+          </div>
+          <div>
+            <h3 style={{ fontSize: '0.84rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Telemetry Alert Thresholds</h3>
+            <p style={{ margin: '4px 0 0 0', color: 'var(--text-muted)', fontSize: '0.74rem', lineHeight: '1.4' }}>
+              Set system resource limits that trigger alerts across global or individual server scopes.
+            </p>
+          </div>
         </div>
         
-        <div className="settings-header-scope">
-          <Filter size={12} color="var(--text-muted)" />
+        <div className="settings-header-scope" style={{ background: 'var(--color-rgb-255-255-255-0-015)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '5px 10px', height: '32px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <Filter size={11} color="var(--text-muted)" />
           <select 
             value={selectedScope}
             onChange={e => setSelectedScope(e.target.value)}
@@ -148,7 +162,7 @@ export default function AlertSettings() {
               background: 'transparent',
               border: 'none',
               color: 'var(--text-primary)',
-              fontSize: '0.74rem',
+              fontSize: '0.72rem',
               fontWeight: 500,
               outline: 'none',
               cursor: 'pointer'
@@ -166,7 +180,7 @@ export default function AlertSettings() {
       {selectedScope !== 'global' && (
         <div style={{
           background: isOverridden ? 'var(--color-rgb-16-185-129-0-02)' : 'var(--color-rgb-255-255-255-0-01)',
-          border: `1px solid ${isOverridden ? 'var(--color-rgb-16-185-129-0-15)' : 'var(--color-rgb-255-255-255-0-02)'}`,
+          border: `1px solid ${isOverridden ? 'var(--color-rgb-16-185-129-0-15)' : 'var(--border-color)'}`,
           borderRadius: 'var(--radius-sm)',
           padding: '10px 14px',
           display: 'flex',
@@ -192,95 +206,101 @@ export default function AlertSettings() {
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', opacity: inputsDisabled ? 0.5 : 1, pointerEvents: inputsDisabled ? 'none' : 'auto' }}>
-        
-        {/* CPU Threshold */}
-        <div style={{
-          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-            <Cpu size={14} color="var(--text-muted)" />
-            <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>CPU Threshold</span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', opacity: inputsDisabled ? 0.5 : 1, pointerEvents: inputsDisabled ? 'none' : 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+          
+          {/* CPU Threshold */}
+          <div style={{
+            background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <Cpu size={13} color="var(--text-muted)" />
+              <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>CPU Threshold</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <input 
+                type="range" 
+                min="10" max="100" 
+                value={currentVals.cpuThreshold ?? 85} 
+                onChange={(e) => handleChange('cpuThreshold', parseInt(e.target.value))}
+                className="minimal-range"
+                style={getSliderStyle(currentVals.cpuThreshold ?? 85)}
+              />
+              <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
+                {currentVals.cpuThreshold ?? 85}%
+              </span>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <input 
-              type="range" 
-              min="10" max="100" 
-              value={currentVals.cpuThreshold ?? 85} 
-              onChange={(e) => handleChange('cpuThreshold', parseInt(e.target.value))}
-              className="minimal-range"
-              style={getSliderStyle(currentVals.cpuThreshold ?? 85)}
-            />
-            <span style={{ fontWeight: 500, fontSize: '0.82rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
-              {currentVals.cpuThreshold ?? 85}%
-            </span>
+
+          {/* RAM Threshold */}
+          <div style={{
+            background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <Server size={13} color="var(--text-muted)" />
+              <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>RAM Threshold</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <input 
+                type="range" 
+                min="10" max="100" 
+                value={currentVals.ramThreshold ?? 90} 
+                onChange={(e) => handleChange('ramThreshold', parseInt(e.target.value))}
+                className="minimal-range"
+                style={getSliderStyle(currentVals.ramThreshold ?? 90)}
+              />
+              <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
+                {currentVals.ramThreshold ?? 90}%
+              </span>
+            </div>
           </div>
+
+          {/* Disk Threshold */}
+          <div style={{
+            background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <HardDrive size={13} color="var(--text-muted)" />
+              <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Disk Threshold</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <input 
+                type="range" 
+                min="10" max="100" 
+                value={currentVals.diskThreshold ?? 90} 
+                onChange={(e) => handleChange('diskThreshold', parseInt(e.target.value))}
+                className="minimal-range"
+                style={getSliderStyle(currentVals.diskThreshold ?? 90)}
+              />
+              <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
+                {currentVals.diskThreshold ?? 90}%
+              </span>
+            </div>
+          </div>
+
         </div>
 
-        {/* RAM Threshold */}
+        {/* Antivirus Toggle — full-width row below sliders */}
         <div style={{
-          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-            <Server size={14} color="var(--text-muted)" />
-            <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>RAM Threshold</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <input 
-              type="range" 
-              min="10" max="100" 
-              value={currentVals.ramThreshold ?? 90} 
-              onChange={(e) => handleChange('ramThreshold', parseInt(e.target.value))}
-              className="minimal-range"
-              style={getSliderStyle(currentVals.ramThreshold ?? 90)}
-            />
-            <span style={{ fontWeight: 500, fontSize: '0.82rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
-              {currentVals.ramThreshold ?? 90}%
-            </span>
-          </div>
-        </div>
-
-        {/* Disk Threshold */}
-        <div style={{
-          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-            <HardDrive size={14} color="var(--text-muted)" />
-            <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Disk Threshold</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <input 
-              type="range" 
-              min="10" max="100" 
-              value={currentVals.diskThreshold ?? 90} 
-              onChange={(e) => handleChange('diskThreshold', parseInt(e.target.value))}
-              className="minimal-range"
-              style={getSliderStyle(currentVals.diskThreshold ?? 90)}
-            />
-            <span style={{ fontWeight: 500, fontSize: '0.82rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
-              {currentVals.diskThreshold ?? 90}%
-            </span>
-          </div>
-        </div>
-
-        {/* Antivirus Toggle */}
-        <div style={{
-          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px',
-          display: 'flex', flexDirection: 'column', gap: '12px'
+          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '14px 16px',
+          display: 'flex', flexDirection: 'column', gap: '14px'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Shield size={14} color="var(--text-muted)" />
-              <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Antivirus Scan Alerts</span>
+              <Shield size={13} color="var(--text-muted)" />
+              <div>
+                <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Antivirus Scan Alerts</span>
+                <p style={{ margin: '2px 0 0 0', fontSize: '0.70rem', color: 'var(--text-muted)' }}>Trigger alerts and reports when ClamAV scans complete on any server.</p>
+              </div>
             </div>
-            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', flexShrink: 0 }}>
               <input 
                 type="checkbox" 
                 checked={currentVals.enableAntivirusAlerts ?? true}
                 onChange={(e) => handleChange('enableAntivirusAlerts', e.target.checked)}
                 style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
               />
-              <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: (currentVals.enableAntivirusAlerts ?? true) ? 'var(--status-healthy)' : 'var(--text-muted)', fontWeight: 500 }}>
+              <span style={{ fontSize: '0.72rem', color: (currentVals.enableAntivirusAlerts ?? true) ? 'var(--status-healthy)' : 'var(--text-muted)', fontWeight: 500 }}>
                 {(currentVals.enableAntivirusAlerts ?? true) ? 'Active' : 'Disabled'}
               </span>
             </label>
@@ -288,29 +308,29 @@ export default function AlertSettings() {
 
           {(currentVals.enableAntivirusAlerts ?? true) && (
             <div style={{ 
-              display: 'flex', flexDirection: 'column', gap: '8px', 
+              display: 'flex', alignItems: 'center', gap: '24px',
               paddingTop: '12px', borderTop: '1px solid var(--color-rgb-255-255-255-0-03)' 
             }}>
-              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Clean Scan Reports Destinations</span>
-              
-              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>Send via Email</span>
+              <span style={{ fontSize: '0.70rem', color: 'var(--text-muted)', flexShrink: 0 }}>Send clean scan reports to:</span>
+
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
                   checked={currentVals.sendAntivirusReportEmail ?? true}
                   onChange={(e) => handleChange('sendAntivirusReportEmail', e.target.checked)}
                   style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
                 />
+                <span style={{ fontSize: '0.74rem', color: (currentVals.sendAntivirusReportEmail ?? true) ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>Email</span>
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
-                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>Send via Telegram</span>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
                   checked={currentVals.sendAntivirusReportTelegram ?? true}
                   onChange={(e) => handleChange('sendAntivirusReportTelegram', e.target.checked)}
                   style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
                 />
+                <span style={{ fontSize: '0.74rem', color: (currentVals.sendAntivirusReportTelegram ?? true) ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>Telegram</span>
               </label>
             </div>
           )}
@@ -344,7 +364,7 @@ export default function AlertSettings() {
             opacity: saving ? 0.7 : 1
           }}
         >
-          <Save size={12} />
+          <Save size={11} />
           {saving ? 'Saving…' : 'Save Thresholds'}
         </button>
       </div>

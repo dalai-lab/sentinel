@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   frontend:
     build:
@@ -22,3 +20,9 @@ services:
     restart: always
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      # Persist user-generated config (settings, alert history) across rebuilds
+      - sentinel_config:/app/src/config
+
+volumes:
+  sentinel_config:

@@ -8,6 +8,18 @@ class EmailService {
   constructor() {
     this.settings = this.loadSettings();
     this.transporter = this.createTransporter();
+    // Tracks last email send time per dedupKey (host+alertType)
+    // to prevent spamming when the same alert keeps firing
+    this.lastEmailed = {};
+  }
+
+  // Minimum cooldown between emails for the same alert type per host
+  // critical → 1h, high → 2h, warning/info → 4h
+  getEmailCooldownMs(severity) {
+    const s = (severity || 'warning').toLowerCase();
+    if (s === 'critical') return 60 * 60 * 1000;       // 1 hour
+    if (s === 'high')     return 2 * 60 * 60 * 1000;   // 2 hours
+    return 4 * 60 * 60 * 1000;                          // 4 hours (warning/info)
   }
 
   loadSettings() {
@@ -211,6 +223,17 @@ class EmailService {
       console.log('[EMAIL SERVICE] No active recipient email addresses configured.');
       return { success: false, reason: 'No recipients configured' };
     }
+
+    // Email-level cooldown — independent of alert dedup
+    const emailDedupKey = `${alert.host}-${alert.type}-${alert.severity}`;
+    const now = Date.now();
+    const cooldown = this.getEmailCooldownMs(alert.severity);
+    if (this.lastEmailed[emailDedupKey] && (now - this.lastEmailed[emailDedupKey]) < cooldown) {
+      const minsLeft = Math.round((cooldown - (now - this.lastEmailed[emailDedupKey])) / 60000);
+      console.log(`[EMAIL SERVICE] ⏳ Suppressed duplicate email for [${alert.severity}] ${alert.title} on ${alert.host} — next allowed in ~${minsLeft}m`);
+      return { success: false, reason: 'Email cooldown active' };
+    }
+    this.lastEmailed[emailDedupKey] = now;
 
     const severity = (alert.severity || 'warning').toLowerCase();
     const severityCheck = this.settings.severities || {};

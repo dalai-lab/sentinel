@@ -84,7 +84,9 @@ export default function AlertSettings() {
           cpuThreshold: prev.cpuThreshold,
           ramThreshold: prev.ramThreshold,
           diskThreshold: prev.diskThreshold,
-          enableAntivirusAlerts: prev.enableAntivirusAlerts
+          enableAntivirusAlerts: prev.enableAntivirusAlerts,
+          sendAntivirusReportEmail: prev.sendAntivirusReportEmail,
+          sendAntivirusReportTelegram: prev.sendAntivirusReportTelegram
         };
         return next;
       });
@@ -100,7 +102,9 @@ export default function AlertSettings() {
     cpuThreshold: settings.cpuThreshold,
     ramThreshold: settings.ramThreshold,
     diskThreshold: settings.diskThreshold,
-    enableAntivirusAlerts: settings.enableAntivirusAlerts
+    enableAntivirusAlerts: settings.enableAntivirusAlerts,
+    sendAntivirusReportEmail: settings.sendAntivirusReportEmail,
+    sendAntivirusReportTelegram: settings.sendAntivirusReportTelegram
   };
 
   if (selectedScope !== 'global' && isOverridden && settings.overrides[selectedScope]) {
@@ -262,23 +266,54 @@ export default function AlertSettings() {
         {/* Antivirus Toggle */}
         <div style={{
           background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          display: 'flex', flexDirection: 'column', gap: '12px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Shield size={14} color="var(--text-muted)" />
-            <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Antivirus Scan Alerts</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Shield size={14} color="var(--text-muted)" />
+              <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Antivirus Scan Alerts</span>
+            </div>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={currentVals.enableAntivirusAlerts ?? true}
+                onChange={(e) => handleChange('enableAntivirusAlerts', e.target.checked)}
+                style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
+              />
+              <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: (currentVals.enableAntivirusAlerts ?? true) ? 'var(--status-healthy)' : 'var(--text-muted)', fontWeight: 500 }}>
+                {(currentVals.enableAntivirusAlerts ?? true) ? 'Active' : 'Disabled'}
+              </span>
+            </label>
           </div>
-          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-            <input 
-              type="checkbox" 
-              checked={currentVals.enableAntivirusAlerts ?? true}
-              onChange={(e) => handleChange('enableAntivirusAlerts', e.target.checked)}
-              style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
-            />
-            <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: (currentVals.enableAntivirusAlerts ?? true) ? 'var(--status-healthy)' : 'var(--text-muted)', fontWeight: 500 }}>
-              {(currentVals.enableAntivirusAlerts ?? true) ? 'Active' : 'Disabled'}
-            </span>
-          </label>
+
+          {(currentVals.enableAntivirusAlerts ?? true) && (
+            <div style={{ 
+              display: 'flex', flexDirection: 'column', gap: '8px', 
+              paddingTop: '12px', borderTop: '1px solid var(--color-rgb-255-255-255-0-03)' 
+            }}>
+              <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '2px' }}>Clean Scan Reports Destinations</span>
+              
+              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>Send via Email</span>
+                <input 
+                  type="checkbox" 
+                  checked={currentVals.sendAntivirusReportEmail ?? true}
+                  onChange={(e) => handleChange('sendAntivirusReportEmail', e.target.checked)}
+                  style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
+                />
+              </label>
+
+              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>Send via Telegram</span>
+                <input 
+                  type="checkbox" 
+                  checked={currentVals.sendAntivirusReportTelegram ?? true}
+                  onChange={(e) => handleChange('sendAntivirusReportTelegram', e.target.checked)}
+                  style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
+                />
+              </label>
+            </div>
+          )}
         </div>
 
       </div>

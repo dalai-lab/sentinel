@@ -15,6 +15,9 @@ class AlertService {
 
     // To prevent spamming the exact same alert repeatedly
     this.lastTriggered = {};
+    
+    // Keep track of the last seen scan timestamp per host
+    this.lastScanTimestamps = {};
   }
 
   loadSettings() {
@@ -116,15 +119,41 @@ class AlertService {
     this.lastTriggered[dedupKey] = now;
     console.log(`[ALERT SERVICE] 🚨 New Alert Triggered: [${alert.severity.toUpperCase()}] ${alert.title} on ${alert.host}`);
 
+    let sendEmailFlag = true;
+    let sendTgFlag = true;
+
+    if (alert.type === 'antivirus_scan_completed') {
+      let rawHost = alert.host;
+      const fNames = {
+        'instance-20260630-1713': 'Oracle database server',
+        'Database-Server-Oracle': 'Oracle database server',
+        'srv1213878': 'Orbithyre',
+        'srv1176513': 'Gaplytiq',
+        'srv1055295': 'Dalai'
+      };
+      for (const [k, v] of Object.entries(fNames)) {
+        if (v === alert.host && this.settings.overrides?.[k]) {
+          rawHost = k;
+          break;
+        }
+      }
+      sendEmailFlag = this.settings.overrides?.[rawHost]?.sendAntivirusReportEmail ?? this.settings.sendAntivirusReportEmail ?? true;
+      sendTgFlag = this.settings.overrides?.[rawHost]?.sendAntivirusReportTelegram ?? this.settings.sendAntivirusReportTelegram ?? true;
+    }
+
     // Dispatch Email Notification via ZeptoMail SMTP
-    emailService.sendAlertNotification(newAlert).catch(err => {
-      console.error('[ALERT SERVICE] Email forwarding error:', err.message);
-    });
+    if (sendEmailFlag) {
+      emailService.sendAlertNotification(newAlert).catch(err => {
+        console.error('[ALERT SERVICE] Email forwarding error:', err.message);
+      });
+    }
 
     // Dispatch Telegram Notification
-    telegramService.sendAlertNotification(newAlert).catch(err => {
-      console.error('[ALERT SERVICE] Telegram forwarding error:', err.message);
-    });
+    if (sendTgFlag) {
+      telegramService.sendAlertNotification(newAlert).catch(err => {
+        console.error('[ALERT SERVICE] Telegram forwarding error:', err.message);
+      });
+    }
   }
 
   // Friendly names map duplicated from aiManager
@@ -208,6 +237,8 @@ class AlertService {
       scans.forEach(scan => {
         const host = scan.host;
         const enableAv = this.settings.overrides?.[host]?.enableAntivirusAlerts ?? this.settings.enableAntivirusAlerts;
+        
+        // Critical alerts for infected files
         if (enableAv && scan.infectedFiles > 0) {
           this.triggerAlert({
             type: 'antivirus',
@@ -216,6 +247,24 @@ class AlertService {
             title: 'Malware Infection Detected',
             message: `ClamAV detected ${scan.infectedFiles} infected files during the recent scan.`
           });
+        }
+
+        // Informational alert for every new scan completion
+        if (enableAv) {
+          const lastTs = this.lastScanTimestamps[host] || 0;
+          if (lastTs > 0 && scan.timestamp > lastTs) {
+            this.triggerAlert({
+              type: 'antivirus_scan_completed',
+              severity: 'info',
+              host: this.getFriendlyName(host),
+              title: 'Antivirus Scan Completed',
+              message: `ClamAV scan completed. Scanned ${scan.scannedFiles || 0} files (${scan.dataScanned || '0 MB'}) in ${scan.timeTaken || '0 sec'}. Infected files: ${scan.infectedFiles}.`
+            });
+          }
+          // Update the known timestamp
+          if (scan.timestamp > lastTs) {
+            this.lastScanTimestamps[host] = scan.timestamp;
+          }
         }
       });
 

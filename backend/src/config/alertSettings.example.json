@@ -1,0 +1,11 @@
+{
+  "cpuThreshold": 85,
+  "ramThreshold": 90,
+  "diskThreshold": 90,
+  "enableAntivirusAlerts": true,
+  "overrides": {
+    "Oracle database server": {
+      "diskThreshold": 70
+    }
+  }
+}

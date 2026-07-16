@@ -91,6 +91,44 @@ export async function fetchServerMetrics() {
   }
 }
 
+export async function fetchServerMetricsRange(timeRangeSeconds) {
+  try {
+    const end = Math.floor(Date.now() / 1000);
+    const start = end - timeRangeSeconds;
+    // Step size logic: 60 data points maximum
+    const step = Math.max(15, Math.floor(timeRangeSeconds / 60));
+
+    const cpuQuery = '100 - (avg by (host_name) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)';
+    const memQuery = '100 * (1 - (avg by (host_name) (node_memory_MemAvailable_bytes) / avg by (host_name) (node_memory_MemTotal_bytes)))';
+    const diskQuery = '100 - ((avg by (host_name) (node_filesystem_avail_bytes{mountpoint="/",fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs|udev|none|devpts|pstore|securityfs|debugfs|bpf|tracefs|sysfs|cgroup|cgroup2|mqueue|systemd-1"}) * 100) / avg by (host_name) (node_filesystem_size_bytes{mountpoint="/",fstype!~"rootfs|selinuxfs|autofs|rpc_pipefs|tmpfs|udev|none|devpts|pstore|securityfs|debugfs|bpf|tracefs|sysfs|cgroup|cgroup2|mqueue|systemd-1"}))';
+    const netRecvQuery = 'sum by (host_name) (rate(node_network_receive_bytes_total{device=~"eth0|ens3|enp3s0|wlan0|bond0|enp0s3"}[5m]))';
+
+    const fetchRange = (query) => fetch(`${BACKEND_URL}/range`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, start, end, step })
+    }).then(res => res.json());
+
+    const [cpuData, memData, diskData, netRecvData] = await Promise.all([
+      fetchRange(cpuQuery),
+      fetchRange(memQuery),
+      fetchRange(diskQuery),
+      fetchRange(netRecvQuery)
+    ]);
+
+    return {
+      success: true,
+      cpu: cpuData.data?.result || [],
+      mem: memData.data?.result || [],
+      disk: diskData.data?.result || [],
+      netRecv: netRecvData.data?.result || []
+    };
+  } catch (error) {
+    console.error("Backend Range API Error:", error);
+    return { error: 'fetch_failed', message: error.message };
+  }
+}
+
 export async function fetchActiveAlerts() {
   try {
     const response = await fetch(`${BACKEND_URL}/alerts`, {

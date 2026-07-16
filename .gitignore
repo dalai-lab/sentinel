@@ -31,3 +31,20 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# ── Runtime data files (generated at runtime, NOT to be committed) ──────────
+# Live alert history — grows with every alert trigger
+backend/src/config/alertsHistory.json
+
+# Incident log — auto-generated from alert engine
+backend/incidents.json
+
+# Alert settings — contains user-defined thresholds and per-server overrides
+# (commit a alertSettings.example.json instead)
+backend/src/config/alertSettings.json
+
+# Temp/scratch scripts created during development
+test_fetch.js
+test_metrics_range.cjs
+test_metrics_range.js
+lookup_servers.js

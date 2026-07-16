@@ -17,6 +17,22 @@ async function fetchMetrics(query) {
   }
 }
 
+async function fetchMetricsRange(query, start, end, step) {
+  try {
+    const response = await axios.get(`${config.SIGNOZ_URL}/api/v1/query_range`, {
+      params: { query, start, end, step },
+      headers: {
+        'SIGNOZ-API-KEY': config.SIGNOZ_API_KEY,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('[METRICS SERVICE] Failed to proxy query_range:', error.message);
+    throw new Error('Failed to fetch time-series metrics from SigNoz');
+  }
+}
+
 async function fetchActiveAlerts() {
   try {
     const response = await axios.get(`${config.SIGNOZ_URL}/api/v1/alerts`, {
@@ -219,6 +235,7 @@ async function fetchLatestScans() {
 
 module.exports = {
   fetchMetrics,
+  fetchMetricsRange,
   fetchActiveAlerts,
   fetchLogs,
   fetchLatestScans

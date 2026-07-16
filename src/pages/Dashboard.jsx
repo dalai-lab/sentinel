@@ -12,6 +12,9 @@ import AiCopilotCard from '../components/AiCopilotCard';
 import AntivirusScansCard from '../components/AntivirusScansCard';
 import OverviewScansWidget from '../components/OverviewScansWidget';
 import AlertCenterWidget from '../components/AlertCenterWidget';
+import GraphsView from '../components/GraphsView';
+import ThreatMapView from '../components/ThreatMapView';
+import TopologyView from '../components/TopologyView';
 import { fetchServerMetrics } from '../api/signoz';
 import { fetchAlerts } from '../api/alerts';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
@@ -259,66 +262,62 @@ export default function Dashboard() {
               {/* Left Column: Stats Summary & Telemetry Cards */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
-                {/* Quick Summary Cards Grid */}
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '16px'
-                }}>
-                  {/* Stat 1 */}
-                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ background: 'var(--status-healthy-bg)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.15)' }}>
-                      <Server size={18} color="var(--status-healthy)" />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Servers Online</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>
-                        {onlineServersCount} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500 }}>/ {totalServersCount}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stat 2 */}
-                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ background: 'var(--accent-light)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(99,102,241,0.15)' }}>
-                      <Cpu size={18} color="var(--accent)" />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Avg CPU Load</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px' }}>{avgCpu}%</div>
-                    </div>
-                  </div>
-
-                  {/* Stat 3 */}
-                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{
-                      background: activeAlertsCount > 0 ? 'var(--status-danger-bg)' : 'var(--status-healthy-bg)',
-                      padding: '10px',
-                      borderRadius: '8px',
-                      border: `1px solid ${activeAlertsCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(16,185,129,0.15)'}`
+                {/* ── AAA Grade stat tiles ── */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
+                  {[
+                    {
+                      label: 'Servers Online', 
+                      value: `${onlineServersCount}`, 
+                      sub: `of ${totalServersCount} nodes`,
+                      icon: Server, color: '#10b981',
+                      bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)',
+                    },
+                    {
+                      label: 'Fleet Avg CPU', 
+                      value: `${avgCpu}%`, 
+                      sub: 'across all servers',
+                      icon: Cpu, color: '#818cf8',
+                      bg: 'rgba(129,140,248,0.08)', border: 'rgba(129,140,248,0.2)',
+                    },
+                    {
+                      label: 'Active Threats', 
+                      value: activeAlertsCount, 
+                      sub: activeAlertsCount > 0 ? 'requires attention' : 'all clear',
+                      icon: ShieldAlert, 
+                      color: activeAlertsCount > 0 ? '#ef4444' : '#10b981',
+                      bg: activeAlertsCount > 0 ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.06)',
+                      border: activeAlertsCount > 0 ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.2)',
+                    },
+                    {
+                      label: 'Platform State', 
+                      value: activeAlertsCount > 0 ? 'DEGRADED' : 'NOMINAL', 
+                      sub: 'overall health',
+                      icon: CheckCircle,
+                      color: activeAlertsCount > 0 ? '#f59e0b' : '#10b981',
+                      bg: activeAlertsCount > 0 ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.06)',
+                      border: activeAlertsCount > 0 ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)',
+                    },
+                  ].map(({ label, value, sub, icon: Icon, color, bg, border }) => (
+                    <div key={label} style={{
+                      background: 'linear-gradient(145deg, #0d0f16, #11141f)',
+                      border: `1px solid ${border}`,
+                      borderTop: `3px solid ${color}`,
+                      borderRadius: '14px',
+                      padding: '18px 20px',
+                      position: 'relative',
+                      overflow: 'hidden',
                     }}>
-                      <ShieldAlert size={18} color={activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--status-healthy)'} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Active Threats</div>
-                      <div style={{ fontSize: '1.25rem', fontWeight: 700, marginTop: '2px', color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)' }}>
-                        {activeAlertsCount}
+                      <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: `radial-gradient(circle, ${bg} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                        <div style={{ background: `${color}18`, border: `1px solid ${color}30`, borderRadius: '7px', padding: '6px' }}>
+                          <Icon size={14} color={color} />
+                        </div>
+                        <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
                       </div>
+                      <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f8fafc', lineHeight: 1, marginBottom: '4px', letterSpacing: '-0.02em' }}>{value}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>{sub}</div>
                     </div>
-                  </div>
-
-                  {/* Stat 4 */}
-                  <div className="dashboard-card" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-                    <div style={{ background: 'var(--status-healthy-bg)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.15)' }}>
-                      <CheckCircle size={18} color="var(--status-healthy)" />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Platform State</div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 700, marginTop: '4px', color: 'var(--status-healthy)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Nominal
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
                 {/* Server Telemetry Cards Container */}
@@ -339,7 +338,6 @@ export default function Dashboard() {
                   onCommandCopy={handleCopyCommand}
                   onRefreshAiAdvice={loadAiAdvice}
                 />
-                
                 <div className="security-feed-panel" style={{ width: '100%', flex: 1 }}>
                   <OverviewScansWidget />
                 </div>
@@ -351,6 +349,10 @@ export default function Dashboard() {
             </div>
           </>
         )}
+
+        {activeTab === 'graphs' && <GraphsView />}
+        {activeTab === 'threatmap' && <ThreatMapView />}
+        {activeTab === 'topology' && <TopologyView />}
 
         {activeTab === 'servers' && <ServerList servers={filteredServers} />}
 

@@ -110,5 +110,165 @@
     "severity": "critical",
     "host": "Dalai",
     "fingerprint": "alt_1784190727455_vsj7i"
+  },
+  {
+    "id": "1784191180355",
+    "timestamp": "2026-07-16T08:39:40.355Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "fingerprint": "alt_1784191121009_2n0gj"
+  },
+  {
+    "id": "1784191180356",
+    "timestamp": "2026-07-16T08:39:40.356Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "fingerprint": "alt_1784191121008_9unqz"
+  },
+  {
+    "id": "1784191180357",
+    "timestamp": "2026-07-16T08:39:40.357Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "fingerprint": "alt_1784191121008_22k3o"
+  },
+  {
+    "id": "1784191180358",
+    "timestamp": "2026-07-16T08:39:40.358Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Dalai",
+    "fingerprint": "alt_1784191121007_t1c1p"
+  },
+  {
+    "id": "1784191564035",
+    "timestamp": "2026-07-16T08:46:04.035Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "fingerprint": "alt_1784191504670_5vim9"
+  },
+  {
+    "id": "1784191564036",
+    "timestamp": "2026-07-16T08:46:04.036Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "fingerprint": "alt_1784191504669_i1xcc"
+  },
+  {
+    "id": "1784191564037",
+    "timestamp": "2026-07-16T08:46:04.037Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "fingerprint": "alt_1784191504668_xs6si"
+  },
+  {
+    "id": "1784191564037",
+    "timestamp": "2026-07-16T08:46:04.037Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Dalai",
+    "fingerprint": "alt_1784191504667_u0igq"
+  },
+  {
+    "id": "1784192464197",
+    "timestamp": "2026-07-16T09:01:04.197Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "fingerprint": "alt_1784192404729_4ik0w"
+  },
+  {
+    "id": "1784192464198",
+    "timestamp": "2026-07-16T09:01:04.198Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "fingerprint": "alt_1784192404728_1akta"
+  },
+  {
+    "id": "1784192464198",
+    "timestamp": "2026-07-16T09:01:04.198Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "fingerprint": "alt_1784192404727_ap281"
+  },
+  {
+    "id": "1784192464199",
+    "timestamp": "2026-07-16T09:01:04.199Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Dalai",
+    "fingerprint": "alt_1784192404726_d59gb"
+  },
+  {
+    "id": "1784193364307",
+    "timestamp": "2026-07-16T09:16:04.307Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "fingerprint": "alt_1784193304988_t2cqj"
+  },
+  {
+    "id": "1784193364308",
+    "timestamp": "2026-07-16T09:16:04.308Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "fingerprint": "alt_1784193304987_ho8q2"
+  },
+  {
+    "id": "1784193364309",
+    "timestamp": "2026-07-16T09:16:04.309Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "fingerprint": "alt_1784193304984_yv0s5"
+  },
+  {
+    "id": "1784193364310",
+    "timestamp": "2026-07-16T09:16:04.310Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Dalai",
+    "fingerprint": "alt_1784193304980_uiouw"
+  },
+  {
+    "id": "1784194264493",
+    "timestamp": "2026-07-16T09:31:04.493Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "fingerprint": "alt_1784194205206_g0ml5"
+  },
+  {
+    "id": "1784194264494",
+    "timestamp": "2026-07-16T09:31:04.494Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "fingerprint": "alt_1784194205205_43xln"
+  },
+  {
+    "id": "1784194264496",
+    "timestamp": "2026-07-16T09:31:04.496Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "fingerprint": "alt_1784194205204_1303q"
+  },
+  {
+    "id": "1784194264497",
+    "timestamp": "2026-07-16T09:31:04.497Z",
+    "alertname": "Malware Infection Detected",
+    "severity": "critical",
+    "host": "Dalai",
+    "fingerprint": "alt_1784194205201_3gl66"
   }
 ]

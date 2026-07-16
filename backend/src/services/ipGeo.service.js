@@ -23,7 +23,7 @@ async function lookupIps(ips) {
     // Chunk the uncached array into batches of 100
     for (let i = 0; i < uncached.length; i += 100) {
       const chunk = uncached.slice(i, i + 100);
-      const payload = chunk.map(ip => ({ query: ip, fields: 'status,country,countryCode,regionName,city,isp,org,query' }));
+      const payload = chunk.map(ip => ({ query: ip, fields: 'status,country,countryCode,regionName,city,lat,lon,isp,org,query' }));
       
       const res = await axios.post('http://ip-api.com/batch', payload, {
         timeout: 5000,
@@ -37,13 +37,15 @@ async function lookupIps(ips) {
             countryCode: (entry.countryCode || '').toLowerCase(),
             city: entry.city || '',
             region: entry.regionName || '',
+            lat: entry.lat || 0,
+            lon: entry.lon || 0,
             isp: entry.isp || entry.org || '',
           };
           cache[entry.query] = geo;
           result[entry.query] = geo;
         } else {
           // Private / reserved IPs
-          const geo = { country: 'Private Network', countryCode: '', city: '', region: '', isp: '' };
+          const geo = { country: 'Private Network', countryCode: '', city: '', region: '', lat: 0, lon: 0, isp: '' };
           cache[entry.query] = geo;
           result[entry.query] = geo;
         }

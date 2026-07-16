@@ -1,40 +1,65 @@
 import React from 'react';
-import { Cpu, HardDrive, Database, Clock, Server, Globe, AlertTriangle } from 'lucide-react';
+import { Cpu, HardDrive, MemoryStick, Clock, Server, Globe, AlertTriangle, ArrowDown, ArrowUp, Activity, Wifi, CheckCircle, XCircle } from 'lucide-react';
 
-// Reimagined AAA-Grade Premium Progress Bar
-function PremiumProgressBar({ value, warningThreshold = 75 }) {
-  const parsedValue = parseFloat(value) || 0;
+function getMetricColor(val) {
+  const n = parseFloat(val) || 0;
+  if (n > 85) return '#ef4444';
+  if (n > 70) return '#f59e0b';
+  return '#10b981';
+}
 
-  const getStatusColor = (val) => {
-    if (val > warningThreshold) return '#ef4444'; // var(--status-danger)
-    if (val > 60) return '#f59e0b'; // var(--status-warning)
-    return '#10b981'; // var(--status-healthy)
-  };
+function formatBytes(bytes) {
+  if (!bytes || isNaN(bytes) || bytes <= 0) return '0 B/s';
+  const k = 1024, sizes = ['B/s', 'KB/s', 'MB/s', 'GB/s'];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
+  return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+}
 
-  const activeColor = getStatusColor(parsedValue);
+function getUptimeString(seconds) {
+  if (!seconds) return '—';
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (d > 0) return `${d}d ${h}h`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+// Radial gauge for a metric value
+function RadialGauge({ value, size = 72 }) {
+  const val = Math.min(parseFloat(value) || 0, 100);
+  const r = (size - 10) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (val / 100) * circ;
+  const color = getMetricColor(val);
 
   return (
-    <div style={{
-      height: '8px',
-      background: 'rgba(255, 255, 255, 0.03)',
-      border: '1px solid rgba(255, 255, 255, 0.05)',
-      borderRadius: '4px',
-      overflow: 'hidden',
-      position: 'relative',
-      marginTop: '6px',
-      boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.2)'
-    }}>
-      <div
-        style={{
-          height: '100%',
-          width: `${parsedValue}%`,
-          background: `linear-gradient(90deg, ${activeColor}bb 0%, ${activeColor} 100%)`,
-          boxShadow: `0 0 10px ${activeColor}80`,
-          borderRadius: '4px',
-          transition: 'width 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-          position: 'relative'
-        }}
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={7} />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none"
+        stroke={color} strokeWidth={7}
+        strokeDasharray={`${dash} ${circ}`}
+        strokeLinecap="round"
+        style={{ transition: 'stroke-dasharray 0.8s cubic-bezier(0.16,1,0.3,1)', filter: `drop-shadow(0 0 4px ${color}88)` }}
       />
+    </svg>
+  );
+}
+
+function GaugeStat({ label, value, unit = '%', icon: Icon }) {
+  const numVal = parseFloat(value) || 0;
+  const color = unit === '%' ? getMetricColor(numVal) : '#60a5fa';
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', position: 'relative' }}>
+      <div style={{ position: 'relative' }}>
+        <RadialGauge value={unit === '%' ? numVal : 50} size={68} />
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+          <Icon size={12} color={color} />
+        </div>
+      </div>
+      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: color }}>{unit === '%' ? `${numVal.toFixed(1)}%` : value}</div>
+      <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>{label}</div>
     </div>
   );
 }
@@ -43,215 +68,105 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
   const parsedCpu = parseFloat(cpu) || 0;
   const parsedRam = parseFloat(ram) || 0;
   const parsedDisk = parseFloat(disk) || 0;
-
-  const isCpuHigh = parsedCpu > 75;
-  const isRamHigh = parsedRam > 75;
-  const isDiskHigh = parsedDisk > 75;
-  const isAnyMetricHigh = isCpuHigh || isRamHigh || isDiskHigh;
-
-  const getStatusColor = (val) => {
-    if (val > 75) return 'var(--status-danger)';
-    if (val > 60) return 'var(--status-warning)';
-    return 'var(--status-healthy)';
-  };
-
-  const getUptimeString = (seconds) => {
-    if (!seconds) return 'Unknown';
-    const d = Math.floor(seconds / (3600 * 24));
-    const h = Math.floor(seconds % (3600 * 24) / 3600);
-    const m = Math.floor(seconds % 3600 / 60);
-    if (d > 0) return `${d}d ${h}h`;
-    if (h > 0) return `${h}h ${m}m`;
-    return `${m}m`;
-  };
-
-  const formatBytes = (bytes) => {
-    if (!bytes || isNaN(bytes)) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[Math.min(i, sizes.length - 1)];
-  };
-
   const isOnline = status === 'online';
+  const isCrit = parsedCpu > 85 || parsedRam > 85 || parsedDisk > 85;
+  const isWarn = !isCrit && (parsedCpu > 70 || parsedRam > 70 || parsedDisk > 70);
 
-  let healthState = 'healthy';
-  if (!isOnline) healthState = 'offline';
-  else if (isAnyMetricHigh) healthState = 'danger';
-  else if (parsedCpu > 70 || parsedRam > 70 || parsedDisk > 70) healthState = 'warning';
+  let accentColor = '#10b981';
+  let accentGlow = 'rgba(16,185,129,0.12)';
+  let borderColor = 'rgba(16,185,129,0.2)';
+  if (!isOnline) { accentColor = '#6b7280'; accentGlow = 'transparent'; borderColor = 'rgba(107,114,128,0.2)'; }
+  else if (isCrit) { accentColor = '#ef4444'; accentGlow = 'rgba(239,68,68,0.1)'; borderColor = 'rgba(239,68,68,0.3)'; }
+  else if (isWarn) { accentColor = '#f59e0b'; accentGlow = 'rgba(245,158,11,0.08)'; borderColor = 'rgba(245,158,11,0.25)'; }
 
-  const getCardBorderColor = () => {
-    if (healthState === 'offline' || healthState === 'danger') return 'rgba(239, 68, 68, 0.25)';
-    if (healthState === 'warning') return 'rgba(245, 158, 11, 0.25)';
-    return 'var(--border-color)';
-  };
+  const healthLabel = !isOnline ? 'Offline' : isCrit ? 'Critical' : isWarn ? 'Warning' : 'Healthy';
 
   return (
-    <div
-      className={`dashboard-card premium-server-card state-${healthState}`}
-      style={{
-        padding: '16px 20px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '14px',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        borderColor: getCardBorderColor(),
-        boxShadow: healthState === 'danger' ? '0 0 12px rgba(239, 68, 68, 0.04)' : 'none'
-      }}
+    <div style={{
+      background: `linear-gradient(145deg, #0e1015, #13151e)`,
+      border: `1px solid ${borderColor}`,
+      borderTop: `3px solid ${accentColor}`,
+      borderRadius: '16px',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '18px',
+      boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)`,
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      position: 'relative',
+      overflow: 'hidden',
+    }}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px ${borderColor}`; }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)`; }}
     >
-      {/* Header section of the card */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <div className={`server-icon-container status-${isOnline ? 'online' : 'offline'}`} style={{
-            background: isOnline ? 'var(--status-healthy-bg)' : 'var(--status-danger-bg)',
-            border: `1px solid ${isOnline ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)'}`,
-            padding: '8px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative'
-          }}>
-            <Server size={16} color={isOnline ? 'var(--status-healthy)' : 'var(--status-danger)'} />
-            {isOnline && <span className="status-ping-dot" />}
+      {/* Background radial glow */}
+      <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`, pointerEvents: 'none' }} />
+
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ background: `${accentColor}18`, border: `1px solid ${accentColor}35`, borderRadius: '10px', padding: '10px', position: 'relative' }}>
+            <Server size={18} color={accentColor} />
+            {isOnline && <span style={{ position: 'absolute', bottom: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#10b981', border: '2px solid #0e1015', boxShadow: '0 0 8px #10b981', animation: 'statusPing 2s infinite' }} />}
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
-              {name}
-            </h4>
-            <div className="text-muted text-mono" style={{ fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-              <Globe size={10} />
-              <span>{ip}</span>
+            <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#f8fafc', letterSpacing: '-0.01em' }}>{name}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+              <Globe size={10} color="rgba(255,255,255,0.3)" />
+              <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'rgba(255,255,255,0.35)' }}>{ip}</span>
             </div>
           </div>
         </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-          <div
-            className="status-pill"
-            style={{
-              background: isOnline ? 'var(--status-healthy-bg)' : 'var(--status-danger-bg)',
-              color: isOnline ? 'var(--status-healthy)' : 'var(--status-danger)',
-              border: `1px solid ${isOnline ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)'}`,
-              padding: '2px 8px',
-              borderRadius: '8px',
-              fontSize: '0.68rem',
-              fontWeight: 750,
-              textTransform: 'uppercase'
-            }}
-          >
-            {status}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+          <div style={{
+            fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
+            color: accentColor, background: `${accentColor}18`, border: `1px solid ${accentColor}30`,
+            padding: '4px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px'
+          }}>
+            {isOnline ? <CheckCircle size={10} /> : <XCircle size={10} />} {healthLabel}
           </div>
-          <div className="text-muted" style={{ fontSize: '0.68rem', display: 'flex', alignItems: 'center', gap: '3px' }}>
-            <Clock size={10} />
-            <span>Up {getUptimeString(uptime)}</span>
-          </div>
+          {isOnline && (
+            <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Clock size={10} /> {getUptimeString(uptime)}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Progress Bars / Telemetry Metrics */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {/* CPU Usage */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '0.78rem', alignItems: 'center' }}>
-            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Cpu size={12} /> CPU
-              {isCpuHigh && <AlertTriangle size={10} color="var(--status-danger)" className="metric-warning-pulse" />}
-            </span>
-            <span style={{ color: getStatusColor(cpu), fontWeight: 700 }}>{cpu}%</span>
+      {/* Gauge row */}
+      {isOnline ? (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+            <GaugeStat label="CPU" value={cpu} icon={Cpu} />
+            <GaugeStat label="Memory" value={ram} icon={MemoryStick} />
+            <GaugeStat label="Disk" value={disk} icon={HardDrive} />
           </div>
-          <PremiumProgressBar value={cpu} />
-        </div>
 
-        {/* Memory Usage */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '0.78rem', alignItems: 'center' }}>
-            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <HardDrive size={12} /> Memory
-              {isRamHigh && <AlertTriangle size={10} color="var(--status-danger)" className="metric-warning-pulse" />}
-            </span>
-            <span style={{ color: getStatusColor(ram), fontWeight: 700 }}>{ram}%</span>
+          {/* Bottom stats strip */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '14px' }}>
+            {[
+              { label: 'Load Avg', value: load || '—', icon: Activity, color: '#a78bfa' },
+              { label: 'Net In', value: formatBytes(netRecv), icon: ArrowDown, color: '#34d399' },
+              { label: 'Net Out', value: formatBytes(netSent), icon: ArrowUp, color: '#60a5fa' },
+            ].map(({ label, value, icon: Icon, color }) => (
+              <div key={label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px 10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                  <Icon size={10} color={color} />
+                  <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.06em' }}>{label}</span>
+                </div>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>{value}</div>
+              </div>
+            ))}
           </div>
-          <PremiumProgressBar value={ram} />
+        </>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', gap: '8px', color: 'rgba(255,255,255,0.25)', fontSize: '0.82rem' }}>
+          <XCircle size={14} /> No telemetry — server offline or unreachable
         </div>
-
-        {/* Disk Storage */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2px', fontSize: '0.78rem', alignItems: 'center' }}>
-            <span className="text-muted" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <Database size={12} /> Disk Storage
-              {isDiskHigh && <AlertTriangle size={10} color="var(--status-danger)" className="metric-warning-pulse" />}
-            </span>
-            <span style={{ color: getStatusColor(disk), fontWeight: 700 }}>{disk}%</span>
-          </div>
-          <PremiumProgressBar value={disk} />
-        </div>
-      </div>
-
-      {/* Advanced Performance Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '10px',
-        borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-        paddingTop: '10px',
-        marginTop: '2px'
-      }}>
-        <div>
-          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em' }}>CPU Load (1m)</div>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px' }}>{load || '0.00'}</div>
-        </div>
-        <div>
-          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 800, letterSpacing: '0.02em' }}>Network IO</div>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '2px', display: 'flex', gap: '6px' }} className="text-mono">
-            <span style={{ color: '#10b981' }}>↓{formatBytes(netRecv)}</span>
-            <span style={{ color: '#6366f1' }}>↑{formatBytes(netSent)}</span>
-          </div>
-        </div>
-      </div>
+      )}
 
       <style>{`
-        .premium-server-card {
-          transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
-        }
-        .premium-server-card:hover {
-          transform: translateY(-2px) scale(1.005) !important;
-          box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.4) !important;
-        }
-        .premium-server-card.state-danger:hover {
-          box-shadow: 0 10px 24px -6px rgba(239, 68, 68, 0.08) !important;
-          border-color: var(--status-danger) !important;
-        }
-        .premium-server-card.state-warning:hover {
-          box-shadow: 0 10px 24px -6px rgba(245, 158, 11, 0.08) !important;
-          border-color: var(--status-warning) !important;
-        }
-        
-        .status-ping-dot {
-          position: absolute;
-          bottom: -1px;
-          right: -1px;
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background-color: var(--status-healthy);
-          border: 1.5px solid var(--bg-card);
-          box-shadow: 0 0 6px var(--status-healthy);
-          animation: statusPing 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes statusPing {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(1.2); }
-        }
-
-        .metric-warning-pulse {
-          animation: warnPulse 1s ease-in-out infinite alternate;
-        }
-        @keyframes warnPulse {
-          from { opacity: 0.4; transform: scale(0.9); }
-          to { opacity: 1; transform: scale(1.1); }
-        }
+        @keyframes statusPing { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(1.4); } }
       `}</style>
     </div>
   );

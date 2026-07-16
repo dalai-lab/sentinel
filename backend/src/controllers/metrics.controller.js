@@ -20,6 +20,24 @@ async function getMetrics(req, res) {
   }
 }
 
+async function getMetricsRange(req, res) {
+  if (!config.SIGNOZ_API_KEY) {
+    return res.status(503).json({ error: 'Backend is missing SIGNOZ_API_KEY in .env' });
+  }
+
+  try {
+    const { query, start, end, step } = req.body;
+    if (!query || !start || !end || !step) {
+      return res.status(400).json({ error: 'Missing required parameters.' });
+    }
+
+    const data = await signozService.fetchMetricsRange(query, start, end, step);
+    return res.json(data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 const aiManagerService = require('../services/aiManager.service');
 
 async function getAiSummary(req, res) {
@@ -96,5 +114,6 @@ module.exports = {
   forceAiSummary,
   getIncidents,
   clearIncidents,
-  askAi
+  askAi,
+  getMetricsRange
 };

@@ -7,6 +7,9 @@ const ipGeoService = require('../services/ipGeo.service');
 // POST /api/metrics
 router.post('/', metricsController.getMetrics);
 
+// POST /api/metrics/range
+router.post('/range', metricsController.getMetricsRange);
+
 // GET /api/metrics/ai-summary/latest
 router.get('/ai-summary/latest', metricsController.getLatestAiSummary);
 

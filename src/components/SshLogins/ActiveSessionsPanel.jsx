@@ -2,8 +2,24 @@ import React from 'react';
 import { User, Activity, AlertTriangle, ShieldCheck } from 'lucide-react';
 import { computeActiveSessions } from '../../utils/logParsers';
 
-export default function ActiveSessionsPanel({ events, ipGeo, topThreat }) {
+export default function ActiveSessionsPanel({ events, ipGeo }) {
   const activeSessions = computeActiveSessions(events);
+
+  // Calculate top attacking countries
+  const countryHits = {};
+  events.filter(e => e.status === 'failed').forEach(e => {
+    const geo = ipGeo[e.ip];
+    if (geo && geo.country && geo.country !== 'Private Network') {
+      if (!countryHits[geo.country]) {
+        countryHits[geo.country] = { attempts: 0, code: geo.countryCode };
+      }
+      countryHits[geo.country].attempts += 1;
+    }
+  });
+  const topCountries = Object.entries(countryHits)
+    .sort((a, b) => b[1].attempts - a[1].attempts)
+    .slice(0, 3)
+    .map(([country, data]) => ({ country, attempts: data.attempts, countryCode: data.code }));
 
   // Calculate top targeted accounts
   const accountHits = {};
@@ -26,15 +42,15 @@ export default function ActiveSessionsPanel({ events, ipGeo, topThreat }) {
   return (
     <div className="ssh-sidebar" style={{ width: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       
-      {/* Top Attacking Countries (from topThreat prop) */}
-      {topThreat && (
+      {/* Top Attacking Countries */}
+      {topCountries.length > 0 && (
         <div className="metric-card" style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: 'var(--text-color)', fontWeight: 600 }}>
             <Activity size={16} color="var(--primary-color)" />
             Top Attacking Countries
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {topThreat.map((t, i) => (
+            {topCountries.map((t, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   {t.countryCode && (

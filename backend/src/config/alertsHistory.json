@@ -1,37 +1,7 @@
 [
   {
-    "id": "alt_1784190518119_lty2p",
-    "timestamp": 1784190518119,
-    "status": "active",
-    "type": "disk",
-    "severity": "warning",
-    "host": "Dalai",
-    "title": "Storage Space Critical",
-    "message": "Disk usage is at 76.5%, exceeding the threshold of 59%."
-  },
-  {
-    "id": "alt_1784190518118_l2n6e",
-    "timestamp": 1784190518118,
-    "status": "active",
-    "type": "disk",
-    "severity": "warning",
-    "host": "Gaplytiq",
-    "title": "Storage Space Critical",
-    "message": "Disk usage is at 80.8%, exceeding the threshold of 59%."
-  },
-  {
-    "id": "alt_1784190278911_p0b5a",
-    "timestamp": 1784190278911,
-    "status": "active",
-    "type": "antivirus",
-    "severity": "critical",
-    "host": "Orbithyre",
-    "title": "Malware Infection Detected",
-    "message": "ClamAV detected 1 infected files during the recent scan."
-  },
-  {
-    "id": "alt_1784190278911_l8lrb",
-    "timestamp": 1784190278911,
+    "id": "alt_1784193304988_t2cqj",
+    "timestamp": 1784193304988,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
@@ -40,28 +10,8 @@
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
-    "id": "alt_1784190278910_935vf",
-    "timestamp": 1784190278910,
-    "status": "active",
-    "type": "antivirus",
-    "severity": "critical",
-    "host": "Gaplytiq",
-    "title": "Malware Infection Detected",
-    "message": "ClamAV detected 1 infected files during the recent scan."
-  },
-  {
-    "id": "alt_1784190278909_og090",
-    "timestamp": 1784190278909,
-    "status": "active",
-    "type": "antivirus",
-    "severity": "critical",
-    "host": "Dalai",
-    "title": "Malware Infection Detected",
-    "message": "ClamAV detected 1 infected files during the recent scan."
-  },
-  {
-    "id": "alt_1784190162272_6oloi",
-    "timestamp": 1784190162272,
+    "id": "alt_1784193304987_ho8q2",
+    "timestamp": 1784193304987,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
@@ -70,8 +20,28 @@
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
-    "id": "alt_1784190162272_ku3nt",
-    "timestamp": 1784190162272,
+    "id": "alt_1784193304984_yv0s5",
+    "timestamp": 1784193304984,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784193304980_uiouw",
+    "timestamp": 1784193304980,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784192404729_4ik0w",
+    "timestamp": 1784192404729,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
@@ -80,8 +50,18 @@
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
-    "id": "alt_1784190162271_c12qr",
-    "timestamp": 1784190162271,
+    "id": "alt_1784192404728_1akta",
+    "timestamp": 1784192404728,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784192404727_ap281",
+    "timestamp": 1784192404727,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
@@ -90,8 +70,8 @@
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
-    "id": "alt_1784190162270_dyev4",
-    "timestamp": 1784190162270,
+    "id": "alt_1784192404726_d59gb",
+    "timestamp": 1784192404726,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
@@ -100,29 +80,89 @@
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
-    "id": "alt_1784190727455_vsj7i",
-    "timestamp": 1784190727455,
+    "id": "alt_1784191504670_5vim9",
+    "timestamp": 1784191504670,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
-    "host": "Dalai",
+    "host": "Oracle database server",
     "title": "Malware Infection Detected",
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
-    "id": "alt_1784190727456_emmz9",
-    "timestamp": 1784190727456,
+    "id": "alt_1784191504669_i1xcc",
+    "timestamp": 1784191504669,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784191504668_xs6si",
+    "timestamp": 1784191504668,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",
     "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784191504667_u0igq",
+    "timestamp": 1784191504667,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784191121009_2n0gj",
+    "timestamp": 1784191121009,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784191121008_9unqz",
+    "timestamp": 1784191121008,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784191121008_22k3o",
+    "timestamp": 1784191121008,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784191121007_t1c1p",
+    "timestamp": 1784191121007,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
     "title": "Malware Infection Detected",
     "message": "ClamAV detected 1 infected files during the recent scan."
   },
   {
     "id": "alt_1784190727457_9fsvg",
     "timestamp": 1784190727457,
-    "status": "active",
+    "status": "acknowledged",
     "type": "antivirus",
     "severity": "critical",
     "host": "Orbithyre",
@@ -132,6 +172,166 @@
   {
     "id": "alt_1784190727457_1ji8k",
     "timestamp": 1784190727457,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190727456_emmz9",
+    "timestamp": 1784190727456,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190727455_vsj7i",
+    "timestamp": 1784190727455,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190518119_lty2p",
+    "timestamp": 1784190518119,
+    "status": "acknowledged",
+    "type": "disk",
+    "severity": "warning",
+    "host": "Dalai",
+    "title": "Storage Space Critical",
+    "message": "Disk usage is at 76.5%, exceeding the threshold of 59%."
+  },
+  {
+    "id": "alt_1784190518118_l2n6e",
+    "timestamp": 1784190518118,
+    "status": "acknowledged",
+    "type": "disk",
+    "severity": "warning",
+    "host": "Gaplytiq",
+    "title": "Storage Space Critical",
+    "message": "Disk usage is at 80.8%, exceeding the threshold of 59%."
+  },
+  {
+    "id": "alt_1784190278911_p0b5a",
+    "timestamp": 1784190278911,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190278911_l8lrb",
+    "timestamp": 1784190278911,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190278910_935vf",
+    "timestamp": 1784190278910,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190278909_og090",
+    "timestamp": 1784190278909,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190162272_6oloi",
+    "timestamp": 1784190162272,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190162272_ku3nt",
+    "timestamp": 1784190162272,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Oracle database server",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190162271_c12qr",
+    "timestamp": 1784190162271,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784190162270_dyev4",
+    "timestamp": 1784190162270,
+    "status": "acknowledged",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784194205201_3gl66",
+    "timestamp": 1784194205201,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Dalai",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784194205204_1303q",
+    "timestamp": 1784194205204,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Gaplytiq",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784194205205_43xln",
+    "timestamp": 1784194205205,
+    "status": "active",
+    "type": "antivirus",
+    "severity": "critical",
+    "host": "Orbithyre",
+    "title": "Malware Infection Detected",
+    "message": "ClamAV detected 1 infected files during the recent scan."
+  },
+  {
+    "id": "alt_1784194205206_g0ml5",
+    "timestamp": 1784194205206,
     "status": "active",
     "type": "antivirus",
     "severity": "critical",

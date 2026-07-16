@@ -82,6 +82,21 @@ class AlertService {
       return;
     }
 
+    // If an unresolved alert (active or acknowledged) already exists for this
+    // host+type, don't create a duplicate — update its timestamp instead so it
+    // stays at the top of the list without spamming new rows
+    const existing = this.alerts.find(
+      a => a.host === alert.host && a.type === alert.type && a.status !== 'resolved'
+    );
+    if (existing) {
+      existing.lastSeen = now;
+      existing.value = alert.value ?? existing.value;
+      existing.message = alert.message ?? existing.message;
+      this.saveAlerts();
+      this.lastTriggered[dedupKey] = now;
+      return;
+    }
+
     const newAlert = {
       id: `alt_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       timestamp: now,

@@ -20,34 +20,34 @@ const SERVERS = ['Oracle database server', 'Orbithyre', 'Gaplytiq', 'Dalai'];
 const METRICS = [
   {
     id: 'cpu', label: 'CPU Usage', unit: '%', icon: Cpu,
-    color: '#818cf8', gradStart: 'rgba(129,140,248,0.25)', gradEnd: 'rgba(129,140,248,0)',
+    color: 'var(--status-healthy)',
     desc: 'Processor load across all cores',
     thresh: 85,
   },
   {
     id: 'mem', label: 'Memory', unit: '%', icon: Activity,
-    color: '#34d399', gradStart: 'rgba(52,211,153,0.22)', gradEnd: 'rgba(52,211,153,0)',
+    color: '#a78bfa',
     desc: 'RAM utilisation',
     thresh: 90,
   },
   {
     id: 'disk', label: 'Disk Usage', unit: '%', icon: HardDrive,
-    color: '#fb923c', gradStart: 'rgba(251,146,60,0.22)', gradEnd: 'rgba(251,146,60,0)',
+    color: 'var(--status-warning)',
     desc: 'Root filesystem consumption',
     thresh: 90,
   },
   {
     id: 'netRecv', label: 'Network In', unit: 'B/s', icon: Wifi,
-    color: '#38bdf8', gradStart: 'rgba(56,189,248,0.22)', gradEnd: 'rgba(56,189,248,0)',
+    color: '#38bdf8',
     desc: 'Inbound bandwidth per server',
     thresh: null,
   },
 ];
 
 const SERVER_COLORS = {
-  'Oracle database server': '#818cf8',
-  'Orbithyre':              '#34d399',
-  'Gaplytiq':               '#fb923c',
+  'Oracle database server': 'var(--status-healthy)',
+  'Orbithyre':              '#a78bfa',
+  'Gaplytiq':               'var(--status-warning)',
   'Dalai':                  '#38bdf8',
 };
 
@@ -112,18 +112,20 @@ function CustomTooltip({ active, payload, label, unit }) {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: 'rgba(12,12,18,0.95)', border: '1px solid rgba(255,255,255,0.1)',
-      borderRadius: '10px', padding: '12px 16px', boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
-      backdropFilter: 'blur(8px)', minWidth: '180px',
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      borderRadius: 'var(--radius-sm)',
+      padding: '8px 12px',
+      minWidth: '160px',
     }}>
-      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.45)', marginBottom: '8px', fontWeight: 600 }}>{label}</div>
+      <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginBottom: '6px', fontWeight: 600 }}>{label}</div>
       {payload.map(p => (
-        <div key={p.dataKey} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', marginBottom: '4px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: p.color }} />
-            <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.65)' }}>{p.dataKey}</span>
+        <div key={p.dataKey} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '2px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: p.color }} />
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{p.dataKey}</span>
           </div>
-          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#fff' }}>{fmtVal(p.value, unit)}</span>
+          <span style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--text-primary)' }}>{fmtVal(p.value, unit)}</span>
         </div>
       ))}
     </div>
@@ -154,48 +156,38 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
     : 0;
 
   const isCritical = metric.thresh && fleetLast > metric.thresh;
-  const borderAccent = isCritical ? '#ef4444' : metric.color;
+  const borderAccent = isCritical ? 'rgba(239, 68, 68, 0.2)' : 'var(--border-color)';
 
   return (
     <div style={{
-      background: 'linear-gradient(145deg, #0d0f16, #111520)',
-      border: `1px solid ${isCritical ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.07)'}`,
-      borderTop: `2px solid ${borderAccent}`,
-      borderRadius: '14px',
-      padding: '20px',
+      background: 'var(--bg-card)',
+      border: `1px solid ${borderAccent}`,
+      borderRadius: 'var(--radius-lg)',
+      padding: '16px',
       display: 'flex',
       flexDirection: 'column',
       gap: '14px',
-      boxShadow: isCritical ? '0 0 20px rgba(239,68,68,0.1)' : 'none',
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Background glow */}
-      <div style={{
-        position: 'absolute', top: -40, right: -40,
-        width: 120, height: 120, borderRadius: '50%',
-        background: `radial-gradient(circle, ${metric.gradStart} 0%, transparent 70%)`,
-        pointerEvents: 'none',
-      }} />
-
       {/* Header row */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ background: `${metric.color}18`, border: `1px solid ${metric.color}30`, borderRadius: '8px', padding: '7px' }}>
-            <Icon size={16} color={metric.color} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px' }}>
+            <Icon size={14} color="var(--text-secondary)" />
           </div>
           <div>
-            <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#f1f5f9' }}>{metric.label}</div>
-            <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>{metric.desc}</div>
+            <div style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-primary)' }}>{metric.label}</div>
+            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '2px' }}>{metric.desc}</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isCritical && (
-            <div style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', fontSize: '0.65rem', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)' }}>
+            <div style={{ background: 'rgba(239,68,68,0.05)', color: 'var(--status-danger)', fontSize: '0.62rem', fontWeight: 650, padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(239,68,68,0.2)' }}>
               OVER THRESHOLD
             </div>
           )}
-          <button onClick={onExpand} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)', borderRadius: '6px', padding: '4px 6px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+          <button onClick={onExpand} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', color: 'var(--text-secondary)', borderRadius: '4px', padding: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
             {isExpanded ? <X size={12} /> : <Maximize2 size={12} />}
           </button>
         </div>
@@ -203,24 +195,24 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 
       {/* Fleet-level stat strip */}
       {fleetLast != null && (
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
           {[
-            { label: 'Current Avg', value: fmtVal(fleetLast, metric.unit), color: metric.color },
-            { label: 'Peak', value: fmtVal(fleetPeak, metric.unit), color: 'rgba(255,255,255,0.7)' },
+            { label: 'Current Avg', value: fmtVal(fleetLast, metric.unit), color: 'var(--text-primary)' },
+            { label: 'Peak', value: fmtVal(fleetPeak, metric.unit), color: 'var(--text-secondary)' },
             {
               label: 'Trend',
               value: (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: fleetTrend > 0.5 ? '#f87171' : fleetTrend < -0.5 ? '#4ade80' : 'rgba(255,255,255,0.5)' }}>
-                  {fleetTrend > 0.5 ? <TrendingUp size={12} /> : fleetTrend < -0.5 ? <TrendingDown size={12} /> : <Minus size={12} />}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: fleetTrend > 0.5 ? 'var(--status-danger)' : fleetTrend < -0.5 ? 'var(--status-healthy)' : 'var(--text-muted)' }}>
+                  {fleetTrend > 0.5 ? <TrendingUp size={11} /> : fleetTrend < -0.5 ? <TrendingDown size={11} /> : <Minus size={11} />}
                   {fleetTrend > 0 ? '+' : ''}{fmtVal(fleetTrend, metric.unit)}
                 </span>
               ),
-              color: 'rgba(255,255,255,0.7)',
+              color: 'var(--text-secondary)',
             },
           ].map(({ label, value, color }) => (
-            <div key={label} style={{ flex: 1, background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px 10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-              <div style={{ fontSize: '0.62rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '4px' }}>{label}</div>
-              <div style={{ fontSize: '0.88rem', fontWeight: 700, color }}>{value}</div>
+            <div key={label} style={{ flex: 1, background: 'rgba(255,255,255,0.01)', borderRadius: 'var(--radius-sm)', padding: '6px 8px', border: '1px solid var(--border-color)' }}>
+              <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.04em', marginBottom: '2px' }}>{label}</div>
+              <div style={{ fontSize: '0.78rem', fontWeight: 600, color }}>{value}</div>
             </div>
           ))}
         </div>
@@ -229,37 +221,26 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
       {/* Chart */}
       <div style={{ height: isExpanded ? 340 : 160, position: 'relative' }}>
         {isEmpty ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.2)', fontSize: '0.8rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
             No data for selected range
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
-              <defs>
-                {hosts.map(host => {
-                  const c = SERVER_COLORS[host] || metric.color;
-                  return (
-                    <linearGradient key={host} id={`grad-${metric.id}-${host.replace(/\s/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={c} stopOpacity={0.3} />
-                      <stop offset="100%" stopColor={c} stopOpacity={0} />
-                    </linearGradient>
-                  );
-                })}
-              </defs>
-              <CartesianGrid strokeDasharray="2 4" stroke="rgba(255,255,255,0.04)" vertical={false} />
+              <CartesianGrid strokeDasharray="1 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
               <XAxis
-                dataKey="time" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
+                dataKey="time" tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                 tickLine={false} axisLine={false} tickMargin={8}
                 interval="preserveStartEnd"
               />
               <YAxis
-                tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
+                tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
                 tickLine={false} axisLine={false} tickMargin={4} width={40}
                 tickFormatter={v => metric.unit === 'B/s' ? fmtBytes(v) : `${v}${metric.unit}`}
               />
               <Tooltip content={<CustomTooltip unit={metric.unit} />} />
               {metric.thresh && (
-                <ReferenceLine y={metric.thresh} stroke="rgba(239,68,68,0.5)" strokeDasharray="4 4" strokeWidth={1} />
+                <ReferenceLine y={metric.thresh} stroke="rgba(239,68,68,0.3)" strokeDasharray="3 3" strokeWidth={1} />
               )}
               {hosts.map(host => {
                 const c = SERVER_COLORS[host] || metric.color;
@@ -267,8 +248,7 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
                   <Area
                     key={host} type="monotoneX" dataKey={host}
                     stroke={c} strokeWidth={1.5}
-                    fill={`url(#grad-${metric.id}-${host.replace(/\s/g, '')})`}
-                    fillOpacity={1}
+                    fill="none"
                     dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: c }}
                   />
                 );
@@ -280,16 +260,16 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 
       {/* Per-server current values */}
       {hosts.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           {hosts.map(host => {
             const s = stats[host];
             const c = SERVER_COLORS[host] || metric.color;
             if (!s) return null;
             return (
-              <div key={host} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '4px 8px', border: `1px solid ${c}25` }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: c, flexShrink: 0 }} />
-                <span style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{host}</span>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: metric.thresh && s.last > metric.thresh ? '#f87171' : '#fff' }}>
+              <div key={host} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.01)', borderRadius: '4px', padding: '3px 6px', border: '1px solid var(--border-color)' }}>
+                <div style={{ width: 5, height: 5, borderRadius: '50%', background: c, flexShrink: 0 }} />
+                <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', maxWidth: '90px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{host}</span>
+                <span style={{ fontSize: '0.68rem', fontWeight: 600, color: metric.thresh && s.last > metric.thresh ? 'var(--status-danger)' : 'var(--text-primary)' }}>
                   {fmtVal(s.last, metric.unit)}
                 </span>
               </div>
@@ -334,26 +314,30 @@ export default function GraphsView() {
       {/* ── Header ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h2 style={{ margin: '0 0 5px 0', fontSize: '1.5rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <Activity size={22} color="var(--accent)" /> Telemetry Analytics
+          <h2 style={{ margin: '0 0 4px 0', fontSize: '1.25rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
+            <Activity size={18} color="var(--text-secondary)" /> Telemetry Analytics
           </h2>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.35)', fontSize: '0.8rem' }}>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
             {lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : 'Loading…'}
             {' · Auto-refreshes every 60s'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Time range pill buttons */}
-          <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: '4px', overflow: 'hidden' }}>
             {TIME_RANGES.map(t => (
               <button
                 key={t.id}
                 onClick={() => setTimeRange(t.id)}
                 style={{
-                  background: timeRange === t.id ? 'var(--accent)' : 'transparent',
-                  border: 'none', color: timeRange === t.id ? '#fff' : 'rgba(255,255,255,0.45)',
-                  padding: '7px 14px', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600,
+                  background: timeRange === t.id ? 'var(--text-primary)' : 'transparent',
+                  border: 'none', 
+                  color: timeRange === t.id ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                  padding: '5px 12px', 
+                  cursor: 'pointer', 
+                  fontSize: '0.72rem', 
+                  fontWeight: 600,
                   transition: 'all 0.15s',
                 }}
               >
@@ -366,7 +350,7 @@ export default function GraphsView() {
           <select
             value={serverFilter}
             onChange={e => setServerFilter(e.target.value)}
-            style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', padding: '7px 12px', borderRadius: '8px', outline: 'none', cursor: 'pointer', fontSize: '0.82rem' }}
+            style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '5px 10px', borderRadius: '4px', outline: 'none', cursor: 'pointer', fontSize: '0.74rem' }}
           >
             <option value="all">All Servers</option>
             {SERVERS.map(s => <option key={s} value={s}>{s}</option>)}
@@ -374,31 +358,31 @@ export default function GraphsView() {
 
           <button
             onClick={load}
-            style={{ background: 'var(--accent)', border: 'none', color: '#fff', padding: '7px 14px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '0.82rem' }}
+            style={{ background: 'var(--text-primary)', border: 'none', color: 'var(--bg-primary)', padding: '5px 12px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '0.72rem' }}
           >
-            <RefreshCw size={13} className={loading ? 'spin' : ''} /> Refresh
+            <RefreshCw size={12} className={loading ? 'spin' : ''} /> Refresh
           </button>
         </div>
       </div>
 
       {/* ── Server color legend ── */}
-      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
         {SERVERS.map(s => (
-          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: SERVER_COLORS[s] }} />
-            <span style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.5)' }}>{s}</span>
+          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: SERVER_COLORS[s] }} />
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{s}</span>
           </div>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: 24, height: 1, borderTop: '2px dashed rgba(239,68,68,0.5)' }} />
-          <span style={{ fontSize: '0.72rem', color: 'rgba(239,68,68,0.7)' }}>Alert threshold</span>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ width: 20, height: 1, borderTop: '1px dashed rgba(239,68,68,0.5)' }} />
+          <span style={{ fontSize: '0.68rem', color: 'rgba(239,68,68,0.7)' }}>Alert threshold</span>
         </div>
       </div>
 
       {/* ── Metric grid ── */}
       {loading && !data && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '12px', color: 'rgba(255,255,255,0.3)' }}>
-          <RefreshCw size={20} className="spin" color="var(--accent)" />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: '8px', color: 'var(--text-muted)' }}>
+          <RefreshCw size={16} className="spin" />
           <span>Fetching telemetry data…</span>
         </div>
       )}
@@ -428,7 +412,7 @@ export default function GraphsView() {
       <style>{`
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        button:hover { opacity: 0.85; }
+        button:hover { opacity: 0.9; }
       `}</style>
     </div>
   );

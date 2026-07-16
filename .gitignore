@@ -33,18 +33,29 @@ dist-ssr
 *.sw?
 
 # ── Runtime data files (generated at runtime, NOT to be committed) ──────────
+
 # Live alert history — grows with every alert trigger
 backend/src/config/alertsHistory.json
 
 # Incident log — auto-generated from alert engine
 backend/incidents.json
 
-# Alert settings — contains user-defined thresholds and per-server overrides
-# (commit a alertSettings.example.json instead)
+# Alert settings — user-defined thresholds and per-server overrides
+# (commit alertSettings.example.json as reference instead)
 backend/src/config/alertSettings.json
 
-# Temp/scratch scripts created during development
+# Mail settings — user-assigned email recipients and severity toggles
+backend/src/config/mailSettings.json
+
+# Temp/scratch/test scripts created during development
 test_fetch.js
 test_metrics_range.cjs
 test_metrics_range.js
 lookup_servers.js
+backend/test_api.js
+backend/test_clickhouse.js
+backend/test_clickhouse2.js
+backend/test_clickhouse_time.js
+backend/test_regex.js
+backend/test_service.js
+backend/check_logs.js

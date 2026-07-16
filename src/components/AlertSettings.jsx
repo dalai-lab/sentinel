@@ -107,28 +107,36 @@ export default function AlertSettings() {
     currentVals = { ...currentVals, ...settings.overrides[selectedScope] };
   }
 
+  const getSliderStyle = (val) => {
+    const v = val ?? 50;
+    const pct = ((v - 10) / 90) * 100;
+    return {
+      background: `linear-gradient(to right, var(--text-primary) 0%, var(--text-primary) ${pct}%, rgba(255, 255, 255, 0.08) ${pct}%, rgba(255, 255, 255, 0.08) 100%)`
+    };
+  };
+
   const inputsDisabled = selectedScope !== 'global' && !isOverridden;
 
   return (
     <div style={{
-      background: 'rgba(20, 20, 25, 0.4)',
+      background: 'var(--bg-card)',
       border: '1px solid var(--border-color)',
-      borderRadius: '12px',
-      padding: '24px',
+      borderRadius: 'var(--radius-lg)',
+      padding: '20px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '24px'
+      gap: '20px'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '1.2rem', fontWeight: 600 }}>Alert Thresholds</h3>
-          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '600px' }}>
-            Configure the specific system thresholds that will trigger critical alerts. You can set global defaults or override them for specific servers.
+          <h3 style={{ margin: '0 0 4px 0', fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>Telemetry Alert Thresholds</h3>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.74rem' }}>
+            Set system resource limits that trigger alerts across global or individual server scopes.
           </p>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(0,0,0,0.2)', padding: '6px 12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <Filter size={16} color="var(--text-secondary)" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.01)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+          <Filter size={12} color="var(--text-muted)" />
           <select 
             value={selectedScope}
             onChange={e => setSelectedScope(e.target.value)}
@@ -136,7 +144,7 @@ export default function AlertSettings() {
               background: 'transparent',
               border: 'none',
               color: 'var(--text-primary)',
-              fontSize: '0.9rem',
+              fontSize: '0.74rem',
               fontWeight: 600,
               outline: 'none',
               cursor: 'pointer'
@@ -153,20 +161,20 @@ export default function AlertSettings() {
 
       {selectedScope !== 'global' && (
         <div style={{
-          background: isOverridden ? 'rgba(99, 102, 241, 0.1)' : 'rgba(255, 255, 255, 0.02)',
-          border: `1px solid ${isOverridden ? 'rgba(99, 102, 241, 0.3)' : 'rgba(255, 255, 255, 0.05)'}`,
-          borderRadius: '8px',
-          padding: '16px',
+          background: isOverridden ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.01)',
+          border: `1px solid ${isOverridden ? 'rgba(16,185,129,0.2)' : 'var(--border-color)'}`,
+          borderRadius: '4px',
+          padding: '10px 14px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justify: 'space-between',
           alignItems: 'center'
         }}>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.95rem', color: isOverridden ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-              Override Global Settings
+            <h4 style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600, color: isOverridden ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+              Server Override Active
             </h4>
-            <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              If disabled, this server will inherit the Global Settings.
+            <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+              Enable to set custom limits for this specific host.
             </p>
           </div>
           <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
@@ -174,31 +182,32 @@ export default function AlertSettings() {
               type="checkbox" 
               checked={isOverridden}
               onChange={(e) => toggleOverride(e.target.checked)}
-              style={{ width: '20px', height: '20px', accentColor: 'var(--accent)' }}
+              style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
             />
           </label>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', opacity: inputsDisabled ? 0.5 : 1, pointerEvents: inputsDisabled ? 'none' : 'auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px', opacity: inputsDisabled ? 0.5 : 1, pointerEvents: inputsDisabled ? 'none' : 'auto' }}>
         
         {/* CPU Threshold */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px'
+          background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Cpu size={18} color="var(--accent)" />
-            <span style={{ fontWeight: 600 }}>CPU Usage Threshold</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+            <Cpu size={14} color="var(--text-secondary)" />
+            <span style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>CPU Threshold</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <input 
               type="range" 
               min="10" max="100" 
               value={currentVals.cpuThreshold ?? 85} 
               onChange={(e) => handleChange('cpuThreshold', parseInt(e.target.value))}
-              style={{ flex: 1, accentColor: 'var(--accent)' }}
+              className="minimal-range"
+              style={getSliderStyle(currentVals.cpuThreshold ?? 85)}
             />
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', width: '50px', textAlign: 'right' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
               {currentVals.cpuThreshold ?? 85}%
             </span>
           </div>
@@ -206,21 +215,22 @@ export default function AlertSettings() {
 
         {/* RAM Threshold */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px'
+          background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <Server size={18} color="#10b981" />
-            <span style={{ fontWeight: 600 }}>RAM Usage Threshold</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+            <Server size={14} color="var(--text-secondary)" />
+            <span style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>RAM Threshold</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <input 
               type="range" 
               min="10" max="100" 
               value={currentVals.ramThreshold ?? 90} 
               onChange={(e) => handleChange('ramThreshold', parseInt(e.target.value))}
-              style={{ flex: 1, accentColor: '#10b981' }}
+              className="minimal-range"
+              style={getSliderStyle(currentVals.ramThreshold ?? 90)}
             />
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', width: '50px', textAlign: 'right' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
               {currentVals.ramThreshold ?? 90}%
             </span>
           </div>
@@ -228,21 +238,22 @@ export default function AlertSettings() {
 
         {/* Disk Threshold */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px'
+          background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-            <HardDrive size={18} color="#f59e0b" />
-            <span style={{ fontWeight: 600 }}>Disk Usage Threshold</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+            <HardDrive size={14} color="var(--text-secondary)" />
+            <span style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>Disk Threshold</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <input 
               type="range" 
               min="10" max="100" 
               value={currentVals.diskThreshold ?? 90} 
               onChange={(e) => handleChange('diskThreshold', parseInt(e.target.value))}
-              style={{ flex: 1, accentColor: '#f59e0b' }}
+              className="minimal-range"
+              style={getSliderStyle(currentVals.diskThreshold ?? 90)}
             />
-            <span style={{ fontWeight: 700, fontSize: '1.1rem', width: '50px', textAlign: 'right' }}>
+            <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
               {currentVals.diskThreshold ?? 90}%
             </span>
           </div>
@@ -250,31 +261,31 @@ export default function AlertSettings() {
 
         {/* Antivirus Toggle */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '16px',
+          background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Shield size={18} color="#ef4444" />
-            <span style={{ fontWeight: 600 }}>Antivirus Alerts</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Shield size={14} color="var(--text-secondary)" />
+            <span style={{ fontWeight: 600, fontSize: '0.78rem', color: 'var(--text-primary)' }}>Antivirus Scanning Alerts</span>
           </div>
           <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
             <input 
               type="checkbox" 
               checked={currentVals.enableAntivirusAlerts ?? true}
               onChange={(e) => handleChange('enableAntivirusAlerts', e.target.checked)}
-              style={{ width: '20px', height: '20px', accentColor: '#ef4444' }}
+              style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
             />
-            <span style={{ marginLeft: '10px', fontSize: '0.9rem', color: (currentVals.enableAntivirusAlerts ?? true) ? 'var(--text-primary)' : 'var(--text-muted)' }}>
-              {(currentVals.enableAntivirusAlerts ?? true) ? 'Enabled' : 'Disabled'}
+            <span style={{ marginLeft: '8px', fontSize: '0.72rem', color: (currentVals.enableAntivirusAlerts ?? true) ? 'var(--status-healthy)' : 'var(--text-muted)', fontWeight: 600 }}>
+              {(currentVals.enableAntivirusAlerts ?? true) ? 'Active' : 'Disabled'}
             </span>
           </label>
         </div>
 
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', marginTop: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
         {saveMessage && (
-          <span style={{ color: saveMessage.includes('successfully') ? '#10b981' : '#ef4444', fontSize: '0.9rem' }}>
+          <span style={{ color: saveMessage.includes('successfully') ? 'var(--status-healthy)' : 'var(--status-danger)', fontSize: '0.74rem' }}>
             {saveMessage}
           </span>
         )}
@@ -283,22 +294,23 @@ export default function AlertSettings() {
           onClick={handleSave}
           disabled={saving}
           style={{
-            background: 'var(--accent)',
-            color: '#fff',
+            background: 'var(--text-primary)',
+            color: 'var(--bg-primary)',
             border: 'none',
-            padding: '10px 24px',
-            borderRadius: '6px',
+            padding: '5px 14px',
+            borderRadius: '4px',
             fontWeight: 600,
+            fontSize: '0.72rem',
             cursor: saving ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px',
-            transition: 'background 0.2s',
+            gap: '4px',
+            transition: 'opacity 0.15s',
             opacity: saving ? 0.7 : 1
           }}
         >
-          <Save size={18} />
-          {saving ? 'Saving...' : 'Save Settings'}
+          <Save size={12} />
+          {saving ? 'Saving…' : 'Save Thresholds'}
         </button>
       </div>
     </div>

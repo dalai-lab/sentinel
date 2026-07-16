@@ -48,62 +48,61 @@ export default function TraceVisualizer({ trace, onClose }) {
   return (
     <div style={{
       position: 'absolute', top: 0, right: 0, bottom: 0, width: '450px',
-      background: 'rgba(15, 23, 42, 0.95)',
-      backdropFilter: 'blur(20px)',
-      borderLeft: '1px solid rgba(255,255,255,0.1)',
+      background: 'var(--bg-card)',
+      borderLeft: '1px solid var(--border-color)',
       display: 'flex', flexDirection: 'column',
-      boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
+      boxShadow: '-4px 0 20px rgba(0,0,0,0.15)',
       zIndex: 100,
       animation: 'slideIn 0.3s ease-out'
     }}>
-      <div style={{ padding: '20px', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: '16px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h3 style={{ margin: 0, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Activity size={18} color="var(--primary-color)" />
+          <h3 style={{ margin: 0, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
+            <Activity size={14} color="var(--text-secondary)" />
             Distributed Trace
           </h3>
-          <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>
             {trace.trace_id}
           </div>
         </div>
-        <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-          <X size={20} />
+        <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex' }}>
+          <X size={16} />
         </button>
       </div>
 
-      <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '24px' }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Clock size={14} /> Total Duration
+      <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+          <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Clock size={12} /> Total Duration
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 600, marginTop: '4px', color: 'var(--text-color)' }}>
+            <div style={{ fontSize: '1rem', fontWeight: 600, marginTop: '2px', color: 'var(--text-primary)' }}>
               {totalDuration}ms
             </div>
           </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Cpu size={14} /> Spans
+          <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <Cpu size={12} /> Spans
             </div>
-            <div style={{ fontSize: '18px', fontWeight: 600, marginTop: '4px', color: 'var(--text-color)' }}>
+            <div style={{ fontSize: '1rem', fontWeight: 600, marginTop: '2px', color: 'var(--text-primary)' }}>
               {spans.length}
             </div>
           </div>
         </div>
 
-        <div style={{ position: 'relative', paddingLeft: '16px', borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ position: 'relative', paddingLeft: '14px', borderLeft: '1px solid var(--border-color)' }}>
           {spans.map((span, i) => (
-            <div key={span.id} style={{ marginBottom: '16px', position: 'relative' }}>
-              <div style={{ position: 'absolute', left: '-20px', top: '10px', width: '12px', height: '1px', background: 'rgba(255,255,255,0.2)' }}></div>
-              <div style={{ position: 'absolute', left: '-24px', top: '6px', width: '8px', height: '8px', borderRadius: '50%', background: getServiceColor(span.service) }}></div>
+            <div key={span.id} style={{ marginBottom: '12px', position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '-15px', top: '10px', width: '8px', height: '1px', background: 'var(--border-color)' }}></div>
+              <div style={{ position: 'absolute', left: '-18px', top: '7px', width: '6px', height: '6px', borderRadius: '50%', background: getServiceColor(span.service) }}></div>
               
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', marginLeft: span.depth * 16 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-color)' }}>{span.name}</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{span.duration}ms</span>
+              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', marginLeft: span.depth * 12 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-primary)' }}>{span.name}</span>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{span.duration}ms</span>
                 </div>
                 
-                <div style={{ height: '24px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ height: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '2px', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ 
                     position: 'absolute', 
                     top: 0, bottom: 0, 
@@ -111,11 +110,11 @@ export default function TraceVisualizer({ trace, onClose }) {
                     width: `${(span.duration / totalDuration) * 100}%`,
                     background: getServiceColor(span.service),
                     opacity: 0.8,
-                    borderRadius: '4px'
+                    borderRadius: '2px'
                   }}></div>
                 </div>
                 
-                <div style={{ fontSize: '11px', color: getServiceColor(span.service), marginTop: '8px', fontWeight: 500 }}>
+                <div style={{ fontSize: '0.65rem', color: getServiceColor(span.service), marginTop: '6px', fontWeight: 600 }}>
                   {span.service}
                 </div>
               </div>

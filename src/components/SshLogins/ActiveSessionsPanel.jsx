@@ -40,25 +40,25 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
     .slice(0, 3);
 
   return (
-    <div className="ssh-sidebar" style={{ width: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div className="ssh-sidebar custom-scrollbar" style={{ width: '300px', display: 'flex', flexDirection: 'column', gap: '14px', overflowY: 'auto', maxHeight: '100%' }}>
       
       {/* Top Attacking Countries */}
       {topCountries.length > 0 && (
-        <div className="metric-card" style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: 'var(--text-color)', fontWeight: 600 }}>
-            <Activity size={16} color="var(--primary-color)" />
+        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+            <Activity size={12} color="var(--text-secondary)" />
             Top Attacking Countries
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {topCountries.map((t, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   {t.countryCode && (
-                    <img src={`https://flagcdn.com/16x12/${t.countryCode.toLowerCase()}.png`} width="16" height="12" alt={t.countryCode} />
+                    <img src={`https://flagcdn.com/16x12/${t.countryCode.toLowerCase()}.png`} width="12" height="9" alt={t.countryCode} />
                   )}
-                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t.country}</span>
+                  <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>{t.country}</span>
                 </div>
-                <span style={{ fontSize: '13px', color: 'var(--text-color)', fontWeight: 600 }}>{t.attempts} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>attempts</span></span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-primary)', fontWeight: 600 }}>{t.attempts} <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>attempts</span></span>
               </div>
             ))}
           </div>
@@ -66,73 +66,73 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       )}
 
       {/* Top Targeted Accounts */}
-      <div className="metric-card" style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: 'var(--text-color)', fontWeight: 600 }}>
-          <User size={16} color="var(--status-danger)" />
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+          <User size={12} color="var(--status-danger)" />
           Top Targeted Accounts
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {topAccounts.map(([acc, hits]) => (
             <div key={acc} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '13px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{acc}</span>
-              <span style={{ fontSize: '13px', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '11px' }}>hits</span></span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{acc}</span>
+              <span style={{ fontSize: '0.74rem', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '0.58rem' }}>hits</span></span>
             </div>
           ))}
-          {topAccounts.length === 0 && <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No failed logins recorded.</span>}
+          {topAccounts.length === 0 && <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>No failed logins.</span>}
         </div>
       </div>
 
       {/* Top Attacker IPs */}
-      <div className="metric-card" style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', color: 'var(--text-color)', fontWeight: 600 }}>
-          <AlertTriangle size={16} color="var(--status-danger)" />
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+          <AlertTriangle size={12} color="var(--status-danger)" />
           Top Attacker IPs
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {topIps.map(([ip, hits]) => {
             const geo = ipGeo[ip];
             return (
               <div key={ip} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div>
-                  <div style={{ fontSize: '13px', color: 'var(--text-color)', fontFamily: 'monospace', fontWeight: 600 }}>{ip}</div>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{ip}</div>
                   {geo && geo.countryCode && (
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-                      <img src={`https://flagcdn.com/16x12/${geo.countryCode.toLowerCase()}.png`} width="12" height="9" alt={geo.countryCode} />
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}>
+                      <img src={`https://flagcdn.com/16x12/${geo.countryCode.toLowerCase()}.png`} width="10" height="8" alt={geo.countryCode} />
                       {geo.city}, {geo.country}
                     </div>
                   )}
                 </div>
-                <span style={{ fontSize: '13px', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '11px' }}>hits</span></span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--status-danger)', fontWeight: 600 }}>{hits} <span style={{ fontSize: '0.58rem' }}>hits</span></span>
               </div>
             );
           })}
-          {topIps.length === 0 && <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No failed logins recorded.</span>}
+          {topIps.length === 0 && <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>No failed logins.</span>}
         </div>
       </div>
 
       {/* Active Sessions */}
-      <div className="metric-card" style={{ background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', padding: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-color)', fontWeight: 600 }}>
-            <ShieldCheck size={16} color="var(--status-healthy)" />
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
+            <ShieldCheck size={12} color="var(--status-healthy)" />
             Active Sessions
           </div>
-          <span style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--status-healthy)', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+          <span style={{ background: 'rgba(16,185,129,0.05)', color: 'var(--status-healthy)', border: '1px solid rgba(16,185,129,0.2)', padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', fontWeight: 600 }}>
             {activeSessions.length}
           </span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {activeSessions.map((session, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '13px', color: 'var(--text-color)', fontWeight: 600 }}>{session.user}</span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{session.time}</span>
+                <span style={{ fontSize: '0.74rem', color: 'var(--text-primary)', fontWeight: 600 }}>{session.user}</span>
+                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{session.time}</span>
               </div>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{session.ip}</span>
-              <span style={{ fontSize: '11px', color: 'var(--primary-color)' }}>{session.server}</span>
+              <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{session.ip}</span>
+              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{session.server}</span>
             </div>
           ))}
-          {activeSessions.length === 0 && <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>No active SSH sessions.</span>}
+          {activeSessions.length === 0 && <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>No active SSH sessions.</span>}
         </div>
       </div>
       

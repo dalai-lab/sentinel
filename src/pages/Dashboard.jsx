@@ -14,7 +14,6 @@ import OverviewScansWidget from '../components/OverviewScansWidget';
 import AlertCenterWidget from '../components/AlertCenterWidget';
 import GraphsView from '../components/GraphsView';
 import ThreatMapView from '../components/ThreatMapView';
-import TopologyView from '../components/TopologyView';
 import { fetchServerMetrics } from '../api/signoz';
 import { fetchAlerts } from '../api/alerts';
 import { getFriendlyName, getServerIp } from '../utils/serverMapping';
@@ -237,85 +236,76 @@ export default function Dashboard() {
         {/* Dynamic Views Router */}
         {activeTab === 'overview' && (
           <>
-            <div style={{ marginBottom: '24px' }}>
-              <h1 style={{ fontSize: '1.65rem', fontWeight: 700, marginBottom: '6px' }}>Infrastructure Overview</h1>
-              <p className="text-muted" style={{ fontSize: '0.9rem' }}>Real-time telemetry and health scores across your servers.</p>
+            <div style={{ marginBottom: '20px' }}>
+              <h1 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '4px', color: 'var(--text-primary)' }}>Infrastructure Overview</h1>
+              <p className="text-muted" style={{ fontSize: '0.8rem' }}>Real-time telemetry and health scores across your servers.</p>
             </div>
 
             {apiError && apiError !== 'waiting_for_token' && (
               <div style={{
-                padding: '16px',
+                padding: '12px',
                 background: 'var(--status-danger-bg)',
                 border: '1px solid var(--status-danger)',
                 borderRadius: 'var(--radius-sm)',
-                marginBottom: '24px',
+                marginBottom: '20px',
                 color: 'var(--status-danger)',
-                fontSize: '0.9rem'
+                fontSize: '0.8rem'
               }}>
                 <strong>Connection Error:</strong> The API request failed. Open the Developer Tools (F12) Console to see the exact error message.
               </div>
             )}
 
-            {/* Core Layout Grid */}
-            <div className="dashboard-grid">
-              
-              {/* Left Column: Stats Summary & Telemetry Cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Main Layout Flow */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
-                {/* ── AAA Grade stat tiles ── */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px' }}>
+                {/* ── Fleet stat tiles ── */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
                   {[
                     {
                       label: 'Servers Online', 
                       value: `${onlineServersCount}`, 
                       sub: `of ${totalServersCount} nodes`,
-                      icon: Server, color: '#10b981',
-                      bg: 'rgba(16,185,129,0.08)', border: 'rgba(16,185,129,0.2)',
+                      icon: Server, color: 'var(--text-primary)',
                     },
                     {
                       label: 'Fleet Avg CPU', 
                       value: `${avgCpu}%`, 
                       sub: 'across all servers',
-                      icon: Cpu, color: '#818cf8',
-                      bg: 'rgba(129,140,248,0.08)', border: 'rgba(129,140,248,0.2)',
+                      icon: Cpu, color: 'var(--text-primary)',
                     },
                     {
                       label: 'Active Threats', 
                       value: activeAlertsCount, 
                       sub: activeAlertsCount > 0 ? 'requires attention' : 'all clear',
                       icon: ShieldAlert, 
-                      color: activeAlertsCount > 0 ? '#ef4444' : '#10b981',
-                      bg: activeAlertsCount > 0 ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.06)',
-                      border: activeAlertsCount > 0 ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.2)',
+                      color: activeAlertsCount > 0 ? 'var(--status-danger)' : 'var(--text-primary)',
                     },
                     {
                       label: 'Platform State', 
                       value: activeAlertsCount > 0 ? 'DEGRADED' : 'NOMINAL', 
                       sub: 'overall health',
                       icon: CheckCircle,
-                      color: activeAlertsCount > 0 ? '#f59e0b' : '#10b981',
-                      bg: activeAlertsCount > 0 ? 'rgba(245,158,11,0.08)' : 'rgba(16,185,129,0.06)',
-                      border: activeAlertsCount > 0 ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)',
+                      color: activeAlertsCount > 0 ? 'var(--status-warning)' : 'var(--status-healthy)',
                     },
-                  ].map(({ label, value, sub, icon: Icon, color, bg, border }) => (
+                  ].map(({ label, value, sub, icon: Icon, color }) => (
                     <div key={label} style={{
-                      background: 'linear-gradient(145deg, #0d0f16, #11141f)',
-                      border: `1px solid ${border}`,
-                      borderTop: `3px solid ${color}`,
-                      borderRadius: '14px',
-                      padding: '18px 20px',
-                      position: 'relative',
-                      overflow: 'hidden',
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '110px'
                     }}>
-                      <div style={{ position: 'absolute', top: -20, right: -20, width: 80, height: 80, borderRadius: '50%', background: `radial-gradient(circle, ${bg} 0%, transparent 70%)`, pointerEvents: 'none' }} />
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                        <div style={{ background: `${color}18`, border: `1px solid ${color}30`, borderRadius: '7px', padding: '6px' }}>
-                          <Icon size={14} color={color} />
-                        </div>
-                        <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</span>
+                        <Icon size={14} color={color} style={{ opacity: 0.8 }} />
                       </div>
-                      <div style={{ fontSize: '1.8rem', fontWeight: 900, color: '#f8fafc', lineHeight: 1, marginBottom: '4px', letterSpacing: '-0.02em' }}>{value}</div>
-                      <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.3)' }}>{sub}</div>
+                      <div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.2, marginBottom: '2px', letterSpacing: '-0.01em' }}>{value}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -326,25 +316,20 @@ export default function Dashboard() {
                     <ServerCard key={server.id} {...server} />
                   ))}
                 </div>
-              </div>
 
-              {/* Right Column: AI SRE Briefing & Active Alerts Feed */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <AiCopilotCard
-                  aiData={aiCopilotData}
-                  servers={servers}
-                  alerts={activeAlerts}
-                  recentLogs={recentLogs}
-                  onCommandCopy={handleCopyCommand}
-                  onRefreshAiAdvice={loadAiAdvice}
-                />
-                <div className="security-feed-panel" style={{ width: '100%', flex: 1 }}>
+                {/* Bottom Intelligence Grid */}
+                <div className="bottom-intelligence-grid">
+                  <AiCopilotCard
+                    aiData={aiCopilotData}
+                    servers={servers}
+                    alerts={activeAlerts}
+                    recentLogs={recentLogs}
+                    onCommandCopy={handleCopyCommand}
+                    onRefreshAiAdvice={loadAiAdvice}
+                  />
+                  <AlertCenterWidget />
                   <OverviewScansWidget />
                 </div>
-                <div className="security-feed-panel" style={{ width: '100%' }}>
-                  <AlertCenterWidget />
-                </div>
-              </div>
 
             </div>
           </>
@@ -352,7 +337,6 @@ export default function Dashboard() {
 
         {activeTab === 'graphs' && <GraphsView />}
         {activeTab === 'threatmap' && <ThreatMapView />}
-        {activeTab === 'topology' && <TopologyView />}
 
         {activeTab === 'servers' && <ServerList servers={filteredServers} />}
 

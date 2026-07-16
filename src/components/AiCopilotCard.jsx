@@ -142,13 +142,15 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
   };
 
   return (
-    <div className="dashboard-card" style={{
-      background: 'rgba(255, 255, 255, 0.015)',
+    <div style={{
+      background: 'var(--bg-card)',
       border: '1px solid var(--border-color)',
       borderRadius: 'var(--radius-md)',
-      padding: '20px',
-      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
-      marginBottom: '16px'
+      padding: '16px',
+      height: '380px',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
       
       {/* Header with Mood Indicator */}
@@ -158,24 +160,23 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '10px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-        paddingBottom: '12px',
-        marginBottom: '16px'
+        borderBottom: '1px solid var(--border-color)',
+        paddingBottom: '10px',
+        marginBottom: '14px',
+        flexShrink: 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
-            background: 'var(--accent-light)',
-            padding: '6px',
-            borderRadius: '6px',
+            color: 'var(--text-secondary)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <Activity size={14} color="var(--accent)" />
+            <Activity size={12} />
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)', letterSpacing: '0.01em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              AI COPILOT BRIEFING
+            <h4 style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'uppercase' }}>
+              System Briefing
               <button 
                 onClick={handleForceRefresh}
                 disabled={loading}
@@ -184,7 +185,7 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                   background: 'none', border: 'none', cursor: 'pointer', padding: 0, 
                   display: 'flex', alignItems: 'center', color: 'var(--text-muted)'
                 }}>
-                <RefreshCw size={12} className={loading ? "spin-animation" : ""} />
+                <RefreshCw size={11} className={loading ? "spin-animation" : ""} />
               </button>
             </h4>
           </div>
@@ -194,290 +195,283 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          padding: '4px 10px',
-          background: currentMood.bg,
-          border: `1px solid ${currentMood.border}`,
-          borderRadius: '12px',
-          fontSize: '0.68rem',
-          fontWeight: 750,
+          gap: '5px',
+          padding: '3px 8px',
+          border: `1px solid var(--border-color)`,
+          borderRadius: 'var(--radius-sm)',
+          fontSize: '0.65rem',
+          fontWeight: 600,
           color: currentMood.color,
           textTransform: 'uppercase',
-          letterSpacing: '0.04em'
+          letterSpacing: '0.04em',
+          background: 'rgba(255,255,255,0.01)'
         }}>
           <div className="mood-orb" style={{
-            width: '6px',
-            height: '6px',
+            width: '5px',
+            height: '5px',
             borderRadius: '50%',
-            backgroundColor: currentMood.color,
-            boxShadow: `0 0 8px ${currentMood.glow}`
+            backgroundColor: currentMood.color
           }} />
           {mood}
         </div>
       </div>
 
-      {/* Main Briefing Headline */}
-      <div style={{ marginBottom: '14px' }}>
-        <h2 style={{
-          fontSize: '1.15rem',
-          fontWeight: 800,
-          color: 'var(--text-primary)',
-          lineHeight: 1.3,
-          margin: '0 0 6px 0',
-          letterSpacing: '-0.01em'
-        }}>
-          {aiData.headline}
-        </h2>
-        <p style={{
-          fontSize: '0.8rem',
-          color: 'var(--text-secondary)',
-          lineHeight: 1.4,
-          margin: 0
-        }}>
-          {aiData.daily_digest}
-        </p>
-      </div>
+      {/* Scrollable Body Wrapper */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingRight: '4px' }} className="custom-scrollbar">
+        {/* Main Briefing Headline */}
+        <div style={{ marginBottom: '4px' }}>
+          <h2 style={{
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            color: 'var(--text-primary)',
+            lineHeight: 1.3,
+            margin: '0 0 4px 0',
+            letterSpacing: '-0.01em'
+          }}>
+            {aiData.headline}
+          </h2>
+          <p style={{
+            fontSize: '0.76rem',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.35,
+            margin: 0
+          }}>
+            {aiData.daily_digest}
+          </p>
+        </div>
 
-      {/* Top Threat Alert (If Active) */}
-      {aiData.top_threat && (
+        {/* Top Threat Alert (If Active) */}
+        {aiData.top_threat && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.02)',
+            border: '1px solid rgba(239, 68, 68, 0.1)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '6px 10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '8px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={12} color="var(--status-danger)" style={{ flexShrink: 0 }} />
+              <div style={{ fontSize: '0.74rem', color: 'var(--text-primary)' }}>
+                <span style={{ color: 'var(--status-danger)', marginRight: '3px', fontWeight: 600 }}>Active Alert:</span>
+                Suspicious activity logged: <span className="text-mono" style={{ background: 'rgba(255,255,255,0.03)', padding: '1px 3px', borderRadius: '3px', fontSize: '0.7rem' }}>{aiData.top_threat}</span>
+              </div>
+            </div>
+            <button 
+              onClick={handleClearIncidents}
+              disabled={loading}
+              style={{
+                background: 'rgba(239, 68, 68, 0.05)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: '3px',
+                color: 'var(--status-danger)',
+                fontSize: '0.65rem',
+                fontWeight: 600,
+                padding: '3px 8px',
+                cursor: 'pointer',
+                transition: 'var(--transition)'
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
+        {/* Grid of Details: Insights & Recommendations */}
         <div style={{
-          background: 'rgba(239, 68, 68, 0.06)',
-          border: '1px solid rgba(239, 68, 68, 0.15)',
-          borderRadius: '6px',
-          padding: '8px 12px',
-          marginBottom: '14px',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '10px'
+          flexDirection: 'column',
+          gap: '12px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <AlertTriangle size={14} color="#ef4444" style={{ flexShrink: 0 }} />
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: 600 }}>
-              <span style={{ color: '#ef4444', marginRight: '4px', fontWeight: 800 }}>AI Alert:</span>
-              Suspicious activity logged from IP/Host: <span className="text-mono" style={{ background: 'rgba(0,0,0,0.2)', padding: '1px 4px', borderRadius: '4px', fontSize: '0.72rem' }}>{aiData.top_threat}</span>
+          {/* Diagnostics & Insights */}
+          <div>
+            <h5 style={{ fontSize: '0.65rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.04em', margin: '0 0 4px 0' }}>
+              Observations
+            </h5>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              {aiData.insights && aiData.insights.map((insight, idx) => (
+                <div key={idx} style={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '5px',
+                  fontSize: '0.74rem',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.3
+                }}>
+                  <Info size={11} style={{ marginTop: '2px', flexShrink: 0, color: 'var(--text-muted)' }} />
+                  <span>{insight}</span>
+                </div>
+              ))}
             </div>
           </div>
-          <button 
-            onClick={handleClearIncidents}
-            disabled={loading}
-            style={{
-              background: 'rgba(239, 68, 68, 0.12)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-              borderRadius: '4px',
-              color: '#ef4444',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              padding: '4px 10px',
-              cursor: 'pointer',
-              transition: 'var(--transition)'
-            }}
-            className="clear-threat-btn"
-          >
-            Clear Threats
-          </button>
-        </div>
-      )}
 
-      {/* Grid of Details: Insights & Recommendations */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-        gap: '14px',
-        marginBottom: '14px'
-      }}>
-        {/* Diagnostics & Insights */}
-        <div>
-          <h5 style={{ fontSize: '0.72rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.03em', margin: '0 0 6px 0' }}>
-            System Observations
-          </h5>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {aiData.insights && aiData.insights.map((insight, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '6px',
-                fontSize: '0.78rem',
-                color: 'var(--text-secondary)',
-                lineHeight: 1.35
-              }}>
-                <Info size={11} style={{ marginTop: '2px', flexShrink: 0, color: 'var(--accent)' }} />
-                <span>{insight}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+          {/* Advice & Remediation */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.01)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '10px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+              <Command size={11} color="var(--status-warning)" />
+              <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--status-warning)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                Suggested Action
+              </span>
+            </div>
+            <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: '0 0 6px 0', lineHeight: 1.3 }}>
+              {aiData.tip}
+            </p>
 
-        {/* Advice & Remediation */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.01)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--radius-sm)',
-          padding: '12px'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '6px' }}>
-            <Command size={12} color="var(--status-warning)" />
-            <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--status-warning)', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
-              Suggested Action
-            </span>
-          </div>
-          <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', margin: '0 0 8px 0', lineHeight: 1.35 }}>
-            {aiData.tip}
-          </p>
-
-          {aiData.command && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: 'rgba(99, 102, 241, 0.04)',
-              border: '1px solid rgba(99, 102, 241, 0.12)',
-              borderRadius: '4px',
-              padding: '6px 10px',
-              cursor: 'pointer'
-            }}
-              onClick={() => copyCommand(aiData.command)}
-              className="command-copy-box"
-            >
-              <code className="text-mono" style={{ fontSize: '0.7rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, paddingRight: '8px' }}>
-                $ {aiData.command}
-              </code>
-              <button style={{
-                background: 'none',
-                border: 'none',
-                color: copied ? 'var(--status-healthy)' : 'var(--text-secondary)',
-                cursor: 'pointer',
+            {aiData.command && (
+              <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                padding: '2px'
-              }} aria-label="Copy command">
-                {copied ? <Check size={11} /> : <Copy size={11} />}
-              </button>
+                justifyContent: 'space-between',
+                background: 'rgba(255, 255, 255, 0.02)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '3px',
+                padding: '4px 8px',
+                cursor: 'pointer'
+              }}
+                onClick={() => copyCommand(aiData.command)}
+              >
+                <code className="text-mono" style={{ fontSize: '0.68rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, paddingRight: '6px' }}>
+                  $ {aiData.command}
+                </code>
+                <button style={{
+                  background: 'none',
+                  border: 'none',
+                  color: copied ? 'var(--status-healthy)' : 'var(--text-muted)',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '2px'
+                }} aria-label="Copy command">
+                  {copied ? <Check size={11} /> : <Copy size={11} />}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Ask Copilot Interactive Section */}
+        <div style={{
+          borderTop: '1px solid var(--border-color)',
+          paddingTop: '8px',
+          marginTop: '4px'
+        }}>
+          {/* Toggle Button for chat */}
+          <button
+            onClick={() => setChatExpanded(!chatExpanded)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+              padding: '2px 0',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              outline: 'none'
+            }}
+          >
+            <MessageSquare size={12} />
+            <span>Ask Copilot</span>
+            {chatExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+          </button>
+
+          {chatExpanded && (
+            <div style={{ marginTop: '8px' }}>
+              {/* Chat History */}
+              {chatHistory.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  marginBottom: '8px',
+                  maxHeight: '140px',
+                  overflowY: 'auto',
+                  padding: '6px',
+                  background: 'rgba(255,255,255,0.01)',
+                  borderRadius: 'var(--radius-sm)',
+                  border: '1px solid var(--border-color)'
+                }}>
+                  {chatHistory.map((chat, idx) => (
+                    <div key={idx} style={{
+                      alignSelf: chat.sender === 'user' ? 'flex-end' : 'flex-start',
+                      background: chat.sender === 'user' ? 'rgba(255, 255, 255, 0.03)' : 'transparent',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '4px',
+                      padding: '5px 8px',
+                      maxWidth: '90%',
+                      fontSize: '0.74rem',
+                      lineHeight: 1.35,
+                      color: 'var(--text-secondary)'
+                    }}>
+                      <div style={{
+                        fontSize: '0.58rem',
+                        fontWeight: 600,
+                        color: chat.sender === 'user' ? 'var(--text-primary)' : 'var(--text-muted)',
+                        marginBottom: '2px',
+                        textTransform: 'uppercase'
+                      }}>
+                        {chat.sender === 'user' ? 'You' : 'Copilot'}
+                      </div>
+                      <div>{formatChatText(chat.text)}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Ask Form Input */}
+              <form onSubmit={handleAsk} style={{ display: 'flex', gap: '4px' }}>
+                <input
+                  type="text"
+                  placeholder="Ask Copilot a question..."
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  disabled={loading}
+                  style={{
+                    flex: 1,
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '3px',
+                    padding: '5px 8px',
+                    fontSize: '0.74rem',
+                    color: 'var(--text-primary)',
+                    outline: 'none'
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={loading || !question.trim()}
+                  style={{
+                    background: 'var(--text-primary)',
+                    color: 'var(--bg-primary)',
+                    border: 'none',
+                    borderRadius: '3px',
+                    padding: '5px 10px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: question.trim() ? 'pointer' : 'not-allowed',
+                    opacity: question.trim() ? 1 : 0.5,
+                    fontSize: '0.72rem',
+                    fontWeight: 600
+                  }}
+                >
+                  Send
+                </button>
+              </form>
             </div>
           )}
         </div>
       </div>
 
-      {/* Ask Copilot Interactive Section */}
-      <div style={{
-        borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-        paddingTop: '10px',
-        marginTop: '6px'
-      }}>
-        {/* Toggle Button for chat to keep it compact */}
-        <button
-          onClick={() => setChatExpanded(!chatExpanded)}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--accent)',
-            cursor: 'pointer',
-            padding: '2px 0',
-            fontSize: '0.76rem',
-            fontWeight: 800,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            outline: 'none'
-          }}
-        >
-          <MessageSquare size={13} />
-          <span>ASK COPILOT QUESTION</span>
-          {chatExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-        </button>
-
-        {chatExpanded && (
-          <div style={{ marginTop: '10px' }}>
-            {/* Chat History */}
-            {chatHistory.length > 0 && (
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                marginBottom: '10px',
-                maxHeight: '180px',
-                overflowY: 'auto',
-                padding: '8px',
-                background: 'rgba(0,0,0,0.2)',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color)'
-              }}>
-                {chatHistory.map((chat, idx) => (
-                  <div key={idx} style={{
-                    alignSelf: chat.sender === 'user' ? 'flex-end' : 'flex-start',
-                    background: chat.sender === 'user' ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.02)',
-                    border: chat.sender === 'user' ? '1px solid rgba(99, 102, 241, 0.2)' : '1px solid var(--border-color)',
-                    borderRadius: '6px',
-                    padding: '6px 10px',
-                    maxWidth: '90%',
-                    fontSize: '0.76rem',
-                    lineHeight: 1.4,
-                    color: 'var(--text-secondary)'
-                  }}>
-                    <div style={{
-                      fontSize: '0.6rem',
-                      fontWeight: 800,
-                      color: chat.sender === 'user' ? 'var(--accent)' : 'var(--text-muted)',
-                      marginBottom: '2px',
-                      textTransform: 'uppercase'
-                    }}>
-                      {chat.sender === 'user' ? 'You' : 'Copilot'}
-                    </div>
-                    <div>{formatChatText(chat.text)}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Ask Form Input */}
-            <form onSubmit={handleAsk} style={{ display: 'flex', gap: '6px' }}>
-              <input
-                type="text"
-                placeholder="Ask Copilot a question..."
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                disabled={loading}
-                style={{
-                  flex: 1,
-                  background: 'rgba(0, 0, 0, 0.25)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '4px',
-                  padding: '6px 10px',
-                  fontSize: '0.76rem',
-                  color: 'var(--text-primary)',
-                  outline: 'none',
-                  transition: 'border-color 0.15s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = 'rgba(99, 102, 241, 0.4)'}
-                onBlur={(e) => e.target.style.borderColor = 'var(--border-color)'}
-              />
-              <button
-                type="submit"
-                disabled={loading || !question.trim()}
-                style={{
-                  background: 'var(--accent)',
-                  border: 'none',
-                  borderRadius: '4px',
-                  padding: '6px 12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: question.trim() ? 'pointer' : 'not-allowed',
-                  opacity: question.trim() ? 1 : 0.5,
-                  transition: 'opacity 0.15s'
-                }}
-              >
-                {loading ? (
-                  <Sparkles size={12} className="spin-animation" color="#fff" />
-                ) : (
-                  <Send size={12} color="#fff" />
-                )}
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
-     {/* Style Tag Removed */}
     </div>
   );
 }

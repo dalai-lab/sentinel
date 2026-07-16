@@ -25,41 +25,38 @@ function getUptimeString(seconds) {
   return `${m}m`;
 }
 
-// Radial gauge for a metric value
-function RadialGauge({ value, size = 72 }) {
+function LinearProgress({ value }) {
   const val = Math.min(parseFloat(value) || 0, 100);
-  const r = (size - 10) / 2;
-  const circ = 2 * Math.PI * r;
-  const dash = (val / 100) * circ;
   const color = getMetricColor(val);
-
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth={7} />
-      <circle
-        cx={size / 2} cy={size / 2} r={r} fill="none"
-        stroke={color} strokeWidth={7}
-        strokeDasharray={`${dash} ${circ}`}
-        strokeLinecap="round"
-        style={{ transition: 'stroke-dasharray 0.8s cubic-bezier(0.16,1,0.3,1)', filter: `drop-shadow(0 0 4px ${color}88)` }}
-      />
-    </svg>
+    <div style={{ width: '100%', height: '3px', backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: '2px', overflow: 'hidden', marginTop: '4px' }}>
+      <div style={{ width: `${val}%`, height: '100%', backgroundColor: color, borderRadius: '2px', transition: 'width 0.6s ease' }} />
+    </div>
   );
 }
 
-function GaugeStat({ label, value, unit = '%', icon: Icon }) {
+function MetricStat({ label, value, icon: Icon }) {
   const numVal = parseFloat(value) || 0;
-  const color = unit === '%' ? getMetricColor(numVal) : '#60a5fa';
+  const color = getMetricColor(numVal);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', position: 'relative' }}>
-      <div style={{ position: 'relative' }}>
-        <RadialGauge value={unit === '%' ? numVal : 50} size={68} />
-        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-          <Icon size={12} color={color} />
-        </div>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '4px',
+      background: '#16161a',
+      border: '1px solid var(--border-color)',
+      borderRadius: 'var(--radius-sm)',
+      padding: '10px 12px'
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>{label}</span>
+        <Icon size={11} color="var(--text-muted)" style={{ opacity: 0.8 }} />
       </div>
-      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: color }}>{unit === '%' ? `${numVal.toFixed(1)}%` : value}</div>
-      <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: 600 }}>{label}</div>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '2px' }}>
+        <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-primary)' }}>{numVal.toFixed(0)}</span>
+        <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 500 }}>%</span>
+      </div>
+      <LinearProgress value={numVal} />
     </div>
   );
 }
@@ -72,61 +69,92 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
   const isCrit = parsedCpu > 85 || parsedRam > 85 || parsedDisk > 85;
   const isWarn = !isCrit && (parsedCpu > 70 || parsedRam > 70 || parsedDisk > 70);
 
-  let accentColor = '#10b981';
-  let accentGlow = 'rgba(16,185,129,0.12)';
-  let borderColor = 'rgba(16,185,129,0.2)';
-  if (!isOnline) { accentColor = '#6b7280'; accentGlow = 'transparent'; borderColor = 'rgba(107,114,128,0.2)'; }
-  else if (isCrit) { accentColor = '#ef4444'; accentGlow = 'rgba(239,68,68,0.1)'; borderColor = 'rgba(239,68,68,0.3)'; }
-  else if (isWarn) { accentColor = '#f59e0b'; accentGlow = 'rgba(245,158,11,0.08)'; borderColor = 'rgba(245,158,11,0.25)'; }
+  let accentColor = 'var(--text-muted)';
+  let borderColor = 'var(--border-color)';
+  if (isOnline) {
+    if (isCrit) {
+      accentColor = 'var(--status-danger)';
+      borderColor = 'rgba(239, 68, 68, 0.2)';
+    } else if (isWarn) {
+      accentColor = 'var(--status-warning)';
+      borderColor = 'rgba(245, 158, 11, 0.2)';
+    } else {
+      accentColor = 'var(--status-healthy)';
+    }
+  }
 
   const healthLabel = !isOnline ? 'Offline' : isCrit ? 'Critical' : isWarn ? 'Warning' : 'Healthy';
 
   return (
     <div style={{
-      background: `linear-gradient(145deg, #0e1015, #13151e)`,
+      background: 'var(--bg-card)',
       border: `1px solid ${borderColor}`,
-      borderTop: `3px solid ${accentColor}`,
-      borderRadius: '16px',
-      padding: '20px',
+      borderRadius: 'var(--radius-lg)',
+      padding: '16px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '18px',
-      boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)`,
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      gap: '14px',
+      transition: 'border-color 0.2s ease',
       position: 'relative',
       overflow: 'hidden',
     }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = `0 16px 40px rgba(0,0,0,0.5), 0 0 0 1px ${borderColor}`; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = `0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04)`; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; }}
     >
-      {/* Background radial glow */}
-      <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: `radial-gradient(circle, ${accentGlow} 0%, transparent 70%)`, pointerEvents: 'none' }} />
-
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ background: `${accentColor}18`, border: `1px solid ${accentColor}35`, borderRadius: '10px', padding: '10px', position: 'relative' }}>
-            <Server size={18} color={accentColor} />
-            {isOnline && <span style={{ position: 'absolute', bottom: -2, right: -2, width: 8, height: 8, borderRadius: '50%', background: '#10b981', border: '2px solid #0e1015', boxShadow: '0 0 8px #10b981', animation: 'statusPing 2s infinite' }} />}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '8px',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Server size={14} color="var(--text-secondary)" />
+            {isOnline && (
+              <span style={{
+                position: 'absolute',
+                bottom: -1,
+                right: -1,
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--status-healthy)',
+                border: '1px solid var(--bg-card)'
+              }} />
+            )}
           </div>
           <div>
-            <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#f8fafc', letterSpacing: '-0.01em' }}>{name}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
-              <Globe size={10} color="rgba(255,255,255,0.3)" />
-              <span style={{ fontSize: '0.72rem', fontFamily: 'monospace', color: 'rgba(255,255,255,0.35)' }}>{ip}</span>
+            <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{name}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+              <Globe size={10} color="var(--text-muted)" />
+              <span style={{ fontSize: '0.68rem', fontFamily: 'monospace', color: 'var(--text-muted)' }}>{ip}</span>
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
           <div style={{
-            fontSize: '0.68rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
-            color: accentColor, background: `${accentColor}18`, border: `1px solid ${accentColor}30`,
-            padding: '4px 10px', borderRadius: '20px', display: 'flex', alignItems: 'center', gap: '5px'
+            fontSize: '0.62rem',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.04em',
+            color: accentColor,
+            background: 'rgba(255, 255, 255, 0.01)',
+            border: '1px solid var(--border-color)',
+            padding: '2px 8px',
+            borderRadius: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
           }}>
-            {isOnline ? <CheckCircle size={10} /> : <XCircle size={10} />} {healthLabel}
+            {healthLabel}
           </div>
           {isOnline && (
-            <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '3px' }}>
               <Clock size={10} /> {getUptimeString(uptime)}
             </div>
           )}
@@ -137,37 +165,33 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
       {isOnline ? (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <GaugeStat label="CPU" value={cpu} icon={Cpu} />
-            <GaugeStat label="Memory" value={ram} icon={MemoryStick} />
-            <GaugeStat label="Disk" value={disk} icon={HardDrive} />
+            <MetricStat label="CPU" value={cpu} icon={Cpu} />
+            <MetricStat label="Memory" value={ram} icon={MemoryStick} />
+            <MetricStat label="Disk" value={disk} icon={HardDrive} />
           </div>
 
           {/* Bottom stats strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '14px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
             {[
-              { label: 'Load Avg', value: load || '—', icon: Activity, color: '#a78bfa' },
-              { label: 'Net In', value: formatBytes(netRecv), icon: ArrowDown, color: '#34d399' },
-              { label: 'Net Out', value: formatBytes(netSent), icon: ArrowUp, color: '#60a5fa' },
+              { label: 'Load Avg', value: load || '—', icon: Activity, color: 'var(--text-secondary)' },
+              { label: 'Net In', value: formatBytes(netRecv), icon: ArrowDown, color: 'var(--text-secondary)' },
+              { label: 'Net Out', value: formatBytes(netSent), icon: ArrowUp, color: 'var(--text-secondary)' },
             ].map(({ label, value, icon: Icon, color }) => (
-              <div key={label} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px 10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                  <Icon size={10} color={color} />
-                  <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.06em' }}>{label}</span>
+              <div key={label} style={{ background: 'rgba(255,255,255,0.01)', borderRadius: 'var(--radius-sm)', padding: '6px 8px', border: '1px solid var(--border-color)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginBottom: '2px' }}>
+                  <Icon size={10} color={color} style={{ opacity: 0.7 }} />
+                  <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.04em' }}>{label}</span>
                 </div>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#e2e8f0', fontFamily: 'monospace' }}>{value}</div>
+                <div style={{ fontSize: '0.74rem', fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{value}</div>
               </div>
             ))}
           </div>
         </>
       ) : (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'rgba(0,0,0,0.2)', borderRadius: '10px', gap: '8px', color: 'rgba(255,255,255,0.25)', fontSize: '0.82rem' }}>
-          <XCircle size={14} /> No telemetry — server offline or unreachable
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', background: 'rgba(255, 255, 255, 0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+          <XCircle size={12} /> No telemetry — offline
         </div>
       )}
-
-      <style>{`
-        @keyframes statusPing { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(1.4); } }
-      `}</style>
     </div>
   );
 }

@@ -1,0 +1,28 @@
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment (injected at runtime via env_file in docker-compose)
+.env
+.env.local
+
+# Runtime-generated data files — must NOT be baked into the image
+# They are recreated fresh on first server start
+src/config/alertsHistory.json
+src/config/alertSettings.json
+src/config/mailSettings.json
+incidents.json
+
+# Development test scripts — not needed in production image
+test_api.js
+test_clickhouse.js
+test_clickhouse2.js
+test_clickhouse_time.js
+test_regex.js
+test_service.js
+check_logs.js
+
+# Git metadata
+.git
+.gitignore

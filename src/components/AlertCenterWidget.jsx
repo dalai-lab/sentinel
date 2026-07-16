@@ -51,98 +51,103 @@ export default function AlertCenterWidget() {
   };
 
   return (
-    <div className="dashboard-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', height: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      borderRadius: 'var(--radius-md)',
+      padding: '16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      height: '380px',
+      overflow: 'hidden'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ 
-            background: activeAlerts.length > 0 ? 'rgba(239, 68, 68, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-            padding: '8px', 
-            borderRadius: '8px',
-            color: activeAlerts.length > 0 ? '#ef4444' : '#10b981',
-            boxShadow: activeAlerts.length > 0 ? '0 0 15px rgba(239,68,68,0.3)' : 'none'
+            background: activeAlerts.length > 0 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(16, 185, 129, 0.08)',
+            padding: '6px', 
+            borderRadius: '6px',
+            color: activeAlerts.length > 0 ? 'var(--status-danger)' : 'var(--status-healthy)'
           }}>
-            {activeAlerts.length > 0 ? <ShieldAlert size={20} className="pulse-alert-icon" /> : <CheckCircle2 size={20} />}
+            {activeAlerts.length > 0 ? <ShieldAlert size={14} className="pulse-alert-icon" /> : <CheckCircle2 size={14} />}
           </div>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Sentinel Alert Center</h3>
-            <p style={{ margin: '2px 0 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <h3 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 650, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Alert Center</h3>
+            <p style={{ margin: '1px 0 0 0', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
               {activeAlerts.length} Active System Alerts
             </p>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto', flex: 1, paddingRight: '4px' }} className="custom-scrollbar">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto', flex: 1, paddingRight: '4px' }} className="custom-scrollbar">
         {loading && alerts.length === 0 ? (
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontStyle: 'italic', textAlign: 'center', padding: '20px' }}>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.76rem', fontStyle: 'italic', textAlign: 'center', padding: '16px' }}>
             Syncing telemetry...
           </div>
         ) : activeAlerts.length === 0 ? (
           <div style={{ 
-            background: 'rgba(16, 185, 129, 0.05)', 
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            borderRadius: '8px',
-            padding: '24px',
+            background: 'rgba(16, 185, 129, 0.02)', 
+            border: '1px solid rgba(16, 185, 129, 0.1)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '16px',
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '12px',
-            textAlign: 'center'
+            gap: '10px'
           }}>
-            <CheckCircle2 size={32} color="#10b981" />
+            <CheckCircle2 size={18} color="var(--status-healthy)" />
             <div>
-              <h4 style={{ margin: 0, color: '#10b981', fontSize: '1rem' }}>All Systems Nominal</h4>
-              <p style={{ margin: '4px 0 0 0', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>No threshold breaches detected across the fleet.</p>
+              <h4 style={{ margin: 0, color: 'var(--status-healthy)', fontSize: '0.78rem', fontWeight: 600 }}>All Systems Nominal</h4>
+              <p style={{ margin: '2px 0 0 0', color: 'var(--text-secondary)', fontSize: '0.7rem' }}>No threshold breaches detected.</p>
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {activeAlerts.map(alert => {
               const color = getSeverityColor(alert.severity);
               return (
                 <div key={alert.id} style={{
-                  background: `linear-gradient(90deg, ${color}10 0%, transparent 100%)`,
-                  borderLeft: `4px solid ${color}`,
+                  background: 'rgba(255, 255, 255, 0.01)',
+                  borderLeft: `3px solid ${color}`,
                   borderTop: '1px solid var(--border-color)',
                   borderRight: '1px solid var(--border-color)',
                   borderBottom: '1px solid var(--border-color)',
-                  borderRadius: '0 8px 8px 0',
-                  padding: '16px',
+                  borderRadius: '0 4px 4px 0',
+                  padding: '8px 10px',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
-                  animation: alert.severity === 'critical' ? 'alert-flash 2s infinite' : 'none'
+                  alignItems: 'center'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                    <div style={{ color: color, marginTop: '2px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flex: 1, minWidth: 0, marginRight: '8px' }}>
+                    <div style={{ color: color, marginTop: '2px', flexShrink: 0 }}>
                       {getIcon(alert.type)}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.95rem' }}>{alert.title}</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0, flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.78rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.title}</h4>
                         <span style={{ 
-                          background: `${color}20`, 
+                          background: `${color}15`, 
                           color: color, 
-                          padding: '2px 8px', 
-                          borderRadius: '12px', 
-                          fontSize: '0.65rem', 
+                          padding: '1px 5px', 
+                          borderRadius: '3px', 
+                          fontSize: '0.58rem', 
                           fontWeight: 700, 
                           textTransform: 'uppercase',
-                          letterSpacing: '0.05em'
+                          letterSpacing: '0.04em'
                         }}>
                           {alert.severity}
                         </span>
                       </div>
-                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.4' }}>
+                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.72rem', lineHeight: '1.2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {alert.message}
                       </p>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Server size={12} /> {alert.host}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                          <Server size={10} /> {alert.host}
                         </span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Clock size={12} /> {new Date(alert.timestamp).toLocaleTimeString()}
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                          <Clock size={10} /> {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                     </div>
@@ -150,18 +155,16 @@ export default function AlertCenterWidget() {
                   <button 
                     onClick={() => handleAcknowledge(alert.id)}
                     style={{
-                      background: 'rgba(255,255,255,0.05)',
+                      background: 'rgba(255,255,255,0.02)',
                       border: '1px solid var(--border-color)',
                       color: 'var(--text-primary)',
-                      padding: '8px 16px',
-                      borderRadius: '6px',
-                      fontSize: '0.8rem',
+                      padding: '4px 8px',
+                      borderRadius: '4px',
+                      fontSize: '0.68rem',
                       fontWeight: 600,
                       cursor: 'pointer',
-                      transition: 'background 0.2s'
+                      flexShrink: 0
                     }}
-                    onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                    onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                   >
                     Acknowledge
                   </button>
@@ -172,31 +175,31 @@ export default function AlertCenterWidget() {
         )}
 
         {historicalAlerts.length > 0 && (
-          <div style={{ marginTop: '20px' }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ marginTop: '10px' }}>
+            <h4 style={{ margin: '0 0 6px 0', fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
               Recent History
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {historicalAlerts.map(alert => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {historicalAlerts.slice(0, 3).map(alert => (
                 <div key={alert.id} style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  borderRadius: '6px',
-                  padding: '12px 16px',
+                  background: 'rgba(255,255,255,0.01)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '4px',
+                  padding: '6px 8px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ color: 'var(--text-muted)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                    <div style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
                       {getIcon(alert.type)}
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{alert.title}</span>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{alert.host} • {new Date(alert.timestamp).toLocaleString()}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                      <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.title}</span>
+                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.host} • {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                   </div>
-                  <CheckCircle2 size={16} color="var(--text-muted)" />
+                  <CheckCircle2 size={12} color="var(--text-muted)" style={{ flexShrink: 0 }} />
                 </div>
               ))}
             </div>
@@ -205,10 +208,6 @@ export default function AlertCenterWidget() {
       </div>
 
       <style>{`
-        @keyframes alert-flash {
-          0%, 100% { border-left-color: #ef4444; background: linear-gradient(90deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%); }
-          50% { border-left-color: #fca5a5; background: linear-gradient(90deg, rgba(239, 68, 68, 0.25) 0%, transparent 100%); }
-        }
         .pulse-alert-icon {
           animation: pulse-icon 2s infinite ease-in-out;
         }

@@ -3,6 +3,7 @@ const cors = require('cors');
 const config = require('./config/env');
 const metricsRoutes = require('./routes/metrics.routes');
 const alertsRoutes = require('./routes/alerts.routes');
+const emailRoutes = require('./routes/email.routes');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Routes
 app.use('/api/metrics', metricsRoutes);
 app.use('/api/alerts', alertsRoutes);
+app.use('/api/email', emailRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

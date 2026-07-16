@@ -89,22 +89,24 @@ export default function SshLoginsCard({ topThreat }) {
   // Loading Skeleton
   if (loading && allEvents.length === 0 && crowdSecEvents.length === 0) {
     return (
-      <div className="card" style={{ height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+      <div style={{ height: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
+        <div style={{ color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
           <div className="spinner"></div>
-          <div>Loading Secure Sentinel logs...</div>
+          <div style={{ fontSize: '0.78rem' }}>Loading access logs...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="card ssh-card" style={{ display: 'flex', flexDirection: 'column', height: '650px', padding: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 160px)', padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
       
       {/* Header & Filters */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-        <User size={18} color="var(--primary-color)" />
-        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>Access Logs Feed</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+          <User size={14} color="var(--text-secondary)" />
+        </div>
+        <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>Access Logs Feed</h3>
       </div>
       
       <LogFilters 
@@ -115,10 +117,10 @@ export default function SshLoginsCard({ topThreat }) {
         uniqueServers={uniqueServers}
       />
 
-      <div style={{ display: 'flex', gap: '24px', flex: 1, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', gap: '20px', flex: 1, overflow: 'hidden' }}>
         
         {/* Main Event Feed */}
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }} className="custom-scrollbar">
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.15)' }} className="custom-scrollbar">
           {filteredEvents.slice(0, visibleCount).map((event, idx) => (
             <SshEventRow 
               key={`${event.rawTs}-${idx}`} 

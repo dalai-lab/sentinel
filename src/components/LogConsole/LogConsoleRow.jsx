@@ -3,10 +3,10 @@ import { ArrowRight, Activity, Terminal } from 'lucide-react';
 
 const getLevelColor = (level) => {
   switch (level) {
-    case 'ERROR': return '#ef4444';
-    case 'WARN': return '#f59e0b';
-    case 'DEBUG': return '#71717a';
-    default: return '#10b981';
+    case 'ERROR': return 'var(--status-danger)';
+    case 'WARN': return 'var(--status-warning)';
+    case 'DEBUG': return 'var(--text-muted)';
+    default: return 'var(--status-healthy)';
   }
 };
 
@@ -20,61 +20,63 @@ export default function LogConsoleRow({ log, onClickTrace }) {
       style={{
         display: 'flex',
         alignItems: 'flex-start',
-        gap: '16px',
-        padding: '8px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.03)',
-        transition: 'background 0.2s',
-        fontSize: '13px'
+        gap: '12px',
+        padding: '6px 14px',
+        borderBottom: '1px solid var(--border-color)',
+        transition: 'background 0.15s',
+        fontSize: '0.72rem',
+        fontFamily: 'var(--font-mono)'
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
-      <div style={{ color: 'var(--text-muted)', fontFamily: 'monospace', flexShrink: 0, width: '100px' }}>
+      <div style={{ color: 'var(--text-muted)', flexShrink: 0, width: '80px' }}>
         {timeStr}
       </div>
       
-      <div style={{ flexShrink: 0, width: '60px' }}>
+      <div style={{ flexShrink: 0, width: '50px' }}>
         <span style={{ 
           color: color, 
-          background: `${color}15`, 
-          padding: '2px 6px', 
-          borderRadius: '4px', 
-          fontSize: '11px', 
-          fontWeight: 600,
-          border: `1px solid ${color}30`
+          background: `${color}08`, 
+          padding: '1px 5px', 
+          borderRadius: '3px', 
+          fontSize: '0.62rem', 
+          fontWeight: 650,
+          border: `1px solid ${color}20`
         }}>
           {log.level}
         </span>
       </div>
 
-      <div style={{ flexShrink: 0, width: '120px', color: 'var(--primary-color)', fontFamily: 'monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={log.service}>
+      <div style={{ flexShrink: 0, width: '110px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={log.service}>
         [{log.service}]
       </div>
 
-      <div style={{ flex: 1, color: 'var(--text-color)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+      <div style={{ flex: 1, color: 'var(--text-primary)', wordBreak: 'break-all' }}>
         {log.msg}
       </div>
 
-      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
         <button 
           onClick={() => onClickTrace(log)}
           style={{
-            background: 'rgba(59, 130, 246, 0.1)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-            color: '#60a5fa',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            fontSize: '11px',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--text-secondary)',
+            padding: '2px 8px',
+            borderRadius: '3px',
+            fontSize: '0.65rem',
+            fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
-            transition: 'all 0.2s'
+            gap: '3px',
+            transition: 'all 0.15s'
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(59, 130, 246, 0.1)'}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
         >
-          <Activity size={12} />
+          <Activity size={10} />
           Trace
         </button>
       </div>

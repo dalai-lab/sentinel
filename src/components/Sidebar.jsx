@@ -4,25 +4,29 @@ import { LayoutDashboard, Server, Activity, Settings, X, Terminal, Key, Shield, 
 export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
   const categories = [
     {
-      title: 'Telemetry',
+      title: 'Dashboard',
       items: [
-        { name: 'Overview', id: 'overview', icon: LayoutDashboard },
-        { name: 'Servers', id: 'servers', icon: Server },
-        { name: 'Graphs', id: 'graphs', icon: LineChart }
+        { name: 'Overview', id: 'overview', icon: LayoutDashboard }
       ]
     },
     {
-      title: 'Intelligence',
+      title: 'Telemetry',
+      items: [
+        { name: 'Servers', id: 'servers', icon: Server },
+        { name: 'Graphs', id: 'graphs', icon: LineChart },
+        { name: 'Logs & Traces', id: 'logs', icon: Activity }
+      ]
+    },
+    {
+      title: 'Security',
       items: [
         { name: 'Threat Map', id: 'threatmap', icon: Map },
-        { name: 'Topology', id: 'topology', icon: Network },
-        { name: 'Logs & Traces', id: 'logs', icon: Activity },
         { name: 'SSH Logins', id: 'ssh', icon: Key },
         { name: 'Antivirus Scans', id: 'scans', icon: Shield }
       ]
     },
     {
-      title: 'Configuration',
+      title: 'System',
       items: [
         { name: 'Settings', id: 'settings', icon: Settings }
       ]
@@ -71,35 +75,32 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
         </button>
 
         {/* Branding Header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '0 8px', marginBottom: '2rem', marginTop: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 8px', marginBottom: '1.75rem', marginTop: '4px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%)',
-            padding: '8px',
-            borderRadius: '8px',
+            color: 'var(--text-primary)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)'
+            justifyContent: 'center'
           }}>
-            <Terminal size={18} color="#fff" />
+            <Terminal size={16} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <h2 style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '0.08em', margin: 0 }}>SENTINEL</h2>
+            <h2 style={{ fontSize: '0.9rem', fontWeight: 700, letterSpacing: '0.06em', margin: 0, color: 'var(--text-primary)' }}>SENTINEL</h2>
           </div>
         </div>
 
         {/* Categorized Navigation */}
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '20px', flex: 1 }}>
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
           {categories.map((cat, idx) => (
-            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               <span style={{
-                fontSize: '0.62rem',
-                fontWeight: 750,
+                fontSize: '0.6rem',
+                fontWeight: 600,
                 color: 'var(--text-muted)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                padding: '0 12px',
-                marginBottom: '4px'
+                letterSpacing: '0.05em',
+                padding: '0 8px',
+                marginBottom: '2px'
               }}>
                 {cat.title}
               </span>
@@ -115,20 +116,19 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '12px',
+                        gap: '10px',
                         color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-                        fontWeight: isActive ? 600 : 500,
-                        padding: '10px 12px',
-                        background: isActive ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
-                        borderLeft: `3px solid ${isActive ? 'var(--accent)' : 'transparent'}`,
-                        borderRadius: '0 6px 6px 0',
+                        fontWeight: isActive ? 500 : 450,
+                        padding: '8px 10px',
+                        background: isActive ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
+                        borderRadius: 'var(--radius-sm)',
                         cursor: 'pointer',
                         transition: 'var(--transition)'
                       }}
                       className={!isActive ? 'nav-item' : ''}
                     >
-                      <Icon size={16} color={isActive ? 'var(--accent)' : 'currentColor'} style={{ flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.86rem' }}>{item.name}</span>
+                      <Icon size={14} style={{ flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.8rem' }}>{item.name}</span>
                     </div>
                   );
                 })}
@@ -144,19 +144,11 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
         .nav-item:hover {
           color: var(--text-primary) !important;
           background: rgba(255, 255, 255, 0.02) !important;
-          border-left-color: rgba(255, 255, 255, 0.15) !important;
         }
         @media (min-width: 769px) {
           .mobile-close-btn {
             display: none !important;
           }
-        }
-        .operator-pulse-dot {
-          animation: status-glow 2s infinite ease-in-out;
-        }
-        @keyframes status-glow {
-          0%, 100% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.2); opacity: 1; }
         }
       `}</style>
     </>

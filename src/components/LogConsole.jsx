@@ -96,11 +96,13 @@ export default function LogConsole() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', height: 'calc(100vh - 160px)', position: 'relative' }}>
       
-      <div className="card ssh-card" style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '24px', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <Terminal size={18} color="var(--primary-color)" />
-          <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>Application Telemetry</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+            <Terminal size={14} color="var(--text-secondary)" />
+          </div>
+          <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>Application Telemetry</h3>
         </div>
 
         <LogConsoleFilters 
@@ -111,7 +113,7 @@ export default function LogConsole() {
           refreshLogs={refreshLogs} loading={loading}
         />
 
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)', marginTop: '16px' }} className="custom-scrollbar">
+        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.15)', marginTop: '12px' }} className="custom-scrollbar">
           
           {loading && logs.length === 0 && (
             <div style={{ padding: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', color: 'var(--text-muted)' }}>

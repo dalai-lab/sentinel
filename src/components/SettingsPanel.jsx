@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Save } from 'lucide-react';
 import AlertSettings from './AlertSettings';
+import EmailSettings from './EmailSettings';
 
 export default function SettingsPanel() {
 
@@ -13,54 +14,30 @@ export default function SettingsPanel() {
   };
 
   return (
-    <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '30px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '4px' }}>Global Settings</h2>
-          <p className="text-muted" style={{ fontSize: '0.85rem' }}>Configure Prometheus database connections and SRE thresholds.</p>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>System Configurations</h2>
+          <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>Configure telemetry thresholds, email forwarding dispatches, and SRE rules.</p>
         </div>
-
-        <button
-          type="submit"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            background: 'linear-gradient(135deg, var(--accent) 0%, #4f46e5 100%)',
-            border: 'none',
-            color: '#fff',
-            padding: '8px 16px',
-            borderRadius: '6px',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(99, 102, 241, 0.2)',
-            transition: 'var(--transition)'
-          }}
-          className="save-settings-btn"
-        >
-          <Save size={14} />
-          <span>Save Changes</span>
-        </button>
       </div>
 
       <AlertSettings />
+      <EmailSettings />
 
       {isSaved && (
         <div style={{
-          background: 'var(--status-healthy-bg)',
+          background: 'rgba(16,185,129,0.05)',
           border: '1px solid rgba(16,185,129,0.2)',
           color: 'var(--status-healthy)',
-          padding: '12px 16px',
+          padding: '10px 14px',
           borderRadius: 'var(--radius-sm)',
-          fontSize: '0.85rem',
+          fontSize: '0.78rem',
           fontWeight: 600
         }}>
-          Configuration profiles updated and cached successfully! otelcol configurations reloaded.
+          Configuration profiles updated and cached successfully!
         </div>
       )}
-
-
-    </form>
+    </div>
   );
 }

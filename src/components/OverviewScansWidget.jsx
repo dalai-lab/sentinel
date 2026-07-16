@@ -31,61 +31,74 @@ export default function OverviewScansWidget() {
   }, []);
 
   return (
-    <div className="dashboard-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', height: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600 }}>Recent Antivirus Scans</h3>
+    <div style={{
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      borderRadius: 'var(--radius-md)',
+      padding: '16px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      height: '380px',
+      overflow: 'hidden'
+    }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '10px' }}>
+        <h3 style={{ margin: 0, fontSize: '0.8rem', fontWeight: 650, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Recent Scans</h3>
       </div>
 
-      {loading && scans.length === 0 ? (
-        <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.9rem' }}>Loading scans...</div>
-      ) : scans.length === 0 ? (
-        <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No recent scans found.</div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {scans.map((scan, i) => {
-            const infected = scan.infectedFiles > 0;
-            const dateObj = new Date(scan.timestamp);
-            const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            return (
-              <div key={i} style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px',
-                background: infected ? 'var(--status-danger-bg)' : 'rgba(255, 255, 255, 0.02)',
-                border: `1px solid ${infected ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.05)'}`,
-                borderRadius: '6px',
-                transition: 'background 0.2s'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  {infected ? <ShieldAlert size={16} color="#ef4444" /> : <ShieldCheck size={16} color="#10b981" />}
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 500, color: infected ? '#ef4444' : 'var(--text-primary)' }}>
-                      {getFriendlyName(scan.host)}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', flex: 1, paddingRight: '4px' }} className="custom-scrollbar">
+        {loading && scans.length === 0 ? (
+          <div style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontSize: '0.76rem', textAlign: 'center', padding: '16px' }}>Loading scans...</div>
+        ) : scans.length === 0 ? (
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.76rem', textAlign: 'center', padding: '16px' }}>No recent scans.</div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {scans.map((scan, i) => {
+              const infected = scan.infectedFiles > 0;
+              const dateObj = new Date(scan.timestamp);
+              const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              
+              return (
+                <div key={i} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '8px 10px',
+                  background: infected ? 'var(--status-danger-bg)' : 'rgba(255, 255, 255, 0.01)',
+                  border: `1px solid ${infected ? 'rgba(239, 68, 68, 0.1)' : 'var(--border-color)'}`,
+                  borderRadius: '4px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                    <div style={{ flexShrink: 0 }}>
+                      {infected ? <ShieldAlert size={14} color="var(--status-danger)" /> : <ShieldCheck size={14} color="var(--status-healthy)" />}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                      <span style={{ fontSize: '0.76rem', fontWeight: 600, color: infected ? 'var(--status-danger)' : 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {getFriendlyName(scan.host)}
+                      </span>
+                      <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                        {scan.scannedFiles} files scanned
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+                    <span style={{ 
+                      fontSize: '0.74rem', 
+                      fontWeight: 600, 
+                      color: infected ? 'var(--status-danger)' : 'var(--status-healthy)'
+                    }}>
+                      {infected ? `${scan.infectedFiles} Infected` : 'Clean'}
                     </span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      {scan.scannedFiles} files scanned
+                    <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+                      {timeStr}
                     </span>
                   </div>
                 </div>
-                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ 
-                    fontSize: '0.8rem', 
-                    fontWeight: 600, 
-                    color: infected ? '#ef4444' : '#10b981'
-                  }}>
-                    {infected ? `${scan.infectedFiles} Infected` : 'Clean'}
-                  </span>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    {timeStr}
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

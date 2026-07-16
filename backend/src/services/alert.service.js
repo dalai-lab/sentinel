@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const signozService = require('./signoz.service');
+const emailService = require('./emailService');
 
 const SETTINGS_PATH = path.join(__dirname, '../config/alertSettings.json');
 const ALERTS_HISTORY_PATH = path.join(__dirname, '../config/alertsHistory.json');
@@ -98,6 +99,11 @@ class AlertService {
     this.saveAlerts();
     this.lastTriggered[dedupKey] = now;
     console.log(`[ALERT SERVICE] 🚨 New Alert Triggered: [${alert.severity.toUpperCase()}] ${alert.title} on ${alert.host}`);
+    
+    // Dispatch Email Notification via ZeptoMail SMTP
+    emailService.sendAlertNotification(newAlert).catch(err => {
+      console.error('[ALERT SERVICE] Email forwarding error:', err.message);
+    });
   }
 
   // Friendly names map duplicated from aiManager

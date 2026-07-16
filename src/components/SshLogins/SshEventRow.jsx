@@ -2,15 +2,15 @@ import React from 'react';
 import { ShieldAlert, Key, LogOut, Wifi, AlertTriangle, Bot, Server } from 'lucide-react';
 
 const statusConfig = {
-  connected: { label: 'Session Active', bg: 'rgba(16,185,129,0.08)', color: 'var(--status-healthy)', border: 'rgba(16,185,129,0.15)', icon: <Wifi size={14} color="var(--status-healthy)" /> },
-  failures: { label: 'Auth Failed', bg: 'rgba(239,68,68,0.08)', color: 'var(--status-danger)', border: 'rgba(239,68,68,0.15)', icon: <ShieldAlert size={14} color="var(--status-danger)" /> },
-  disconnected: { label: 'Closed', bg: 'rgba(255,255,255,0.02)', color: 'var(--text-muted)', border: 'var(--border-color)', icon: <LogOut size={14} color="var(--text-muted)" /> }
+  connected: { label: 'Session Active', bg: 'rgba(16,185,129,0.05)', color: 'var(--status-healthy)', border: 'rgba(16,185,129,0.2)', icon: <Wifi size={12} color="var(--status-healthy)" /> },
+  failures: { label: 'Auth Failed', bg: 'rgba(239,68,68,0.05)', color: 'var(--status-danger)', border: 'rgba(239,68,68,0.2)', icon: <ShieldAlert size={12} color="var(--status-danger)" /> },
+  disconnected: { label: 'Closed', bg: 'rgba(255,255,255,0.01)', color: 'var(--text-muted)', border: 'var(--border-color)', icon: <LogOut size={12} color="var(--text-muted)" /> }
 };
 
 const securityConfig = {
-  'SSH Bruteforce Blocked': { label: 'Threat Blocked', bg: 'rgba(239,68,68,0.08)', color: 'var(--status-danger)', border: 'rgba(239,68,68,0.15)', icon: <ShieldAlert size={14} color="var(--status-danger)" /> },
-  'Bot Scan Dropped': { label: 'Scan Blocked', bg: 'rgba(245,158,11,0.08)', color: '#f59e0b', border: 'rgba(245,158,11,0.15)', icon: <Bot size={14} color="#f59e0b" /> },
-  'Security Alert': { label: 'Anomaly', bg: 'rgba(245,158,11,0.08)', color: '#f59e0b', border: 'rgba(245,158,11,0.15)', icon: <AlertTriangle size={14} color="#f59e0b" /> }
+  'SSH Bruteforce Blocked': { label: 'Threat Blocked', bg: 'rgba(239,68,68,0.05)', color: 'var(--status-danger)', border: 'rgba(239,68,68,0.2)', icon: <ShieldAlert size={12} color="var(--status-danger)" /> },
+  'Bot Scan Dropped': { label: 'Scan Blocked', bg: 'rgba(245,158,11,0.05)', color: 'var(--status-warning)', border: 'rgba(245,158,11,0.2)', icon: <Bot size={12} color="var(--status-warning)" /> },
+  'Security Alert': { label: 'Anomaly', bg: 'rgba(245,158,11,0.05)', color: 'var(--status-warning)', border: 'rgba(245,158,11,0.2)', icon: <AlertTriangle size={12} color="var(--status-warning)" /> }
 };
 
 function FlagIcon({ countryCode }) {
@@ -19,19 +19,17 @@ function FlagIcon({ countryCode }) {
   return (
     <img 
       src={`https://flagcdn.com/16x12/${code}.png`} 
-      width="16" 
-      height="12" 
+      width="12" 
+      height="9" 
       alt={code} 
-      style={{ display: 'inline-block', verticalAlign: 'middle', borderRadius: '1.5px', marginTop: '-2px' }} 
+      style={{ display: 'inline-block', verticalAlign: 'middle', borderRadius: '1px', marginTop: '-2px' }} 
     />
   );
 }
 
 export default function SshEventRow({ event, geo, onClick }) {
-  // Determine if it's a security event or an SSH event
   const isSecurity = !!event.scenario;
   
-  // Render Security Alert
   if (isSecurity) {
     const config = securityConfig[event.scenario] || securityConfig['Security Alert'];
     return (
@@ -41,48 +39,48 @@ export default function SshEventRow({ event, geo, onClick }) {
         style={{
           display: 'flex',
           alignItems: 'flex-start',
-          gap: '16px',
-          padding: '12px 16px',
-          borderBottom: '1px solid rgba(255,255,255,0.03)',
+          gap: '12px',
+          padding: '8px 12px',
+          borderBottom: '1px solid var(--border-color)',
           cursor: 'pointer',
-          transition: 'background 0.2s',
-          background: event.isWhitelisted ? 'rgba(255,255,255,0.02)' : 'rgba(239,68,68,0.03)'
+          transition: 'background 0.15s',
+          background: event.isWhitelisted ? 'rgba(255,255,255,0.01)' : 'rgba(239,68,68,0.01)'
         }}
-        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-        onMouseLeave={(e) => e.currentTarget.style.background = event.isWhitelisted ? 'rgba(255,255,255,0.02)' : 'rgba(239,68,68,0.03)'}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = event.isWhitelisted ? 'rgba(255,255,255,0.01)' : 'rgba(239,68,68,0.01)'}
       >
         <div style={{
-          width: '32px', height: '32px', borderRadius: '8px',
-          background: config.bg, border: `1px solid ${config.border}`,
+          width: '24px', height: '24px', borderRadius: '3px',
+          background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
         }}>
           {config.icon}
         </div>
         
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ color: config.color, fontWeight: 600, fontSize: '14px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ color: config.color, fontWeight: 600, fontSize: '0.78rem' }}>
                 {config.label}
               </span>
-              <span style={{ background: 'rgba(255,255,255,0.05)', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <span style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', color: 'var(--text-muted)' }}>
                 {event.server}
               </span>
               {event.isWhitelisted && (
-                <span style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981', padding: '2px 8px', borderRadius: '4px', fontSize: '11px' }}>
+                <span style={{ background: 'rgba(16,185,129,0.05)', color: 'var(--status-healthy)', border: '1px solid rgba(16,185,129,0.2)', padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', fontWeight: 600 }}>
                   Whitelisted
                 </span>
               )}
             </div>
-            <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem' }}>
               {event.time}
             </span>
           </div>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '13px', color: 'var(--text-color)' }}>
-            <span style={{ fontFamily: 'monospace' }}>{event.ip}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)' }}>{event.ip}</span>
             {geo && (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-muted)' }}>
                 <FlagIcon countryCode={geo.countryCode} />
                 {geo.city}, {geo.country}
               </span>
@@ -95,7 +93,6 @@ export default function SshEventRow({ event, geo, onClick }) {
     );
   }
 
-  // Render Standard SSH Login Event
   const config = statusConfig[event.status === 'success' ? 'connected' : event.status === 'failed' ? 'failures' : 'disconnected'];
   
   return (
@@ -105,51 +102,52 @@ export default function SshEventRow({ event, geo, onClick }) {
       style={{
         display: 'flex',
         alignItems: 'flex-start',
-        gap: '16px',
-        padding: '12px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.03)',
+        gap: '12px',
+        padding: '8px 12px',
+        borderBottom: '1px solid var(--border-color)',
         cursor: 'pointer',
-        transition: 'background 0.2s',
+        transition: 'background 0.15s',
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
       <div style={{
-        width: '32px', height: '32px', borderRadius: '8px',
-        background: config.bg, border: `1px solid ${config.border}`,
+        width: '24px', height: '24px', borderRadius: '3px',
+        background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
       }}>
-        <Key size={14} color={config.color} />
+        <Key size={12} color={config.color} />
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: 'var(--text-color)', fontWeight: 600, fontSize: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.78rem' }}>
               {event.user}
             </span>
             <span style={{ 
-              background: event.status === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)', 
-              color: event.status === 'success' ? '#10b981' : 'var(--text-muted)', 
-              padding: '2px 8px', borderRadius: '4px', fontSize: '11px', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' 
+              background: event.status === 'success' ? 'rgba(16,185,129,0.05)' : 'rgba(255,255,255,0.01)', 
+              color: event.status === 'success' ? 'var(--status-healthy)' : 'var(--text-muted)', 
+              border: `1px solid ${event.status === 'success' ? 'rgba(16,185,129,0.2)' : 'var(--border-color)'}`,
+              padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.5px' 
             }}>
               {event.action}
             </span>
           </div>
-          <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem' }}>
             {event.time}
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '13px', color: 'var(--text-muted)' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Server size={12} /> {event.server}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Server size={11} /> {event.server}
           </span>
-          <span style={{ fontFamily: 'monospace', color: 'var(--text-color)' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)' }}>
             {event.ip}{event.port ? `:${event.port}` : ''}
           </span>
           {geo && geo.countryCode && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               <FlagIcon countryCode={geo.countryCode} />
               {geo.city}, {geo.country}
             </span>

@@ -31,17 +31,27 @@ async function fetchActiveAlerts() {
   }
 }
 
-async function fetchLogs(startTime, endTime) {
+async function fetchLogs(startTime, endTime, type) {
   try {
     const end = endTime || Date.now();
     const start = startTime || (end - 60 * 60 * 1000); // 1 hour default
 
-    const payload = {
-      start,
-      end,
-      requestType: 'raw',
-      variables: {},
-      compositeQuery: {
+    let compositeQuery;
+
+    if (type === 'ssh') {
+      compositeQuery = {
+        queries: [
+          {
+            type: 'clickhouse_sql',
+            spec: {
+              name: 'A',
+              query: `SELECT timestamp, body, severity_text, resources_string, attributes_string FROM signoz_logs.logs_v2 WHERE body ILIKE '%sshd%' OR body ILIKE '%crowdsec%' ORDER BY timestamp DESC LIMIT 2000`
+            }
+          }
+        ]
+      };
+    } else {
+      compositeQuery = {
         queries: [
           {
             type: 'builder_query',
@@ -53,7 +63,15 @@ async function fetchLogs(startTime, endTime) {
             }
           }
         ]
-      }
+      };
+    }
+
+    const payload = {
+      start,
+      end,
+      requestType: 'raw',
+      variables: {},
+      compositeQuery
     };
 
     const response = await axios.post(`${config.SIGNOZ_URL}/api/v5/query_range`, payload, {

@@ -105,12 +105,13 @@ export async function fetchActiveAlerts() {
   }
 }
 
-export async function fetchRealLogs(startTime, endTime) {
+export async function fetchRealLogs(startTime, endTime, type) {
   try {
     let url = `${BACKEND_URL}/logs`;
     const params = [];
     if (startTime) params.push(`startTime=${startTime}`);
     if (endTime) params.push(`endTime=${endTime}`);
+    if (type) params.push(`type=${type}`);
     if (params.length > 0) url += `?${params.join('&')}`;
 
     const response = await fetch(url, {

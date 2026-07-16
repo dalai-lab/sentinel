@@ -37,10 +37,11 @@ router.get('/alerts', async (req, res) => {
 
 router.get('/logs', async (req, res) => {
   try {
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, type } = req.query;
     const logs = await signozService.fetchLogs(
       startTime ? parseInt(startTime) : null,
-      endTime ? parseInt(endTime) : null
+      endTime ? parseInt(endTime) : null,
+      type
     );
     res.json(logs);
   } catch (error) {

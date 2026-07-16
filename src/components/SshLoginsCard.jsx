@@ -229,7 +229,7 @@ export default function SshLoginsCard({ topThreat }) {
     try {
       const now = Date.now();
       const past24h = now - 24 * 60 * 60 * 1000;
-      const rawLogs = await fetchRealLogs(past24h, now);
+      const rawLogs = await fetchRealLogs(past24h, now, 'ssh');
       if (!Array.isArray(rawLogs)) return;
 
       const parsedSsh = rawLogs.map(log => parseSshEvent(log)).filter(Boolean);
@@ -287,7 +287,7 @@ export default function SshLoginsCard({ topThreat }) {
       isFetchingRef.current = true;
       setFetchingOlder(true);
       const targetStart = currentStart - 7 * 24 * 60 * 60 * 1000; // Go back 7 days to jump over empty pockets
-      const rawLogs = await fetchRealLogs(targetStart, currentStart);
+      const rawLogs = await fetchRealLogs(targetStart, currentStart, 'ssh');
       
       if (!Array.isArray(rawLogs) || rawLogs.length === 0) {
         setCurrentStart(targetStart);
@@ -570,17 +570,18 @@ export default function SshLoginsCard({ topThreat }) {
 
       <style>{`
         .ssh-event-row {
-          display: grid;
-          grid-template-columns: 32px 1fr auto;
+          display: flex;
           gap: 12px;
-          align-items: center;
+          align-items: flex-start;
           padding: 12px 20px;
+          border-bottom: 1px solid rgba(255,255,255,0.03);
+          cursor: pointer;
         }
         .ssh-event-row:hover { background: rgba(255,255,255,0.015) !important; }
         .spin-animation { animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (min-width: 1024px) { .audit-layout-grid { grid-template-columns: 3fr 1fr !important; } }
-        @media (max-width: 576px) { .ssh-event-row { grid-template-columns: 1fr auto !important; padding: 8px 10px !important; gap: 6px !important; border-left: none !important; } .ssh-event-icon { display: none !important; } .hide-on-mobile { display: none !important; } .ssh-event-row span, .ssh-event-row strong { font-size: 0.72rem !important; } }
+        @media (max-width: 576px) { .ssh-event-row { padding: 8px 10px !important; gap: 6px !important; } .hide-on-mobile { display: none !important; } .ssh-event-row span, .ssh-event-row strong { font-size: 0.72rem !important; } }
         .live-pulse { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); animation: pulse 2s infinite; }
         @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
       `}</style>

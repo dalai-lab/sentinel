@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Plus, Trash2, Send, Check, AlertCircle, RefreshCw, ToggleLeft, ToggleRight, Shield } from 'lucide-react';
-import { fetchEmailSettings, saveEmailSettings, addRecipient, removeRecipient, toggleRecipient, sendTestEmail } from '../api/email';
+import { Mail, Plus, Trash2, Send, Check, AlertCircle, RefreshCw, ToggleLeft, ToggleRight, Shield, Bell } from 'lucide-react';
+import { fetchEmailSettings, saveEmailSettings, addRecipient, removeRecipient, toggleRecipient, sendTestEmail, sendActiveAlerts } from '../api/email';
 
 export default function EmailSettings() {
   const [settings, setSettings] = useState(null);
@@ -8,12 +8,26 @@ export default function EmailSettings() {
   const [newEmail, setNewEmail] = useState('');
   const [newName, setNewName] = useState('');
   const [testing, setTesting] = useState(false);
+  const [sendingActive, setSendingActive] = useState(false);
+  const [activeAlertCount, setActiveAlertCount] = useState(0);
   const [testSuccess, setTestSuccess] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     loadSettings();
+    loadActiveAlertCount();
   }, []);
+
+  const loadActiveAlertCount = async () => {
+    try {
+      const res = await fetch('/api/alerts');
+      const json = await res.json();
+      const alerts = Array.isArray(json) ? json : (json.data || []);
+      setActiveAlertCount(alerts.filter(a => a.status === 'active').length);
+    } catch (e) {
+      // silently ignore
+    }
+  };
 
   const loadSettings = async () => {
     setLoading(true);
@@ -104,6 +118,26 @@ export default function EmailSettings() {
     }
   };
 
+  const handleSendActiveAlerts = async () => {
+    setSendingActive(true);
+    setTestSuccess('');
+    setErrorMsg('');
+    try {
+      const res = await sendActiveAlerts();
+      const { sent, total } = res.data || {};
+      if (total === 0) {
+        setTestSuccess('No active alerts — system is currently clean.');
+      } else {
+        setTestSuccess(`Dispatched ${sent} of ${total} active alert${total !== 1 ? 's' : ''} to all recipients.`);
+      }
+      setTimeout(() => setTestSuccess(''), 6000);
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to dispatch active alerts.');
+    } finally {
+      setSendingActive(false);
+    }
+  };
+
   if (loading || !settings) {
     return (
       <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: '24px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem' }}>
@@ -150,6 +184,26 @@ export default function EmailSettings() {
           >
             {settings.enabled ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
             {settings.enabled ? 'Active' : 'Disabled'}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSendActiveAlerts}
+            disabled={sendingActive || !settings.enabled}
+            title="Send all current active alerts to all configured recipients"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '5px',
+              background: activeAlertCount > 0 ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.01)',
+              border: `1px solid ${activeAlertCount > 0 ? 'rgba(239,68,68,0.25)' : 'var(--border-color)'}`,
+              color: activeAlertCount > 0 ? 'var(--status-danger)' : 'var(--text-muted)',
+              padding: '5px 12px', borderRadius: '4px',
+              cursor: (sendingActive || !settings.enabled) ? 'default' : 'pointer',
+              fontSize: '0.72rem', fontWeight: 600,
+              opacity: (sendingActive || !settings.enabled) ? 0.5 : 1
+            }}
+          >
+            <Bell size={11} />
+            {sendingActive ? 'Sending…' : `Send Active Alerts${activeAlertCount > 0 ? ` (${activeAlertCount})` : ''}`}
           </button>
 
           <button

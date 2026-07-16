@@ -83,3 +83,18 @@ export async function sendTestEmail(email) {
     throw err;
   }
 }
+
+export async function sendActiveAlerts() {
+  try {
+    const res = await fetch(`${API_BASE}/send-active-alerts`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const json = await res.json();
+    if (json.status === 'error') throw new Error(json.message);
+    return json;
+  } catch (err) {
+    console.error('Failed to dispatch active alerts email:', err);
+    throw err;
+  }
+}

@@ -95,4 +95,46 @@ router.post('/test', async (req, res) => {
   }
 });
 
+// Dispatch all current active alerts to configured recipients (manual trigger)
+router.post('/send-active-alerts', async (req, res) => {
+  try {
+    const alertService = require('../services/alert.service');
+    const allAlerts = alertService.getAlerts();
+    const activeAlerts = allAlerts.filter(a => a.status === 'active');
+
+    if (activeAlerts.length === 0) {
+      return res.json({ status: 'success', message: 'No active alerts to send.', data: { sent: 0, skipped: 0 } });
+    }
+
+    let sent = 0;
+    let skipped = 0;
+    const results = [];
+
+    for (const alert of activeAlerts) {
+      // Force-clear the email cooldown for this alert so manual dispatch always goes through
+      const dedupKey = `${alert.host}-${alert.type}-${alert.severity}`;
+      delete emailService.lastEmailed[dedupKey];
+
+      const result = await emailService.sendAlertNotification(alert);
+      if (result && result.success) {
+        sent++;
+        results.push({ alert: alert.title, host: alert.host, status: 'sent' });
+      } else {
+        skipped++;
+        results.push({ alert: alert.title, host: alert.host, status: 'skipped', reason: result?.reason });
+      }
+    }
+
+    console.log(`[EMAIL SERVICE] 📬 Manual dispatch: ${sent} sent, ${skipped} skipped out of ${activeAlerts.length} active alerts`);
+    res.json({
+      status: 'success',
+      message: `Dispatched ${sent} of ${activeAlerts.length} active alerts.`,
+      data: { sent, skipped, total: activeAlerts.length, results }
+    });
+  } catch (err) {
+    console.error('[EMAIL ROUTES] send-active-alerts error:', err.message);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
 module.exports = router;

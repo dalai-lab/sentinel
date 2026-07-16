@@ -127,7 +127,7 @@ export default function AlertSettings() {
       flexDirection: 'column',
       gap: '20px'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="settings-header">
         <div>
           <h3 style={{ margin: '0 0 4px 0', fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-primary)' }}>Telemetry Alert Thresholds</h3>
           <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.74rem' }}>
@@ -135,7 +135,7 @@ export default function AlertSettings() {
           </p>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.015)', padding: '4px 8px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.03)' }}>
+        <div className="settings-header-scope">
           <Filter size={12} color="var(--text-muted)" />
           <select 
             value={selectedScope}

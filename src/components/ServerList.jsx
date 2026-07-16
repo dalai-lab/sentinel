@@ -63,7 +63,7 @@ function LargeSparkline({ cpuValues, ramValues, diskValues }) {
   const diskPoints = diskValues ? getPoints(diskValues) : null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, minWidth: '220px' }}>
+    <div className="server-sparkline-container">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.04em' }}>Telemetry History</span>
         <div style={{ display: 'flex', gap: '8px', fontSize: '0.58rem' }}>
@@ -173,13 +173,13 @@ export default function ServerList({ servers, onSelectServer }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.4s ease' }}>
       
       {/* Page Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="server-list-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Infrastructure</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
-          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>Server Fleet</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap' }}>Server Fleet</h2>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="server-list-header-badges">
           {[
             { label: `${details.length} Total Nodes`, color: 'var(--text-secondary)' },
             { label: `${onlineCount} Online`, color: 'var(--status-healthy)' },
@@ -221,25 +221,13 @@ export default function ServerList({ servers, onSelectServer }) {
             }
 
             return (
-              <div key={name} style={{
-                background: 'rgba(255,255,255,0.005)',
-                border: `1px solid ${borderColor}`,
-                borderRadius: 'var(--radius-md)',
-                padding: '18px 20px',
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '24px',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                transition: 'all 0.2s ease',
-                cursor: onSelectServer ? 'pointer' : 'default'
-              }}
+              <div key={name} className="server-row-container" style={{ borderColor }}
                 onClick={() => onSelectServer && onSelectServer(name)}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.01)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = 'rgba(255,255,255,0.005)'; }}
               >
                 {/* Column 1: Details & Telemetry Progress Bars */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '340px', flexShrink: 0 }}>
+                <div className="server-row-col1">
                   {/* Identity Header */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
@@ -303,7 +291,7 @@ export default function ServerList({ servers, onSelectServer }) {
                 )}
 
                 {/* Column 3: Stats, Services & Exporters */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '260px', flexShrink: 0 }}>
+                <div className="server-row-col3">
                   {/* Badges / Header info */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '0.62rem', fontWeight: 500, color: roleColor, background: `${roleColor}08`, border: `1px solid ${roleColor}15`, padding: '2px 8px', borderRadius: '4px' }}>

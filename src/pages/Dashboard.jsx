@@ -42,6 +42,7 @@ export default function Dashboard() {
   });
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeMobileWidget, setActiveMobileWidget] = useState('copilot');
 
   const parseAiData = (rawText) => {
     try {
@@ -319,7 +320,7 @@ export default function Dashboard() {
                   
                   {/* ── Fleet stat tiles ── */}
                   {/* Fleet Stats Strip in Premium Design Language */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.03)', marginBottom: '0px' }}>
+                  <div className="fleet-stats-grid">
                     {[
                       {
                         label: 'Servers Online', 
@@ -350,17 +351,17 @@ export default function Dashboard() {
                         color: activeAlertsCount > 0 ? 'var(--status-warning)' : 'var(--status-healthy)'
                       }
                     ].map(({ label, value, sub, icon: Icon, color }) => (
-                      <div key={label} style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div key={label} className="fleet-stat-tile">
+                        <div className="fleet-stat-header">
                           <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{label}</span>
                           <Icon size={14} color={color} />
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                          <span style={{ fontSize: '1.75rem', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+                        <div className="fleet-stat-value">
+                          <span className="fleet-stat-value-text">
                             {value}
                           </span>
                         </div>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{sub}</span>
+                        <span className="fleet-stat-sub">{sub}</span>
                       </div>
                     ))}
                   </div>
@@ -372,18 +373,46 @@ export default function Dashboard() {
                     ))}
                   </div>
 
+                  {/* Mobile-only Segmented Control for Widgets */}
+                  <div className="mobile-widget-tabs">
+                    <button 
+                      className={`mobile-widget-tab-btn ${activeMobileWidget === 'copilot' ? 'active' : ''}`}
+                      onClick={() => setActiveMobileWidget('copilot')}
+                    >
+                      Copilot AI
+                    </button>
+                    <button 
+                      className={`mobile-widget-tab-btn ${activeMobileWidget === 'alerts' ? 'active' : ''}`}
+                      onClick={() => setActiveMobileWidget('alerts')}
+                    >
+                      Alerts
+                    </button>
+                    <button 
+                      className={`mobile-widget-tab-btn ${activeMobileWidget === 'scans' ? 'active' : ''}`}
+                      onClick={() => setActiveMobileWidget('scans')}
+                    >
+                      Scans
+                    </button>
+                  </div>
+
                   {/* Bottom Intelligence Grid */}
-                  <div className="bottom-intelligence-grid">
-                    <AiCopilotCard
-                      aiData={aiCopilotData}
-                      servers={servers}
-                      alerts={activeAlerts}
-                      recentLogs={recentLogs}
-                      onCommandCopy={handleCopyCommand}
-                      onRefreshAiAdvice={loadAiAdvice}
-                    />
-                    <AlertCenterWidget />
-                    <OverviewScansWidget />
+                  <div className="bottom-intelligence-grid mobile-tabbed">
+                    <div className={activeMobileWidget === 'copilot' ? 'active-tab-widget' : ''}>
+                      <AiCopilotCard
+                        aiData={aiCopilotData}
+                        servers={servers}
+                        alerts={activeAlerts}
+                        recentLogs={recentLogs}
+                        onCommandCopy={handleCopyCommand}
+                        onRefreshAiAdvice={loadAiAdvice}
+                      />
+                    </div>
+                    <div className={activeMobileWidget === 'alerts' ? 'active-tab-widget' : ''}>
+                      <AlertCenterWidget />
+                    </div>
+                    <div className={activeMobileWidget === 'scans' ? 'active-tab-widget' : ''}>
+                      <OverviewScansWidget />
+                    </div>
                   </div>
               </div>
             )}

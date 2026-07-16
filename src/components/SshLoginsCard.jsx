@@ -89,7 +89,7 @@ export default function SshLoginsCard({ topThreat }) {
   // Loading Skeleton
   if (loading && allEvents.length === 0 && crowdSecEvents.length === 0) {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '16px', height: '600px' }}>
+      <div className="ssh-logins-layout shimmer">
         <div className="shimmer-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', gap: '10px' }}>
             <div className="shimmer-bar" style={{ width: '80px', height: '24px' }} />
@@ -120,11 +120,14 @@ export default function SshLoginsCard({ topThreat }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', animation: 'fadeIn 0.4s ease' }}>
       
       {/* Page Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="ssh-header">
+        <div className="ssh-breadcrumbs">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Security</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
-          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0 }}>SSH Access Logs</h2>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Logins</span>
+        </div>
+        <div className="ssh-title-row">
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap' }}>SSH Access Logs</h2>
         </div>
       </div>
       
@@ -136,7 +139,7 @@ export default function SshLoginsCard({ topThreat }) {
         uniqueServers={uniqueServers}
       />
 
-      <div style={{ display: 'flex', gap: '20px', flex: 1, overflow: 'hidden' }}>
+      <div className="ssh-logins-layout">
         
         {/* Main Event Feed */}
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)', background: 'rgba(255,255,255,0.005)' }} className="custom-scrollbar">

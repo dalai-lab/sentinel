@@ -103,7 +103,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
       onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = 'rgba(255,255,255,0.005)'; }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="server-card-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             background: 'rgba(255, 255, 255, 0.01)',
@@ -137,7 +137,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
             </div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+        <div className="server-card-status-badge">
           <div style={{
             fontSize: '0.62rem',
             fontWeight: 500,

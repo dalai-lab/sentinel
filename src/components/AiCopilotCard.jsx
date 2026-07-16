@@ -237,9 +237,9 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
               <AlertTriangle size={12} color="var(--status-danger)" style={{ flexShrink: 0 }} />
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', minWidth: 0, flex: 1 }}>
                 <span style={{ color: 'var(--status-danger)', marginRight: '3px', fontWeight: 600 }}>Active Alert:</span>
-                Suspicious activity logged: <span className="text-mono" style={{ background: 'rgba(255,255,255,0.03)', padding: '1px 4px', borderRadius: '3px', fontSize: '0.68rem' }}>{aiData.top_threat}</span>
+                Suspicious activity logged: <span className="text-mono" style={{ background: 'rgba(255,255,255,0.03)', padding: '1px 4px', borderRadius: '3px', fontSize: '0.68rem', wordBreak: 'break-all' }}>{aiData.top_threat}</span>
               </div>
             </div>
             <button 
@@ -253,7 +253,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                 fontSize: '0.65rem',
                 fontWeight: 500,
                 padding: '3px 8px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0
               }}
             >
               Clear
@@ -315,7 +316,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                 border: '1px solid rgba(255,255,255,0.02)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '5px 10px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                minWidth: 0
               }}
                 onClick={() => copyCommand(aiData.command)}
               >

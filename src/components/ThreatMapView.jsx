@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { fetchRealLogs, fetchIpInfo } from '../api/signoz';
 import { getFriendlyName } from '../utils/serverMapping';
@@ -27,6 +27,14 @@ export default function ThreatMapView() {
   const [loading, setLoading] = useState(true);
   const [timeWindow, setTimeWindow] = useState(86400000);
   const [selectedOrigin, setSelectedOrigin] = useState(null);
+  const mapContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (!loading && mapContainerRef.current) {
+      const container = mapContainerRef.current;
+      container.scrollLeft = (container.scrollWidth - container.clientWidth) / 2;
+    }
+  }, [loading]);
 
   useEffect(() => {
     loadThreats();
@@ -140,15 +148,20 @@ export default function ThreatMapView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', paddingBottom: '20px', animation: 'fadeIn 0.4s ease' }}>
       
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="threat-header">
+        <div className="threat-breadcrumbs">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Security</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
-          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Threat Map</span>
+        </div>
+        
+        <div className="threat-title-row">
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
             <Map size={14} color="var(--text-muted)" /> Threat Intelligence Map
           </h2>
         </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+
+        <div className="threat-header-actions">
           <select
             value={timeWindow}
             onChange={e => setTimeWindow(parseInt(e.target.value))}
@@ -157,13 +170,13 @@ export default function ThreatMapView() {
             {TIME_WINDOWS.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
           <button onClick={loadThreats} style={{ background: 'var(--text-primary)', border: 'none', color: 'var(--bg-primary)', padding: '5px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, fontSize: '0.72rem' }}>
-            <RefreshCw size={11} className={loading ? 'spin' : ''} /> Refresh
+            <RefreshCw size={11} className={loading ? 'spin' : ''} /> <span>Refresh</span>
           </button>
         </div>
       </div>
 
       {/* Fleet Overview Stat Strip (Overview design style: unified cells separated by gap: 1px) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.03)' }}>
+      <div className="threat-stats-grid">
         {[
           { icon: ShieldAlert, label: 'Total Attempts', value: totalAttacks.toLocaleString(), color: 'var(--status-danger)', sub: 'blocked by SSH' },
           { icon: Globe, label: 'Unique Attackers', value: uniqueIPs.toLocaleString(), color: 'var(--status-warning)', sub: 'distinct IPs' },
@@ -176,16 +189,7 @@ export default function ThreatMapView() {
               <Icon size={14} color={color} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', width: '100%', overflow: 'hidden' }}>
-              <span style={{ 
-                fontSize: value && value.length > 12 ? '1.15rem' : '1.75rem', 
-                fontWeight: value && value.length > 12 ? 400 : 300, 
-                letterSpacing: '-0.02em', 
-                color: 'var(--text-primary)',
-                whiteSpace: 'nowrap',
-                textOverflow: 'ellipsis',
-                overflow: 'hidden',
-                width: '100%'
-              }} title={value}>
+              <span className="threat-stat-value" title={value}>
                 {value}
               </span>
             </div>
@@ -198,16 +202,7 @@ export default function ThreatMapView() {
       {loading && logs.length === 0 ? (
         <div className="shimmer-card" style={{ height: 'calc(100vh - 220px)', minHeight: '600px' }} />
       ) : (
-        <div style={{
-          position: 'relative',
-          width: '100%',
-          height: 'calc(100vh - 220px)',
-          minHeight: '600px',
-          background: 'rgba(255,255,255,0.003)',
-          border: '1px solid rgba(255,255,255,0.03)',
-          borderRadius: 'var(--radius-md)',
-          overflow: 'hidden'
-        }}>
+        <div className="threat-map-container" ref={mapContainerRef}>
           {loading && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(9,9,11,0.6)', zIndex: 20 }}>
               <RefreshCw size={20} className="spin" color="var(--text-primary)" />
@@ -215,7 +210,7 @@ export default function ThreatMapView() {
           )}
 
           {/* Map Layer */}
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="threat-map-scrollable">
             <ComposableMap projectionConfig={{ scale: 190, center: [10, 15] }} style={{ width: '100%', height: '100%' }}>
               <Geographies geography={geoUrl}>
                 {({ geographies }) =>
@@ -264,18 +259,7 @@ export default function ThreatMapView() {
           </div>
 
           {/* FLOATING OVERLAY: Top Countries (Top Right) */}
-          <div style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            width: '280px',
-            zIndex: 5,
-            background: 'rgba(9, 9, 11, 0.85)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '14px'
-          }}>
+          <div className="threat-overlay countries-overlay">
             <div style={{ fontWeight: 500, fontSize: '0.74rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
               <Globe size={12} color="#8b5cf6" /> Top Origin Countries
             </div>
@@ -306,18 +290,7 @@ export default function ThreatMapView() {
           </div>
 
           {/* FLOATING OVERLAY: Top Attacker IPs (Bottom Right) */}
-          <div style={{
-            position: 'absolute',
-            bottom: '20px',
-            right: '20px',
-            width: '280px',
-            zIndex: 5,
-            background: 'rgba(9, 9, 11, 0.85)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '14px'
-          }}>
+          <div className="threat-overlay attackers-overlay">
             <div style={{ fontWeight: 500, fontSize: '0.74rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
               <Activity size={12} color="var(--status-warning)" /> Top Attacking IPs
             </div>
@@ -357,18 +330,7 @@ export default function ThreatMapView() {
           </div>
 
           {/* FLOATING OVERLAY: Attacks Per Server (Bottom Left) */}
-          <div style={{
-            position: 'absolute',
-            bottom: '20px',
-            left: '20px',
-            width: '240px',
-            zIndex: 5,
-            background: 'rgba(9, 9, 11, 0.85)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-            borderRadius: 'var(--radius-sm)',
-            padding: '14px'
-          }}>
+          <div className="threat-overlay targets-overlay">
             <div style={{ fontWeight: 500, fontSize: '0.74rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
               <Server size={12} color="#06b6d4" /> Target Distribution
             </div>
@@ -394,18 +356,7 @@ export default function ThreatMapView() {
             const atk = attackerMap[selectedOrigin];
             const geo = atk.geo || {};
             return (
-              <div style={{
-                position: 'absolute',
-                top: '20px',
-                left: '20px',
-                width: '240px',
-                zIndex: 6,
-                background: 'rgba(9, 9, 11, 0.92)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 'var(--radius-sm)',
-                padding: '12px 14px'
-              }}>
+              <div className="threat-overlay selected-overlay">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div style={{ color: 'var(--status-danger)', fontWeight: 650, fontSize: '0.58rem', textTransform: 'uppercase', letterSpacing: '0.02em' }}>Selected Target</div>
                   <button onClick={() => setSelectedOrigin(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '10px', lineHeight: 1 }}>✕</button>

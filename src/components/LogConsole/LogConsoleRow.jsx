@@ -16,47 +16,38 @@ export default function LogConsoleRow({ log, onClickTrace }) {
 
   return (
     <div 
-      className="log-line"
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '12px',
-        padding: '6px 14px',
-        borderBottom: '1px solid var(--border-color)',
-        transition: 'background 0.15s',
-        fontSize: '0.72rem',
-        fontFamily: 'var(--font-mono)'
-      }}
+      className="log-row-container"
       onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
-      <div style={{ color: 'var(--text-muted)', flexShrink: 0, width: '80px' }}>
+      <div className="log-row-time">
         {timeStr}
       </div>
       
-      <div style={{ flexShrink: 0, width: '50px' }}>
+      <div className="log-row-level">
         <span style={{ 
           color: color, 
           background: `${color}08`, 
           padding: '1px 5px', 
           borderRadius: '3px', 
           fontSize: '0.62rem', 
-          fontWeight: 650,
-          border: `1px solid ${color}20`
+          fontWeight: 655,
+          border: `1px solid ${color}20`,
+          display: 'inline-block'
         }}>
           {log.level}
         </span>
       </div>
 
-      <div style={{ flexShrink: 0, width: '110px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={log.service}>
+      <div className="log-row-service" title={log.service}>
         [{log.service}]
       </div>
 
-      <div style={{ flex: 1, color: 'var(--text-primary)', wordBreak: 'break-all' }}>
+      <div className="log-row-msg">
         {log.msg}
       </div>
 
-      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <div className="log-row-trace">
         <button 
           onClick={() => onClickTrace(log)}
           style={{
@@ -77,7 +68,7 @@ export default function LogConsoleRow({ log, onClickTrace }) {
           onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
         >
           <Activity size={10} />
-          Trace
+          <span>Trace</span>
         </button>
       </div>
     </div>

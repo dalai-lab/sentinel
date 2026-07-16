@@ -166,26 +166,29 @@ export default function ServerDetailView({ serverName, onBack }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.4s ease' }}>
       
       {/* ── Breadcrumb Navigation & Control ────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button onClick={onBack} style={backBtnStyle} aria-label="Go Back">
+      <div className="server-detail-header">
+        <div className="server-detail-breadcrumbs">
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Infrastructure</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Server Detail</span>
+        </div>
+        
+        <div className="server-detail-title-row">
+          <button onClick={onBack} style={backBtnStyle} aria-label="Go Back" className="server-detail-back-btn">
             <ArrowLeft size={16} />
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Infrastructure</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
-            <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {serverName}
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem', fontWeight: 500, color: isOnline ? 'var(--status-healthy)' : 'var(--status-danger)' }}>
-                <span className={`status-pulse ${isOnline ? 'online' : 'offline'}`} />
-                {isOnline ? 'Live' : 'Offline'}
-              </span>
-            </h2>
-          </div>
+          <h2 className="server-detail-title-text">
+            {serverName}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.65rem', fontWeight: 500, color: isOnline ? 'var(--status-healthy)' : 'var(--status-danger)' }}>
+              <span className={`status-pulse ${isOnline ? 'online' : 'offline'}`} />
+              {isOnline ? 'Live' : 'Offline'}
+            </span>
+          </h2>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+        <div className="server-detail-header-actions">
           {lastUpdated && (
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+            <span className="server-detail-last-updated">
               Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </span>
           )}
@@ -201,7 +204,7 @@ export default function ServerDetailView({ serverName, onBack }) {
       </div>
 
       {/* ── Real-Time Hero Vitals Row ───────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.03)' }}>
+      <div className="detail-vitals-grid">
         {[
           {
             label: 'CPU Utilization',
@@ -234,7 +237,7 @@ export default function ServerDetailView({ serverName, onBack }) {
         ].map((vital, i) => {
           const Icon = vital.icon;
           return (
-            <div key={vital.label} style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div key={vital.label} className="detail-vital-tile">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{vital.label}</span>
                 <Icon size={14} color="var(--text-muted)" />
@@ -251,7 +254,7 @@ export default function ServerDetailView({ serverName, onBack }) {
       </div>
 
       {/* ── Main Dual-Pane Workspace ────────────────────────────────────────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '24px', alignItems: 'start' }}>
+      <div className="server-detail-layout">
         
         {/* Left Workspace: Telemetry Graphs */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

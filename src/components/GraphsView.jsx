@@ -187,7 +187,7 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
               Warning Thresh
             </span>
           )}
-          <button onClick={onExpand} style={panelBtnStyle} aria-label="Toggle Expand">
+          <button onClick={onExpand} style={panelBtnStyle} aria-label="Toggle Expand" className="graphs-expand-btn">
             {isExpanded ? <X size={12} /> : <Maximize2 size={12} />}
           </button>
         </div>
@@ -306,74 +306,85 @@ export default function GraphsView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.4s ease' }}>
 
       {/* ── Header Row ── */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="graphs-header">
+        <div className="graphs-breadcrumbs">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Infrastructure</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
-          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Telemetry</span>
+        </div>
+        
+        <div className="graphs-title-row">
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap' }}>
             Telemetry Analytics
           </h2>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          {lastUpdated && (
-            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-              Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
-          )}
+        <div className="graphs-header-actions">
+          <div className="graphs-controls-row">
+            {/* Time range picker */}
+            <div className="graphs-time-picker">
+              {TIME_RANGES.map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setTimeRange(t.id)}
+                  style={{
+                    background: timeRange === t.id ? 'var(--text-primary)' : 'transparent',
+                    border: 'none', 
+                    color: timeRange === t.id ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                    padding: '5px 12px', 
+                    cursor: 'pointer', 
+                    fontSize: '0.7rem', 
+                    fontWeight: 500,
+                    transition: 'all 0.15s ease',
+                  }}
+                  className="graphs-time-btn"
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
 
-          {/* Time range picker */}
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-            {TIME_RANGES.map(t => (
-              <button
-                key={t.id}
-                onClick={() => setTimeRange(t.id)}
-                style={{
-                  background: timeRange === t.id ? 'var(--text-primary)' : 'transparent',
-                  border: 'none', 
-                  color: timeRange === t.id ? 'var(--bg-primary)' : 'var(--text-secondary)',
-                  padding: '5px 12px', 
-                  cursor: 'pointer', 
-                  fontSize: '0.7rem', 
-                  fontWeight: 500,
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {t.label}
-              </button>
-            ))}
+            {/* Server filter */}
+            <select
+              value={serverFilter}
+              onChange={e => setServerFilter(e.target.value)}
+              className="graphs-select-filter"
+              style={selectFilterStyle}
+            >
+              <option value="all">All Servers</option>
+              {SERVERS.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
           </div>
 
-          {/* Server filter */}
-          <select
-            value={serverFilter}
-            onChange={e => setServerFilter(e.target.value)}
-            style={selectFilterStyle}
-          >
-            <option value="all">All Servers</option>
-            {SERVERS.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
+          <div className="graphs-meta-row">
+            {lastUpdated && (
+              <span className="graphs-last-updated">
+                Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </span>
+            )}
 
-          <button
-            onClick={load}
-            style={refreshBtnStyle}
-            disabled={loading}
-          >
-            <RefreshCw size={12} className={loading ? 'spin-animation' : ''} />
-            Refresh
-          </button>
+            <button
+              onClick={load}
+              className="graphs-refresh-btn"
+              style={refreshBtnStyle}
+              disabled={loading}
+            >
+              <RefreshCw size={12} className={loading ? 'spin-animation' : ''} />
+              <span>Refresh</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* ── Server Color Legend row ── */}
-      <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="graphs-legend-container">
         {SERVERS.map(s => (
-          <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div key={s} className="graphs-legend-item">
             <span style={{ width: 6, height: 6, borderRadius: '50%', background: SERVER_COLORS[s], display: 'inline-block' }} />
             <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>{s}</span>
           </div>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="graphs-legend-threshold">
           <div style={{ width: 16, height: 1, borderTop: '1px dashed rgba(239,68,68,0.4)' }} />
           <span style={{ fontSize: '0.68rem', color: 'rgba(239,68,68,0.6)' }}>Alert threshold</span>
         </div>
@@ -381,20 +392,14 @@ export default function GraphsView() {
 
       {/* ── Metric Grid ── */}
       {loading && !data ? (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '16px'
-        }}>
+        <div className="graphs-metrics-grid shimmer">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="shimmer-card" style={{ height: '300px' }} />
           ))}
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: expandedMetric ? '1fr' : 'repeat(2, 1fr)',
-          gap: '20px'
+        <div className="graphs-metrics-grid" style={{
+          gridTemplateColumns: expandedMetric ? '1fr' : undefined
         }}>
           {visibleMetrics.map(metric => (
             <MetricPanel

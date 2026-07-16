@@ -157,10 +157,10 @@ export default function EmailSettings() {
       gap: '20px'
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="settings-header">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+            <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
               <Mail size={14} color="var(--text-muted)" />
             </div>
             <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-primary)' }}>Email Notifications</h3>
@@ -170,7 +170,7 @@ export default function EmailSettings() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="settings-header-actions">
           <button
             type="button"
             onClick={handleToggleMasterEnable}
@@ -224,20 +224,11 @@ export default function EmailSettings() {
       </div>
 
       {/* Connection Info Banner */}
-      <div style={{
-        background: 'rgba(255,255,255,0.01)',
-        border: '1px solid rgba(255,255,255,0.02)',
-        borderRadius: 'var(--radius-sm)',
-        padding: '10px 14px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        fontSize: '0.72rem'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+      <div className="settings-connection-banner">
+        <div className="settings-connection-info">
           <Shield size={12} color="var(--status-healthy)" />
           <span><strong>SMTP Server:</strong> {settings.smtpHost || 'smtp.zeptomail.in'}:587</span>
-          <span style={{ color: 'var(--text-muted)' }}>•</span>
+          <span style={{ color: 'var(--text-muted)' }} className="bullet-sep">•</span>
           <span><strong>From Email:</strong> info@orbithyre.com</span>
         </div>
         <span style={{ color: 'var(--status-healthy)', fontWeight: 500, fontSize: '0.65rem', background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '3px' }}>
@@ -258,7 +249,7 @@ export default function EmailSettings() {
       )}
 
       {/* Add Recipient Form */}
-      <form onSubmit={handleAddRecipient} style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+      <form onSubmit={handleAddRecipient} className="settings-recipient-form">
         <div style={{ flex: '1', minWidth: '160px', background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
           <input
             type="text"
@@ -304,13 +295,13 @@ export default function EmailSettings() {
             {settings.recipients.map((rcp, idx) => (
               <div
                 key={rcp.id || idx}
+                className="recipient-row"
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '8px 12px', borderBottom: idx < settings.recipients.length - 1 ? '1px solid rgba(255,255,255,0.015)' : 'none',
+                  borderBottom: idx < settings.recipients.length - 1 ? '1px solid rgba(255,255,255,0.015)' : 'none',
                   background: rcp.active ? 'transparent' : 'rgba(255,255,255,0.005)', opacity: rcp.active ? 1 : 0.6
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="recipient-info">
                   <Mail size={12} color={rcp.active ? 'var(--status-healthy)' : 'var(--text-muted)'} />
                   <div>
                     <span style={{ fontSize: '0.74rem', fontWeight: 500, color: 'var(--text-primary)', marginRight: '6px' }}>{rcp.name}</span>
@@ -318,7 +309,7 @@ export default function EmailSettings() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div className="recipient-actions">
                   <button
                     type="button"
                     onClick={() => handleSendTest(rcp.email)}
@@ -356,12 +347,11 @@ export default function EmailSettings() {
         )}
       </div>
 
-      {/* Severity Trigger Selection */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '14px' }}>
         <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Alert Severity Dispatch Triggers
         </div>
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+        <div className="severity-triggers-grid">
           {[
             { key: 'critical', label: 'Critical Incidents (CPU/Disk Overflow)', color: 'var(--status-danger)' },
             { key: 'high', label: 'High Severity Threats (Viruses, SSH Spikes)', color: 'var(--status-warning)' },

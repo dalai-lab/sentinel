@@ -85,7 +85,7 @@ function ScanCard({ scan }) {
     }}>
 
       {/* Row 1: Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="scan-card-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
             <StatusIcon size={14} color={statusColor} />
@@ -95,7 +95,7 @@ function ScanCard({ scan }) {
             <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginTop: '2px' }}>{scan.host}</div>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+        <div className="scan-card-header-right">
           <span style={{
             background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', color: statusColor, fontSize: '0.65rem',
             fontWeight: 500, padding: '2px 8px', borderRadius: 'var(--radius-sm)', letterSpacing: '0.04em'
@@ -109,7 +109,7 @@ function ScanCard({ scan }) {
       </div>
 
       {/* Row 2: Stats grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: infected ? 'rgba(239,68,68,0.08)' : 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', overflow: 'hidden', border: `1px solid ${infected ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.02)'}` }}>
+      <div className={`scan-card-stats ${infected ? 'infected' : 'clean'}`}>
         {[
           { label: 'Files Scanned', value: scannedNum.toLocaleString(), icon: File, color: 'var(--text-muted)' },
           { label: 'Data Scanned', value: scan.dataScanned || 'N/A', icon: Database, color: '#60a5fa' },
@@ -183,21 +183,26 @@ export default function AntivirusScansCard() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', paddingBottom: '20px', animation: 'fadeIn 0.4s ease' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="antivirus-header">
+        <div className="antivirus-breadcrumbs">
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Security</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
-          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Antivirus</span>
+        </div>
+        <div className="antivirus-title-row">
+          <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}>
             <Shield size={14} color="var(--text-muted)" /> Antivirus Intelligence
           </h2>
         </div>
-        <button onClick={loadData} disabled={loading} style={{ background: 'var(--text-primary)', border: 'none', color: 'var(--bg-primary)', padding: '5px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, opacity: loading ? 0.6 : 1, fontSize: '0.72rem' }}>
-          <RefreshCw size={11} className={loading ? 'spin' : ''} /> {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
+        <div className="antivirus-header-actions">
+          <button onClick={loadData} disabled={loading} style={{ background: 'var(--text-primary)', border: 'none', color: 'var(--bg-primary)', padding: '5px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, opacity: loading ? 0.6 : 1, fontSize: '0.72rem' }}>
+            <RefreshCw size={11} className={loading ? 'spin' : ''} /> <span>{loading ? 'Refreshing…' : 'Refresh'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Fleet Overview Stat Strip (Overview design style: unified cells separated by gap: 1px) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.03)' }}>
+      <div className="antivirus-stats-grid">
         {[
           { icon: Server, label: 'Servers Scanned', value: scans.length, color: '#a78bfa', sub: 'nodes registered' },
           { icon: ShieldCheck, label: 'Clean Nodes', value: cleanCount, color: 'var(--status-healthy)', sub: 'no threats detected' },
@@ -210,7 +215,7 @@ export default function AntivirusScansCard() {
               <Icon size={14} color={color} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-              <span style={{ fontSize: '1.75rem', fontWeight: 300, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
+              <span className="antivirus-stat-value">
                 {value}
               </span>
             </div>
@@ -220,7 +225,7 @@ export default function AntivirusScansCard() {
       </div>
 
       {/* Fleet security posture banner */}
-      <div style={{
+      <div className="antivirus-posture-banner" style={{
         background: totalThreats > 0 ? 'rgba(239, 68, 68, 0.02)' : 'rgba(16, 185, 129, 0.02)',
         border: `1px solid ${totalThreats > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)'}`,
         borderRadius: 'var(--radius-md)',
@@ -246,7 +251,7 @@ export default function AntivirusScansCard() {
       </div>
 
       {/* Per-server scan cards grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: '16px', overflowY: 'auto', flex: 1, contentVisibility: 'auto', alignItems: 'start', alignContent: 'start' }} className="custom-scrollbar">
+      <div className="antivirus-cards-grid custom-scrollbar">
         {loading && scans.length === 0 && (
           [1, 2, 3, 4].map(i => (
             <div key={i} className="shimmer-card" style={{ height: '142px' }} />

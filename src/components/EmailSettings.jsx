@@ -140,7 +140,7 @@ export default function EmailSettings() {
 
   if (loading || !settings) {
     return (
-      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '24px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem' }}>
+      <div style={{ background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-md)', padding: '24px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem' }}>
         <RefreshCw size={12} className="spin" /> Loading email alert configurations...
       </div>
     );
@@ -148,8 +148,8 @@ export default function EmailSettings() {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
-      border: '1px solid rgba(255,255,255,0.03)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
+      border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
       padding: '20px 24px',
       display: 'flex',
@@ -160,7 +160,7 @@ export default function EmailSettings() {
       <div className="settings-header">
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+            <div style={{ background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
               <Mail size={14} color="var(--text-muted)" />
             </div>
             <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 500, color: 'var(--text-primary)' }}>Email Notifications</h3>
@@ -176,8 +176,8 @@ export default function EmailSettings() {
             onClick={handleToggleMasterEnable}
             style={{
               display: 'flex', alignItems: 'center', gap: '6px',
-              background: settings.enabled ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.015)',
-              border: `1px solid ${settings.enabled ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)'}`,
+              background: settings.enabled ? 'var(--color-rgb-16-185-129-0-04)' : 'var(--color-rgb-255-255-255-0-015)',
+              border: `1px solid ${settings.enabled ? 'var(--color-rgb-16-185-129-0-15)' : 'var(--color-rgb-255-255-255-0-03)'}`,
               color: settings.enabled ? 'var(--status-healthy)' : 'var(--text-muted)',
               padding: '4px 10px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 500
             }}
@@ -193,8 +193,8 @@ export default function EmailSettings() {
             title="Send all current active alerts to all configured recipients"
             style={{
               display: 'flex', alignItems: 'center', gap: '5px',
-              background: activeAlertCount > 0 ? 'rgba(239,68,68,0.04)' : 'rgba(255,255,255,0.015)',
-              border: `1px solid ${activeAlertCount > 0 ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.03)'}`,
+              background: activeAlertCount > 0 ? 'var(--color-rgb-239-68-68-0-04)' : 'var(--color-rgb-255-255-255-0-015)',
+              border: `1px solid ${activeAlertCount > 0 ? 'var(--color-rgb-239-68-68-0-15)' : 'var(--color-rgb-255-255-255-0-03)'}`,
               color: activeAlertCount > 0 ? 'var(--status-danger)' : 'var(--text-muted)',
               padding: '5px 12px', borderRadius: 'var(--radius-sm)',
               cursor: (sendingActive || !settings.enabled) ? 'default' : 'pointer',
@@ -231,26 +231,26 @@ export default function EmailSettings() {
           <span style={{ color: 'var(--text-muted)' }} className="bullet-sep">•</span>
           <span><strong>From Email:</strong> info@orbithyre.com</span>
         </div>
-        <span style={{ color: 'var(--status-healthy)', fontWeight: 500, fontSize: '0.65rem', background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '3px' }}>
+        <span style={{ color: 'var(--status-healthy)', fontWeight: 500, fontSize: '0.65rem', background: 'var(--color-rgb-16-185-129-0-04)', border: '1px solid var(--color-rgb-16-185-129-0-15)', padding: '1px 6px', borderRadius: '3px' }}>
           ✓ Connected
         </span>
       </div>
 
       {/* Notifications Feedback */}
       {testSuccess && (
-        <div style={{ background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.15)', color: 'var(--status-healthy)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ background: 'var(--color-rgb-16-185-129-0-04)', border: '1px solid var(--color-rgb-16-185-129-0-15)', color: 'var(--status-healthy)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Check size={14} /> {testSuccess}
         </div>
       )}
       {errorMsg && (
-        <div style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.15)', color: 'var(--status-danger)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ background: 'var(--color-rgb-239-68-68-0-04)', border: '1px solid var(--color-rgb-239-68-68-0-15)', color: 'var(--status-danger)', padding: '8px 12px', borderRadius: 'var(--radius-sm)', fontSize: '0.74rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <AlertCircle size={14} /> {errorMsg}
         </div>
       )}
 
       {/* Add Recipient Form */}
       <form onSubmit={handleAddRecipient} className="settings-recipient-form">
-        <div style={{ flex: '1', minWidth: '160px', background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
+        <div style={{ flex: '1', minWidth: '160px', background: 'var(--color-rgb-255-255-255-0-015)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
           <input
             type="text"
             placeholder="Recipient Name (e.g. Sales Desk)"
@@ -259,7 +259,7 @@ export default function EmailSettings() {
             style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', padding: '6px 4px', width: '100%', outline: 'none', fontSize: '0.74rem' }}
           />
         </div>
-        <div style={{ flex: '1.5', minWidth: '220px', background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
+        <div style={{ flex: '1.5', minWidth: '220px', background: 'var(--color-rgb-255-255-255-0-015)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-sm)', padding: '0 8px' }}>
           <input
             type="email"
             placeholder="Email Address (e.g. sales@orbithyre.com)"
@@ -272,7 +272,7 @@ export default function EmailSettings() {
         <button
           type="submit"
           style={{
-            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', color: 'var(--text-primary)',
+            background: 'var(--color-rgb-255-255-255-0-02)', border: '1px solid var(--color-rgb-255-255-255-0-03)', color: 'var(--text-primary)',
             padding: '6px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px'
           }}
         >
@@ -287,18 +287,18 @@ export default function EmailSettings() {
         </div>
 
         {(!settings.recipients || settings.recipients.length === 0) ? (
-          <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.74rem', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)' }}>
+          <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.74rem', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-sm)' }}>
             No recipients configured. Add email addresses above to begin receiving alert dispatches.
           </div>
         ) : (
-          <div style={{ border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+          <div style={{ border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
             {settings.recipients.map((rcp, idx) => (
               <div
                 key={rcp.id || idx}
                 className="recipient-row"
                 style={{
-                  borderBottom: idx < settings.recipients.length - 1 ? '1px solid rgba(255,255,255,0.015)' : 'none',
-                  background: rcp.active ? 'transparent' : 'rgba(255,255,255,0.005)', opacity: rcp.active ? 1 : 0.6
+                  borderBottom: idx < settings.recipients.length - 1 ? '1px solid var(--color-rgb-255-255-255-0-015)' : 'none',
+                  background: rcp.active ? 'transparent' : 'var(--color-rgb-255-255-255-0-005)', opacity: rcp.active ? 1 : 0.6
                 }}
               >
                 <div className="recipient-info">
@@ -313,7 +313,7 @@ export default function EmailSettings() {
                   <button
                     type="button"
                     onClick={() => handleSendTest(rcp.email)}
-                    style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)', color: 'var(--text-secondary)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.65rem', cursor: 'pointer' }}
+                    style={{ background: 'var(--color-rgb-255-255-255-0-015)', border: '1px solid var(--color-rgb-255-255-255-0-03)', color: 'var(--text-secondary)', padding: '2px 8px', borderRadius: 'var(--radius-sm)', fontSize: '0.65rem', cursor: 'pointer' }}
                     title="Send test to this address"
                   >
                     Test Mail
@@ -323,8 +323,8 @@ export default function EmailSettings() {
                     type="button"
                     onClick={() => handleToggle(rcp.id)}
                     style={{
-                      background: rcp.active ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.015)',
-                      border: `1px solid ${rcp.active ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)'}`,
+                      background: rcp.active ? 'var(--color-rgb-16-185-129-0-04)' : 'var(--color-rgb-255-255-255-0-015)',
+                      border: `1px solid ${rcp.active ? 'var(--color-rgb-16-185-129-0-15)' : 'var(--color-rgb-255-255-255-0-03)'}`,
                       color: rcp.active ? 'var(--status-healthy)' : 'var(--text-muted)',
                       padding: '2px 6px', borderRadius: 'var(--radius-sm)', fontSize: '0.62rem', fontWeight: 500, cursor: 'pointer'
                     }}
@@ -347,7 +347,7 @@ export default function EmailSettings() {
         )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.03)', paddingTop: '14px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--color-rgb-255-255-255-0-03)', paddingTop: '14px' }}>
         <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Alert Severity Dispatch Triggers
         </div>

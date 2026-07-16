@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Save } from 'lucide-react';
 import AlertSettings from './AlertSettings';
 import EmailSettings from './EmailSettings';
+import TelegramSettings from './TelegramSettings';
 
 export default function SettingsPanel() {
 
@@ -16,7 +17,7 @@ export default function SettingsPanel() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', height: '100%', paddingBottom: '30px', animation: 'fadeIn 0.4s ease' }}>
       {/* Page Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>System</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>/</span>
@@ -26,11 +27,12 @@ export default function SettingsPanel() {
 
       <AlertSettings />
       <EmailSettings />
+      <TelegramSettings />
 
       {isSaved && (
         <div style={{
-          background: 'rgba(16,185,129,0.05)',
-          border: '1px solid rgba(16,185,129,0.2)',
+          background: 'var(--color-rgb-16-185-129-0-05)',
+          border: '1px solid var(--color-rgb-16-185-129-0-2)',
           color: 'var(--status-healthy)',
           padding: '10px 14px',
           borderRadius: 'var(--radius-sm)',

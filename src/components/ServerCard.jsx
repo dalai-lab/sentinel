@@ -29,7 +29,7 @@ function LinearProgress({ value }) {
   const val = Math.min(parseFloat(value) || 0, 100);
   const color = getMetricColor(val);
   return (
-    <div style={{ width: '100%', height: '2px', backgroundColor: 'rgba(255, 255, 255, 0.04)', borderRadius: '1px', overflow: 'hidden', marginTop: '4px' }}>
+    <div style={{ width: '100%', height: '2px', backgroundColor: 'var(--color-rgb-255-255-255-0-04)', borderRadius: '1px', overflow: 'hidden', marginTop: '4px' }}>
       <div style={{ width: `${val}%`, height: '100%', backgroundColor: color, borderRadius: '1px', transition: 'width 0.6s ease' }} />
     </div>
   );
@@ -42,8 +42,8 @@ function MetricStat({ label, value, icon: Icon }) {
       display: 'flex',
       flexDirection: 'column',
       gap: '4px',
-      background: 'rgba(255,255,255,0.01)',
-      border: '1px solid rgba(255,255,255,0.02)',
+      background: 'var(--color-rgb-255-255-255-0-01)',
+      border: '1px solid var(--color-rgb-255-255-255-0-02)',
       borderRadius: 'var(--radius-sm)',
       padding: '10px 12px'
     }}>
@@ -69,14 +69,14 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
   const isWarn = !isCrit && (parsedCpu > 70 || parsedRam > 70 || parsedDisk > 70);
 
   let accentColor = 'var(--text-muted)';
-  let borderColor = 'rgba(255,255,255,0.03)';
+  let borderColor = 'var(--color-rgb-255-255-255-0-03)';
   if (isOnline) {
     if (isCrit) {
       accentColor = 'var(--status-danger)';
-      borderColor = 'rgba(239, 68, 68, 0.15)';
+      borderColor = 'var(--color-rgb-239-68-68-0-15)';
     } else if (isWarn) {
       accentColor = 'var(--status-warning)';
-      borderColor = 'rgba(245, 158, 11, 0.15)';
+      borderColor = 'var(--color-rgb-245-158-11-0-15)';
     } else {
       accentColor = 'var(--status-healthy)';
     }
@@ -86,7 +86,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
       border: `1px solid ${borderColor}`,
       borderRadius: 'var(--radius-md)',
       padding: '18px 20px',
@@ -99,15 +99,15 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
       cursor: onClick ? 'pointer' : 'default'
     }}
       onClick={onClick}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.01)'; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = 'rgba(255,255,255,0.005)'; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-1)'; e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-01)'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-005)'; }}
     >
       {/* Header */}
       <div className="server-card-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            background: 'rgba(255, 255, 255, 0.01)',
-            border: '1px solid rgba(255,255,255,0.02)',
+            background: 'var(--color-rgb-255-255-255-0-01)',
+            border: '1px solid var(--color-rgb-255-255-255-0-02)',
             borderRadius: 'var(--radius-sm)',
             padding: '8px',
             position: 'relative',
@@ -125,7 +125,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
                 height: '6px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--status-healthy)',
-                border: '1px solid #09090b'
+                border: '1px solid var(--color-hex-09090b)'
               }} />
             )}
           </div>
@@ -144,8 +144,8 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
             textTransform: 'uppercase',
             letterSpacing: '0.04em',
             color: accentColor,
-            background: 'rgba(255, 255, 255, 0.01)',
-            border: '1px solid rgba(255,255,255,0.02)',
+            background: 'var(--color-rgb-255-255-255-0-01)',
+            border: '1px solid var(--color-rgb-255-255-255-0-02)',
             padding: '2px 8px',
             borderRadius: '4px',
             display: 'flex',
@@ -172,7 +172,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
           </div>
 
           {/* Bottom stats strip */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', borderTop: '1px solid rgba(255,255,255,0.015)', paddingTop: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', borderTop: '1px solid var(--color-rgb-255-255-255-0-015)', paddingTop: '12px' }}>
             {[
               { label: 'Load Avg', value: load || '—', icon: Activity, color: 'var(--text-secondary)' },
               { label: 'Net In', value: formatBytes(netRecv), icon: ArrowDown, color: 'var(--text-secondary)' },
@@ -189,7 +189,7 @@ export default function ServerCard({ name, ip, cpu, ram, disk, uptime, status, l
           </div>
         </>
       ) : (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', background: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', gap: '6px', color: 'var(--text-muted)', fontSize: '0.78rem' }}>
           <XCircle size={12} /> No telemetry — offline
         </div>
       )}

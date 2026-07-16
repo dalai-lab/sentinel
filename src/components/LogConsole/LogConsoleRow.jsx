@@ -17,7 +17,7 @@ export default function LogConsoleRow({ log, onClickTrace }) {
   return (
     <div 
       className="log-row-container"
-      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-02)'}
       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
     >
       <div className="log-row-time">
@@ -51,7 +51,7 @@ export default function LogConsoleRow({ log, onClickTrace }) {
         <button 
           onClick={() => onClickTrace(log)}
           style={{
-            background: 'rgba(255,255,255,0.02)',
+            background: 'var(--color-rgb-255-255-255-0-02)',
             border: '1px solid var(--border-color)',
             color: 'var(--text-secondary)',
             padding: '2px 8px',
@@ -64,8 +64,8 @@ export default function LogConsoleRow({ log, onClickTrace }) {
             gap: '3px',
             transition: 'all 0.15s'
           }}
-          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+          onMouseEnter={e => e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-06)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-02)'}
         >
           <Activity size={10} />
           <span>Trace</span>

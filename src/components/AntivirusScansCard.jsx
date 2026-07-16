@@ -62,20 +62,20 @@ function ScanCard({ scan }) {
   const name = getFriendlyName(scan.host);
 
   let statusColor = 'var(--status-healthy)';
-  let statusBorder = 'rgba(255,255,255,0.03)';
+  let statusBorder = 'var(--color-rgb-255-255-255-0-03)';
   let statusLabel = 'CLEAN';
   let StatusIcon = ShieldCheck;
 
   if (infected) {
     statusColor = 'var(--status-danger)';
-    statusBorder = 'rgba(239,68,68,0.15)';
+    statusBorder = 'var(--color-rgb-239-68-68-0-15)';
     statusLabel = 'THREATS FOUND';
     StatusIcon = ShieldAlert;
   }
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
       border: `1px solid ${statusBorder}`,
       borderRadius: 'var(--radius-md)',
       padding: '18px 20px',
@@ -87,7 +87,7 @@ function ScanCard({ scan }) {
       {/* Row 1: Header */}
       <div className="scan-card-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+          <div style={{ background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
             <StatusIcon size={14} color={statusColor} />
           </div>
           <div>
@@ -97,7 +97,7 @@ function ScanCard({ scan }) {
         </div>
         <div className="scan-card-header-right">
           <span style={{
-            background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', color: statusColor, fontSize: '0.65rem',
+            background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', color: statusColor, fontSize: '0.65rem',
             fontWeight: 500, padding: '2px 8px', borderRadius: 'var(--radius-sm)', letterSpacing: '0.04em'
           }}>
             {infected ? `⚠ ${scan.infectedFiles} THREAT${scan.infectedFiles > 1 ? 'S' : ''}` : '✓ ' + statusLabel}
@@ -112,11 +112,11 @@ function ScanCard({ scan }) {
       <div className={`scan-card-stats ${infected ? 'infected' : 'clean'}`}>
         {[
           { label: 'Files Scanned', value: scannedNum.toLocaleString(), icon: File, color: 'var(--text-muted)' },
-          { label: 'Data Scanned', value: scan.dataScanned || 'N/A', icon: Database, color: '#60a5fa' },
-          { label: 'Duration', value: formatDuration(scan.timeTaken), icon: Clock, color: '#a78bfa' },
+          { label: 'Data Scanned', value: scan.dataScanned || 'N/A', icon: Database, color: 'var(--color-hex-60a5fa)' },
+          { label: 'Duration', value: formatDuration(scan.timeTaken), icon: Clock, color: 'var(--color-hex-a78bfa)' },
           { label: 'Engine', value: `ClamAV ${scan.engineVersion || ''}`, icon: Shield, color: statusColor },
         ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} style={{ background: 'rgba(255,255,255,0.003)', padding: '10px 12px' }}>
+          <div key={label} style={{ background: 'var(--color-rgb-255-255-255-0-003)', padding: '10px 12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
               <Icon size={11} color={color} />
               <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 500, letterSpacing: '0.04em' }}>{label}</span>
@@ -128,12 +128,12 @@ function ScanCard({ scan }) {
 
       {/* Row 3: Infected files list if any */}
       {infected && scan.infectedFilesList && scan.infectedFilesList.length > 0 && (
-        <div style={{ background: 'rgba(239,68,68,0.02)', border: '1px solid rgba(239,68,68,0.12)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
+        <div style={{ background: 'var(--color-rgb-239-68-68-0-02)', border: '1px solid var(--color-rgb-239-68-68-0-12)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
           <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--status-danger)', textTransform: 'uppercase', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <AlertTriangle size={11} /> Detected Threats
           </div>
           {scan.infectedFilesList.slice(0, 4).map((f, i) => (
-            <div key={i} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--status-danger)', paddingBottom: '3px', borderBottom: '1px solid rgba(239,68,68,0.05)', marginBottom: '3px' }}>
+            <div key={i} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--status-danger)', paddingBottom: '3px', borderBottom: '1px solid var(--color-rgb-239-68-68-0-05)', marginBottom: '3px' }}>
               {f}
             </div>
           ))}
@@ -204,12 +204,12 @@ export default function AntivirusScansCard() {
       {/* Fleet Overview Stat Strip (Overview design style: unified cells separated by gap: 1px) */}
       <div className="antivirus-stats-grid">
         {[
-          { icon: Server, label: 'Servers Scanned', value: scans.length, color: '#a78bfa', sub: 'nodes registered' },
+          { icon: Server, label: 'Servers Scanned', value: scans.length, color: 'var(--color-hex-a78bfa)', sub: 'nodes registered' },
           { icon: ShieldCheck, label: 'Clean Nodes', value: cleanCount, color: 'var(--status-healthy)', sub: 'no threats detected' },
           { icon: ShieldAlert, label: 'Infected Nodes', value: infectedCount, color: infectedCount > 0 ? 'var(--status-danger)' : 'var(--status-healthy)', sub: infectedCount > 0 ? `${totalThreats} total threat(s)` : 'clean environment' },
-          { icon: File, label: 'Total Files Scanned', value: totalFiles.toLocaleString(), color: '#60a5fa', sub: `last scan: ${lastScanAge}` },
+          { icon: File, label: 'Total Files Scanned', value: totalFiles.toLocaleString(), color: 'var(--color-hex-60a5fa)', sub: `last scan: ${lastScanAge}` },
         ].map(({ icon: Icon, label, value, color, sub }) => (
-          <div key={label} style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div key={label} style={{ padding: '20px 24px', background: 'var(--color-rgb-255-255-255-0-003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{label}</span>
               <Icon size={14} color={color} />
@@ -226,8 +226,8 @@ export default function AntivirusScansCard() {
 
       {/* Fleet security posture banner */}
       <div className="antivirus-posture-banner" style={{
-        background: totalThreats > 0 ? 'rgba(239, 68, 68, 0.02)' : 'rgba(16, 185, 129, 0.02)',
-        border: `1px solid ${totalThreats > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)'}`,
+        background: totalThreats > 0 ? 'var(--color-rgb-239-68-68-0-02)' : 'var(--color-rgb-16-185-129-0-02)',
+        border: `1px solid ${totalThreats > 0 ? 'var(--color-rgb-239-68-68-0-1)' : 'var(--color-rgb-16-185-129-0-1)'}`,
         borderRadius: 'var(--radius-md)',
         padding: '14px 16px',
         display: 'flex',

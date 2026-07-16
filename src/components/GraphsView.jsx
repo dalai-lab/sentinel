@@ -26,25 +26,25 @@ const METRICS = [
   },
   {
     id: 'mem', label: 'Memory Usage', unit: '%', icon: Activity,
-    color: '#a78bfa',
+    color: 'var(--color-hex-a78bfa)',
     desc: 'RAM utilisation across fleet',
     thresh: 90,
   },
   {
     id: 'disk', label: 'Disk Usage', unit: '%', icon: HardDrive,
-    color: '#38bdf8',
+    color: 'var(--color-hex-38bdf8)',
     desc: 'Root filesystem consumption',
     thresh: 90,
   },
   {
     id: 'netRecv', label: 'Network In', unit: 'B/s', icon: Wifi,
-    color: '#38bdf8',
+    color: 'var(--color-hex-38bdf8)',
     desc: 'Inbound bandwidth per server',
     thresh: null,
   },
   {
     id: 'netSent', label: 'Network Out', unit: 'B/s', icon: Wifi,
-    color: '#f59e0b',
+    color: 'var(--color-hex-f59e0b)',
     desc: 'Outbound bandwidth per server',
     thresh: null,
   },
@@ -52,9 +52,9 @@ const METRICS = [
 
 const SERVER_COLORS = {
   'Oracle database server': 'var(--status-healthy)',
-  'Orbithyre':              '#a78bfa',
-  'Gaplytiq':               '#38bdf8',
-  'Dalai':                  '#f59e0b',
+  'Orbithyre':              'var(--color-hex-a78bfa)',
+  'Gaplytiq':               'var(--color-hex-38bdf8)',
+  'Dalai':                  'var(--color-hex-f59e0b)',
 };
 
 function fmtBytes(v) {
@@ -118,11 +118,11 @@ function CustomTooltip({ active, payload, label, unit }) {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: '#09090b',
-      border: '1px solid rgba(255,255,255,0.05)',
+      background: 'var(--color-hex-09090b)',
+      border: '1px solid var(--color-rgb-255-255-255-0-05)',
       borderRadius: 'var(--radius-sm)',
       padding: '8px 12px',
-      boxShadow: '0 10px 30px -10px rgba(0,0,0,0.7)',
+      boxShadow: '0 10px 30px -10px var(--color-rgb-0-0-0-0-7)',
       minWidth: '150px',
       display: 'flex',
       flexDirection: 'column',
@@ -167,8 +167,8 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
-      border: isCritical ? '1px solid rgba(239, 68, 68, 0.15)' : '1px solid rgba(255,255,255,0.03)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
+      border: isCritical ? '1px solid var(--color-rgb-239-68-68-0-15)' : '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
       padding: '20px 24px',
       display: 'flex',
@@ -189,7 +189,7 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {isCritical && (
-            <span style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)', color: 'var(--status-danger)', fontSize: '0.6rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
+            <span style={{ background: 'var(--color-rgb-239-68-68-0-05)', border: '1px solid var(--color-rgb-239-68-68-0-2)', color: 'var(--status-danger)', fontSize: '0.6rem', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
               Warning Thresh
             </span>
           )}
@@ -201,7 +201,7 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 
       {/* Fleet-level stats row */}
       {fleetLast != null && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'var(--color-rgb-255-255-255-0-03)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
           {[
             { label: 'Current Avg', value: fmtVal(fleetLast, metric.unit) },
             { label: 'Fleet Peak', value: fmtVal(fleetPeak, metric.unit) },
@@ -215,7 +215,7 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
               )
             },
           ].map(({ label, value }) => (
-            <div key={label} style={{ padding: '8px 12px', background: 'rgba(255,255,255,0.003)' }}>
+            <div key={label} style={{ padding: '8px 12px', background: 'var(--color-rgb-255-255-255-0-003)' }}>
               <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 650, letterSpacing: '0.04em' }}>{label}</div>
               <div style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-secondary)', marginTop: '2px' }}>{value}</div>
             </div>
@@ -244,16 +244,16 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
                   );
                 })}
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-              <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+              <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
               <YAxis
-                stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false}
+                stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false}
                 domain={metric.unit === '%' ? [0, 100] : ['auto', 'auto']}
                 tickFormatter={v => metric.unit === 'B/s' ? fmtBytes(v) : `${v}${metric.unit}`}
               />
-              <Tooltip content={<CustomTooltip unit={metric.unit} />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
+              <Tooltip content={<CustomTooltip unit={metric.unit} />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
               {metric.thresh && (
-                <ReferenceLine y={metric.thresh} stroke="rgba(239,68,68,0.2)" strokeDasharray="3 3" />
+                <ReferenceLine y={metric.thresh} stroke="var(--color-rgb-239-68-68-0-2)" strokeDasharray="3 3" />
               )}
               {hosts.map(host => {
                 const c = SERVER_COLORS[host] || metric.color;
@@ -276,13 +276,13 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 
       {/* Per-server current values pills */}
       {hosts.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.015)', paddingTop: '12px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', borderTop: '1px solid var(--color-rgb-255-255-255-0-015)', paddingTop: '12px' }}>
           {hosts.map(host => {
             const s = stats[host];
             const c = SERVER_COLORS[host] || metric.color;
             if (!s) return null;
             return (
-              <div key={host} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '4px 8px' }}>
+              <div key={host} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '4px 8px' }}>
                 <span style={{ width: 5, height: 5, borderRadius: '50%', background: c }} />
                 <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>{host}:</span>
                 <span style={{ fontSize: '0.68rem', fontWeight: 600, color: metric.thresh && s.last > metric.thresh ? 'var(--status-danger)' : 'var(--text-primary)' }}>
@@ -341,7 +341,7 @@ export default function GraphsView({ initialServer = 'all', initialMetric = null
               onClick={onBack} 
               style={{
                 background: 'transparent',
-                border: '1px solid rgba(255,255,255,0.06)',
+                border: '1px solid var(--color-rgb-255-255-255-0-06)',
                 borderRadius: '4px',
                 width: '28px',
                 height: '28px',
@@ -429,8 +429,8 @@ export default function GraphsView({ initialServer = 'all', initialMetric = null
           </div>
         ))}
         <div className="graphs-legend-threshold">
-          <div style={{ width: 16, height: 1, borderTop: '1px dashed rgba(239,68,68,0.4)' }} />
-          <span style={{ fontSize: '0.68rem', color: 'rgba(239,68,68,0.6)' }}>Alert threshold</span>
+          <div style={{ width: 16, height: 1, borderTop: '1px dashed var(--color-rgb-239-68-68-0-4)' }} />
+          <span style={{ fontSize: '0.68rem', color: 'var(--color-rgb-239-68-68-0-6)' }}>Alert threshold</span>
         </div>
       </div>
 
@@ -464,8 +464,8 @@ export default function GraphsView({ initialServer = 'all', initialMetric = null
 
 // ── Inline Styles ─────────────────────────────────────────────────────────────
 const panelBtnStyle = {
-  background: 'rgba(255,255,255,0.01)',
-  border: '1px solid rgba(255,255,255,0.03)',
+  background: 'var(--color-rgb-255-255-255-0-01)',
+  border: '1px solid var(--color-rgb-255-255-255-0-03)',
   color: 'var(--text-secondary)',
   borderRadius: 'var(--radius-sm)',
   padding: '5px',
@@ -477,8 +477,8 @@ const panelBtnStyle = {
 };
 
 const selectFilterStyle = {
-  background: 'rgba(255,255,255,0.02)',
-  border: '1px solid rgba(255,255,255,0.03)',
+  background: 'var(--color-rgb-255-255-255-0-02)',
+  border: '1px solid var(--color-rgb-255-255-255-0-03)',
   color: 'var(--text-primary)',
   padding: '6px 12px',
   borderRadius: 'var(--radius-sm)',
@@ -489,8 +489,8 @@ const selectFilterStyle = {
 };
 
 const refreshBtnStyle = {
-  background: 'rgba(255,255,255,0.02)',
-  border: '1px solid rgba(255,255,255,0.03)',
+  background: 'var(--color-rgb-255-255-255-0-02)',
+  border: '1px solid var(--color-rgb-255-255-255-0-03)',
   color: 'var(--text-secondary)',
   padding: '6px 12px',
   borderRadius: 'var(--radius-sm)',

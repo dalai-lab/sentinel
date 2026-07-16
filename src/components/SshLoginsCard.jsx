@@ -164,7 +164,7 @@ export default function SshLoginsCard({ topThreat }) {
       <div className="ssh-logins-layout">
         
         {/* Main Event Feed */}
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-md)', border: '1px solid rgba(255,255,255,0.03)', background: 'rgba(255,255,255,0.005)' }} className="custom-scrollbar">
+        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-rgb-255-255-255-0-03)', background: 'var(--color-rgb-255-255-255-0-005)' }} className="custom-scrollbar">
           {filteredEvents.slice(0, visibleCount).map((event, idx) => (
             <SshEventRow 
               key={`${event.rawTs}-${idx}`} 
@@ -197,8 +197,8 @@ export default function SshLoginsCard({ topThreat }) {
                 }}
                 disabled={fetchingOlder}
                 style={{
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.03)',
+                  background: 'var(--color-rgb-255-255-255-0-02)',
+                  border: '1px solid var(--color-rgb-255-255-255-0-03)',
                   padding: '8px 20px',
                   borderRadius: 'var(--radius-sm)',
                   color: 'var(--text-secondary)',

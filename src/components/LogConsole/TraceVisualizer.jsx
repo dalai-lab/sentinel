@@ -51,7 +51,7 @@ export default function TraceVisualizer({ trace, onClose }) {
       background: 'var(--bg-card)',
       borderLeft: '1px solid var(--border-color)',
       display: 'flex', flexDirection: 'column',
-      boxShadow: '-4px 0 20px rgba(0,0,0,0.15)',
+      boxShadow: '-4px 0 20px var(--color-rgb-0-0-0-0-15)',
       zIndex: 100,
       animation: 'slideIn 0.3s ease-out'
     }}>
@@ -72,7 +72,7 @@ export default function TraceVisualizer({ trace, onClose }) {
 
       <div style={{ padding: '16px', flex: 1, overflowY: 'auto' }}>
         <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+          <div style={{ flex: 1, background: 'var(--color-rgb-255-255-255-0-01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Clock size={12} /> Total Duration
             </div>
@@ -80,7 +80,7 @@ export default function TraceVisualizer({ trace, onClose }) {
               {totalDuration}ms
             </div>
           </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
+          <div style={{ flex: 1, background: 'var(--color-rgb-255-255-255-0-01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)' }}>
             <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Cpu size={12} /> Spans
             </div>
@@ -96,13 +96,13 @@ export default function TraceVisualizer({ trace, onClose }) {
               <div style={{ position: 'absolute', left: '-15px', top: '10px', width: '8px', height: '1px', background: 'var(--border-color)' }}></div>
               <div style={{ position: 'absolute', left: '-18px', top: '7px', width: '6px', height: '6px', borderRadius: '50%', background: getServiceColor(span.service) }}></div>
               
-              <div style={{ background: 'rgba(255,255,255,0.01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', marginLeft: span.depth * 12 }}>
+              <div style={{ background: 'var(--color-rgb-255-255-255-0-01)', padding: '10px', borderRadius: '4px', border: '1px solid var(--border-color)', marginLeft: span.depth * 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                   <span style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-primary)' }}>{span.name}</span>
                   <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{span.duration}ms</span>
                 </div>
                 
-                <div style={{ height: '16px', background: 'rgba(255,255,255,0.02)', borderRadius: '2px', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ height: '16px', background: 'var(--color-rgb-255-255-255-0-02)', borderRadius: '2px', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ 
                     position: 'absolute', 
                     top: 0, bottom: 0, 

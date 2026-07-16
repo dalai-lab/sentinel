@@ -10,25 +10,25 @@ import { Network, Server, ShieldAlert, Cpu, MemoryStick, HardDrive, Wifi, Refres
 function HubNode({ data }) {
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #1e1b4b, #312e81)',
-      border: '2px solid #818cf8',
+      background: 'linear-gradient(135deg, var(--color-hex-1e1b4b), var(--color-hex-312e81))',
+      border: '2px solid var(--color-hex-818cf8)',
       borderRadius: '16px',
       padding: '16px 20px',
       minWidth: '160px',
       textAlign: 'center',
-      boxShadow: '0 0 30px rgba(99,102,241,0.4)',
-      color: '#fff',
+      boxShadow: '0 0 30px var(--color-rgb-99-102-241-0-4)',
+      color: 'var(--color-hex-fff)',
     }}>
       <Handle type="source" position={Position.Right} style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Left} style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Top} style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
-      <Network size={28} color="#818cf8" style={{ marginBottom: '8px' }} />
+      <Network size={28} color="var(--color-hex-818cf8)" style={{ marginBottom: '8px' }} />
       <div style={{ fontWeight: 800, fontSize: '0.95rem', letterSpacing: '0.05em' }}>GATEWAY HUB</div>
-      <div style={{ fontSize: '0.7rem', color: '#a5b4fc', marginTop: '4px' }}>Mumbai DC · Active</div>
+      <div style={{ fontSize: '0.7rem', color: 'var(--color-hex-a5b4fc)', marginTop: '4px' }}>Mumbai DC · Active</div>
       <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '6px' }}>
         {[1, 2, 3].map(i => (
-          <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', animation: `ping ${0.8 + i * 0.3}s ease-in-out infinite` }} />
+          <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-hex-4ade80)', animation: `ping ${0.8 + i * 0.3}s ease-in-out infinite` }} />
         ))}
       </div>
     </div>
@@ -42,17 +42,17 @@ function ServerNode({ data }) {
   const hasCritical = alerts?.some(a => a.severity === 'critical');
   const hasWarning = alerts?.some(a => a.severity === 'warning');
 
-  let borderColor = '#10b981';
-  let glowColor = 'rgba(16,185,129,0.3)';
+  let borderColor = 'var(--color-hex-10b981)';
+  let glowColor = 'var(--color-rgb-16-185-129-0-3)';
   let statusLabel = 'Online';
-  let statusColor = '#4ade80';
+  let statusColor = 'var(--color-hex-4ade80)';
 
   if (isOffline) {
-    borderColor = '#6b7280'; glowColor = 'rgba(107,114,128,0.2)'; statusLabel = 'Offline'; statusColor = '#9ca3af';
+    borderColor = 'var(--color-hex-6b7280)'; glowColor = 'var(--color-rgb-107-114-128-0-2)'; statusLabel = 'Offline'; statusColor = 'var(--color-hex-9ca3af)';
   } else if (hasCritical) {
-    borderColor = '#ef4444'; glowColor = 'rgba(239,68,68,0.35)'; statusLabel = 'Critical'; statusColor = '#f87171';
+    borderColor = 'var(--color-hex-ef4444)'; glowColor = 'var(--color-rgb-239-68-68-0-35)'; statusLabel = 'Critical'; statusColor = 'var(--color-hex-f87171)';
   } else if (hasWarning) {
-    borderColor = '#f59e0b'; glowColor = 'rgba(245,158,11,0.3)'; statusLabel = 'Warning'; statusColor = '#fbbf24';
+    borderColor = 'var(--color-hex-f59e0b)'; glowColor = 'var(--color-rgb-245-158-11-0-3)'; statusLabel = 'Warning'; statusColor = 'var(--color-hex-fbbf24)';
   }
 
   const cpuVal = parseFloat(cpu) || 0;
@@ -61,21 +61,21 @@ function ServerNode({ data }) {
 
   function MiniBar({ value, color }) {
     return (
-      <div style={{ height: '4px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden', flex: 1 }}>
-        <div style={{ height: '100%', width: `${Math.min(value, 100)}%`, background: value > 85 ? '#ef4444' : value > 65 ? '#f59e0b' : color, borderRadius: '2px' }} />
+      <div style={{ height: '4px', background: 'var(--color-rgb-255-255-255-0-08)', borderRadius: '2px', overflow: 'hidden', flex: 1 }}>
+        <div style={{ height: '100%', width: `${Math.min(value, 100)}%`, background: value > 85 ? 'var(--color-hex-ef4444)' : value > 65 ? 'var(--color-hex-f59e0b)' : color, borderRadius: '2px' }} />
       </div>
     );
   }
 
   return (
     <div style={{
-      background: isOffline ? '#111214' : 'linear-gradient(145deg, #13141a, #1c1e27)',
+      background: isOffline ? 'var(--color-hex-111214)' : 'linear-gradient(145deg, var(--color-hex-13141a), var(--color-hex-1c1e27))',
       border: `2px solid ${borderColor}`,
       borderRadius: '14px',
       padding: '14px 16px',
       minWidth: '200px',
       boxShadow: `0 0 20px ${glowColor}`,
-      color: '#fff',
+      color: 'var(--color-hex-fff)',
       opacity: isOffline ? 0.65 : 1,
       position: 'relative',
     }}>
@@ -87,14 +87,14 @@ function ServerNode({ data }) {
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {hasCritical ? <ShieldAlert size={18} color="#ef4444" /> : isOffline ? <XCircle size={18} color="#6b7280" /> : <Server size={18} color={borderColor} />}
+          {hasCritical ? <ShieldAlert size={18} color="var(--color-hex-ef4444)" /> : isOffline ? <XCircle size={18} color="var(--color-hex-6b7280)" /> : <Server size={18} color={borderColor} />}
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.2 }}>{name}</div>
             <div style={{ fontSize: '0.65rem', color: statusColor, fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>● {statusLabel}</div>
           </div>
         </div>
         {alerts?.length > 0 && (
-          <div style={{ background: 'rgba(239,68,68,0.15)', color: '#f87171', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)' }}>
+          <div style={{ background: 'var(--color-rgb-239-68-68-0-15)', color: 'var(--color-hex-f87171)', fontSize: '0.65rem', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', border: '1px solid var(--color-rgb-239-68-68-0-3)' }}>
             {alerts.length} ALERT{alerts.length > 1 ? 'S' : ''}
           </div>
         )}
@@ -104,31 +104,31 @@ function ServerNode({ data }) {
       {!isOffline && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Cpu size={11} color="#a78bfa" style={{ flexShrink: 0 }} />
+            <Cpu size={11} color="var(--color-hex-a78bfa)" style={{ flexShrink: 0 }} />
             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', width: '28px' }}>CPU</span>
-            <MiniBar value={cpuVal} color="#a78bfa" />
-            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: cpuVal > 85 ? '#ef4444' : '#e2e8f0', width: '34px', textAlign: 'right' }}>{cpuVal.toFixed(1)}%</span>
+            <MiniBar value={cpuVal} color="var(--color-hex-a78bfa)" />
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: cpuVal > 85 ? 'var(--color-hex-ef4444)' : 'var(--color-hex-e2e8f0)', width: '34px', textAlign: 'right' }}>{cpuVal.toFixed(1)}%</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Activity size={11} color="#34d399" style={{ flexShrink: 0 }} />
+            <Activity size={11} color="var(--color-hex-34d399)" style={{ flexShrink: 0 }} />
             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', width: '28px' }}>RAM</span>
-            <MiniBar value={memVal} color="#34d399" />
-            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: memVal > 85 ? '#ef4444' : '#e2e8f0', width: '34px', textAlign: 'right' }}>{memVal.toFixed(1)}%</span>
+            <MiniBar value={memVal} color="var(--color-hex-34d399)" />
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: memVal > 85 ? 'var(--color-hex-ef4444)' : 'var(--color-hex-e2e8f0)', width: '34px', textAlign: 'right' }}>{memVal.toFixed(1)}%</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <HardDrive size={11} color="#60a5fa" style={{ flexShrink: 0 }} />
+            <HardDrive size={11} color="var(--color-hex-60a5fa)" style={{ flexShrink: 0 }} />
             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', width: '28px' }}>DISK</span>
-            <MiniBar value={diskVal} color="#60a5fa" />
-            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: diskVal > 85 ? '#ef4444' : '#e2e8f0', width: '34px', textAlign: 'right' }}>{diskVal.toFixed(1)}%</span>
+            <MiniBar value={diskVal} color="var(--color-hex-60a5fa)" />
+            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: diskVal > 85 ? 'var(--color-hex-ef4444)' : 'var(--color-hex-e2e8f0)', width: '34px', textAlign: 'right' }}>{diskVal.toFixed(1)}%</span>
           </div>
         </div>
       )}
 
       {/* Alerts list */}
       {alerts?.length > 0 && (
-        <div style={{ marginTop: '10px', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ marginTop: '10px', borderTop: '1px solid var(--color-rgb-255-255-255-0-07)', paddingTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {alerts.slice(0, 2).map((a, i) => (
-            <div key={i} style={{ fontSize: '0.65rem', color: a.severity === 'critical' ? '#fca5a5' : '#fcd34d', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div key={i} style={{ fontSize: '0.65rem', color: a.severity === 'critical' ? 'var(--color-hex-fca5a5)' : 'var(--color-hex-fcd34d)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <AlertTriangle size={9} /> {a.title || a.alertname}
             </div>
           ))}
@@ -217,7 +217,7 @@ export default function TopologyView() {
       const newEdges = Object.keys(serverMap).map(name => {
         const isCrit = hasCritical(name);
         const isWarn = hasWarning(name);
-        const edgeColor = isCrit ? '#ef4444' : isWarn ? '#f59e0b' : '#10b981';
+        const edgeColor = isCrit ? 'var(--color-hex-ef4444)' : isWarn ? 'var(--color-hex-f59e0b)' : 'var(--color-hex-10b981)';
         return {
           id: `hub-${name}`,
           source: 'hub',
@@ -257,7 +257,7 @@ export default function TopologyView() {
             Live node map. Edges animate with traffic — sever on critical failure. Drag nodes freely.
           </p>
         </div>
-        <button onClick={loadTopology} style={{ background: 'var(--accent)', border: 'none', color: '#fff', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+        <button onClick={loadTopology} style={{ background: 'var(--accent)', border: 'none', color: 'var(--color-hex-fff)', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
           <RefreshCw size={14} className={loading ? 'spin' : ''} /> Refresh
         </button>
       </div>
@@ -265,22 +265,22 @@ export default function TopologyView() {
       {/* Stat strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
         {[
-          { icon: CheckCircle, label: 'Servers Online', value: `${onlineCount} / ${Math.max(onlineCount, 4)}`, color: '#10b981' },
-          { icon: ShieldAlert, label: 'Active Alerts', value: alertCount, color: alertCount > 0 ? '#ef4444' : '#10b981' },
-          { icon: Cpu, label: 'Fleet Avg CPU', value: `${avgCpu}%`, color: '#a78bfa' },
+          { icon: CheckCircle, label: 'Servers Online', value: `${onlineCount} / ${Math.max(onlineCount, 4)}`, color: 'var(--color-hex-10b981)' },
+          { icon: ShieldAlert, label: 'Active Alerts', value: alertCount, color: alertCount > 0 ? 'var(--color-hex-ef4444)' : 'var(--color-hex-10b981)' },
+          { icon: Cpu, label: 'Fleet Avg CPU', value: `${avgCpu}%`, color: 'var(--color-hex-a78bfa)' },
         ].map(({ icon: Icon, label, value, color }) => (
-          <div key={label} style={{ background: 'rgba(0,0,0,0.3)', border: `1px solid ${color}22`, borderLeft: `3px solid ${color}`, borderRadius: '10px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div key={label} style={{ background: 'var(--color-rgb-0-0-0-0-3)', border: `1px solid ${color}22`, borderLeft: `3px solid ${color}`, borderRadius: '10px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Icon size={18} color={color} />
             <div>
               <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>{label}</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#fff' }}>{value}</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--color-hex-fff)' }}>{value}</div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Flow canvas */}
-      <div style={{ flex: 1, minHeight: '520px', background: '#0d0e14', border: '1px solid rgba(99,102,241,0.15)', borderRadius: '16px', position: 'relative' }}>
+      <div style={{ flex: 1, minHeight: '520px', background: 'var(--color-hex-0d0e14)', border: '1px solid var(--color-rgb-99-102-241-0-15)', borderRadius: '16px', position: 'relative' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -289,11 +289,11 @@ export default function TopologyView() {
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.2 }}
-          style={{ background: '#0d0e14', borderRadius: '16px' }}
+          style={{ background: 'var(--color-hex-0d0e14)', borderRadius: '16px' }}
           attributionPosition="bottom-right"
         >
-          <Background color="#1a1c28" gap={20} size={1} />
-          <Controls style={{ background: '#1e202c', border: '1px solid #2d2f3d' }} />
+          <Background color="var(--color-hex-1a1c28)" gap={20} size={1} />
+          <Controls style={{ background: 'var(--color-hex-1e202c)', border: '1px solid var(--color-hex-2d2f3d)' }} />
         </ReactFlow>
       </div>
 

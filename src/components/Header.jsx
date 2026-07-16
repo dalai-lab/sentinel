@@ -27,7 +27,7 @@ export default function Header({ onMenuToggle, search, onSearchChange }) {
             alignItems: 'center',
             justifyContent: 'center',
             border: '1px solid var(--border-color)',
-            backgroundColor: 'rgba(255,255,255,0.02)'
+            backgroundColor: 'var(--color-rgb-255-255-255-0-02)'
           }}
           className="mobile-menu-toggle"
           aria-label="Toggle menu"
@@ -41,7 +41,7 @@ export default function Header({ onMenuToggle, search, onSearchChange }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         {/* Working Global Search Input */}
         <div style={{
-          background: 'rgba(255,255,255,0.02)',
+          background: 'var(--color-rgb-255-255-255-0-02)',
           border: '1px solid var(--border-color)',
           borderRadius: 'var(--radius-sm)',
           padding: '5px 10px',

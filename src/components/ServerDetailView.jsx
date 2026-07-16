@@ -203,9 +203,9 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
             value={timeRange}
             onChange={(e) => setTimeRange(Number(e.target.value))}
             style={{
-              background: '#121214',
+              background: 'var(--color-hex-121214)',
               color: 'var(--text-primary)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              border: '1px solid var(--color-rgb-255-255-255-0-06)',
               borderRadius: '4px',
               padding: '4px 8px',
               fontSize: '0.75rem',
@@ -246,7 +246,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
             value: fmtPct(live?.ram),
             rawPct: live?.ram,
             subtext: specs?.memTotal && live?.ram ? `${fmtGB((live.ram / 100) * specs.memTotal)} of ${fmtGB(specs.memTotal)}` : 'No specs loaded',
-            color: '#a78bfa',
+            color: 'var(--color-hex-a78bfa)',
             icon: MemoryStick
           },
           {
@@ -254,7 +254,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
             value: fmtPct(live?.disk),
             rawPct: live?.disk,
             subtext: specs?.diskTotal && live?.disk ? `${fmtGB((live.disk / 100) * specs.diskTotal)} of ${fmtGB(specs.diskTotal)}` : 'No disk specs',
-            color: '#38bdf8',
+            color: 'var(--color-hex-38bdf8)',
             icon: HardDrive
           },
           {
@@ -262,7 +262,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
             value: live ? fmtBps(live.netRecv + live.netSent) : '—',
             rawPct: null,
             subtext: live ? `↑ ${fmtBps(live.netSent)}  ↓ ${fmtBps(live.netRecv)}` : 'Inactive',
-            color: '#f59e0b',
+            color: 'var(--color-hex-f59e0b)',
             icon: Wifi
           }
         ].map((vital, i) => {
@@ -279,7 +279,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                 </span>
               </div>
               {vital.rawPct != null && (
-                <div style={{ width: '100%', height: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '2px', overflow: 'hidden', margin: '6px 0 8px 0' }}>
+                <div style={{ width: '100%', height: '4px', background: 'var(--color-rgb-255-255-255-0-03)', borderRadius: '2px', overflow: 'hidden', margin: '6px 0 8px 0' }}>
                   <div style={{ width: `${Math.min(100, Math.max(0, vital.rawPct))}%`, height: '100%', background: vital.color, borderRadius: '2px', transition: 'width 0.4s ease' }} />
                 </div>
               )}
@@ -300,7 +300,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
               <div className="shimmer-card" style={{ height: '220px' }} />
             </div>
           ) : chartData.length === 0 ? (
-            <div style={{ padding: '60px 20px', textAlign: 'center', border: '1px dashed rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', color: 'var(--text-muted)' }}>
+            <div style={{ padding: '60px 20px', textAlign: 'center', border: '1px dashed var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-md)', color: 'var(--text-muted)' }}>
               No telemetry range history found. Node Exporter may be offline.
             </div>
           ) : (
@@ -311,8 +311,8 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                   title="Processor, Memory & Storage Load" 
                   legends={[
                     { label: 'CPU Utilization', color: 'var(--status-healthy)' },
-                    { label: 'RAM Utilization', color: '#a78bfa' },
-                    { label: 'Disk Utilization', color: '#38bdf8' }
+                    { label: 'RAM Utilization', color: 'var(--color-hex-a78bfa)' },
+                    { label: 'Disk Utilization', color: 'var(--color-hex-38bdf8)' }
                   ]}
                 >
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
@@ -322,21 +322,21 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                         <stop offset="95%" stopColor="var(--status-healthy)" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="ramGlow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.18}/>
-                        <stop offset="95%" stopColor="#a78bfa" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="var(--color-hex-a78bfa)" stopOpacity={0.18}/>
+                        <stop offset="95%" stopColor="var(--color-hex-a78bfa)" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="diskGlow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.18}/>
-                        <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0.18}/>
+                        <stop offset="95%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                    <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                    <YAxis domain={[0, 100]} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
-                    <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                    <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                    <YAxis domain={[0, 100]} stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
+                    <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
                     <Area type="monotone" dataKey="cpu" name="CPU" stroke="var(--status-healthy)" fill="url(#cpuGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--status-healthy)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
-                    <Area type="monotone" dataKey="ram" name="RAM" stroke="#a78bfa" fill="url(#ramGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #a78bfa40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
-                    <Area type="monotone" dataKey="disk" name="Disk" stroke="#38bdf8" fill="url(#diskGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #38bdf840)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                    <Area type="monotone" dataKey="ram" name="RAM" stroke="var(--color-hex-a78bfa)" fill="url(#ramGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-a78bfa)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                    <Area type="monotone" dataKey="disk" name="Disk" stroke="var(--color-hex-38bdf8)" fill="url(#diskGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-38bdf8)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                   </AreaChart>
                 </PremiumChartCard>
               ) : (
@@ -355,53 +355,53 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                           <stop offset="95%" stopColor="var(--status-healthy)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                      <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                      <YAxis domain={[0, 100]} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
-                      <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                      <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 100]} stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
+                      <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
                       <Area type="monotone" dataKey="cpu" name="CPU" stroke="var(--status-healthy)" fill="url(#cpuGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--status-healthy)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                     </AreaChart>
                   </PremiumChartCard>
 
                   <PremiumChartCard 
                     title="Memory Usage" 
-                    legends={[{ label: 'RAM Utilization', color: '#a78bfa' }]}
+                    legends={[{ label: 'RAM Utilization', color: 'var(--color-hex-a78bfa)' }]}
                     style={{ flex: 1, minWidth: 0 }}
                     onClick={isMobile ? null : () => onNavigateToGraphs && onNavigateToGraphs(serverName, 'mem')}
                   >
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                       <defs>
                         <linearGradient id="ramGlow" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.18}/>
-                          <stop offset="95%" stopColor="#a78bfa" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="var(--color-hex-a78bfa)" stopOpacity={0.18}/>
+                          <stop offset="95%" stopColor="var(--color-hex-a78bfa)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                      <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                      <YAxis domain={[0, 100]} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
-                      <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-                      <Area type="monotone" dataKey="ram" name="RAM" stroke="#a78bfa" fill="url(#ramGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #a78bfa40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                      <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 100]} stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
+                      <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
+                      <Area type="monotone" dataKey="ram" name="RAM" stroke="var(--color-hex-a78bfa)" fill="url(#ramGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-a78bfa)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                     </AreaChart>
                   </PremiumChartCard>
 
                   <PremiumChartCard 
                     title="Storage Analytics" 
-                    legends={[{ label: 'Disk Utilization', color: '#38bdf8' }]}
+                    legends={[{ label: 'Disk Utilization', color: 'var(--color-hex-38bdf8)' }]}
                     style={{ flex: 1, minWidth: 0 }}
                     onClick={isMobile ? null : () => onNavigateToGraphs && onNavigateToGraphs(serverName, 'disk')}
                   >
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                       <defs>
                         <linearGradient id="diskGlow" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.18}/>
-                          <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0.18}/>
+                          <stop offset="95%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                      <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                      <YAxis domain={[0, 100]} stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
-                      <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-                      <Area type="monotone" dataKey="disk" name="Disk" stroke="#38bdf8" fill="url(#diskGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #38bdf840)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                      <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                      <YAxis domain={[0, 100]} stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={v => `${v}%`} />
+                      <Tooltip content={<CustomChartTooltip suffix="%" />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
+                      <Area type="monotone" dataKey="disk" name="Disk" stroke="var(--color-hex-38bdf8)" fill="url(#diskGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-38bdf8)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                     </AreaChart>
                   </PremiumChartCard>
                 </div>
@@ -412,27 +412,27 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                 <PremiumChartCard 
                   title="Network Throughput" 
                   legends={[
-                    { label: 'Inbound', color: '#38bdf8' },
-                    { label: 'Outbound', color: '#f59e0b' }
+                    { label: 'Inbound', color: 'var(--color-hex-38bdf8)' },
+                    { label: 'Outbound', color: 'var(--color-hex-f59e0b)' }
                   ]}
                 >
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                     <defs>
                       <linearGradient id="netInGlow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.18}/>
-                        <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0.18}/>
+                        <stop offset="95%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="netOutGlow" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.18}/>
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="var(--color-hex-f59e0b)" stopOpacity={0.18}/>
+                        <stop offset="95%" stopColor="var(--color-hex-f59e0b)" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                    <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                    <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={fmtBps} />
-                    <Tooltip content={<CustomChartTooltip formatter={fmtBps} />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-                    <Area type="monotone" dataKey="netIn" name="Inbound" stroke="#38bdf8" fill="url(#netInGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #38bdf840)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
-                    <Area type="monotone" dataKey="netOut" name="Outbound" stroke="#f59e0b" fill="url(#netOutGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #f59e0b40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                    <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                    <YAxis stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={fmtBps} />
+                    <Tooltip content={<CustomChartTooltip formatter={fmtBps} />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
+                    <Area type="monotone" dataKey="netIn" name="Inbound" stroke="var(--color-hex-38bdf8)" fill="url(#netInGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-38bdf8)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                    <Area type="monotone" dataKey="netOut" name="Outbound" stroke="var(--color-hex-f59e0b)" fill="url(#netOutGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-f59e0b)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                   </AreaChart>
                 </PremiumChartCard>
               ) : (
@@ -440,43 +440,43 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                 <div style={{ display: 'flex', gap: '16px', width: '100%' }}>
                   <PremiumChartCard 
                     title="Network Inbound" 
-                    legends={[{ label: 'Inbound', color: '#38bdf8' }]}
+                    legends={[{ label: 'Inbound', color: 'var(--color-hex-38bdf8)' }]}
                     style={{ flex: 1, minWidth: 0 }}
                     onClick={() => onNavigateToGraphs && onNavigateToGraphs(serverName, 'netRecv')}
                   >
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                       <defs>
                         <linearGradient id="netInGlow" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.18}/>
-                          <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0.18}/>
+                          <stop offset="95%" stopColor="var(--color-hex-38bdf8)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                      <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                      <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={fmtBps} />
-                      <Tooltip content={<CustomChartTooltip formatter={fmtBps} />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-                      <Area type="monotone" dataKey="netIn" name="Inbound" stroke="#38bdf8" fill="url(#netInGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #38bdf840)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                      <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                      <YAxis stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={fmtBps} />
+                      <Tooltip content={<CustomChartTooltip formatter={fmtBps} />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
+                      <Area type="monotone" dataKey="netIn" name="Inbound" stroke="var(--color-hex-38bdf8)" fill="url(#netInGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-38bdf8)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                     </AreaChart>
                   </PremiumChartCard>
 
                   <PremiumChartCard 
                     title="Network Outbound" 
-                    legends={[{ label: 'Outbound', color: '#f59e0b' }]}
+                    legends={[{ label: 'Outbound', color: 'var(--color-hex-f59e0b)' }]}
                     style={{ flex: 1, minWidth: 0 }}
                     onClick={() => onNavigateToGraphs && onNavigateToGraphs(serverName, 'netSent')}
                   >
                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                       <defs>
                         <linearGradient id="netOutGlow" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.18}/>
-                          <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="var(--color-hex-f59e0b)" stopOpacity={0.18}/>
+                          <stop offset="95%" stopColor="var(--color-hex-f59e0b)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
-                      <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
-                      <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={fmtBps} />
-                      <Tooltip content={<CustomChartTooltip formatter={fmtBps} />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
-                      <Area type="monotone" dataKey="netOut" name="Outbound" stroke="#f59e0b" fill="url(#netOutGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px #f59e0b40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-rgb-255-255-255-0-015)" vertical={false} />
+                      <XAxis dataKey="time" stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} />
+                      <YAxis stroke="var(--color-rgb-255-255-255-0-2)" fontSize={9} tickLine={false} axisLine={false} tickFormatter={fmtBps} />
+                      <Tooltip content={<CustomChartTooltip formatter={fmtBps} />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
+                      <Area type="monotone" dataKey="netOut" name="Outbound" stroke="var(--color-hex-f59e0b)" fill="url(#netOutGlow)" strokeWidth={2.2} style={{ filter: 'drop-shadow(0px 2px 6px var(--color-hex-f59e0b)40)' }} dot={false} activeDot={{ r: 4, strokeWidth: 0 }} isAnimationActive={false} />
                     </AreaChart>
                   </PremiumChartCard>
                 </div>
@@ -489,7 +489,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           
           {/* Active Incidents Banner */}
-          <div style={{ padding: '16px 20px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ padding: '16px 20px', borderRadius: 'var(--radius-md)', background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <span style={{ fontSize: '0.62rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Active Alerts</span>
             {alerts.length === 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--status-healthy)', fontWeight: 500 }}>
@@ -501,7 +501,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                 {alerts.map(a => (
                   <div key={a.id} style={{
                     display: 'flex', alignItems: 'center', gap: '8px',
-                    background: 'rgba(239, 68, 68, 0.02)', border: '1px solid rgba(239, 68, 68, 0.1)',
+                    background: 'var(--color-rgb-239-68-68-0-02)', border: '1px solid var(--color-rgb-239-68-68-0-1)',
                     borderRadius: 'var(--radius-sm)', padding: '8px 12px',
                     fontSize: '0.72rem', color: 'var(--status-danger)'
                   }}>
@@ -516,7 +516,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
 
           {/* Micro CPU Threads Visualizer */}
           {perCore.length > 0 && (
-            <div style={{ padding: '16px 20px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)' }}>
+            <div style={{ padding: '16px 20px', borderRadius: 'var(--radius-md)', background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '12px' }}>
                 <span style={{ fontSize: '0.62rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Logical Thread Map</span>
                 <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{perCore.length} Cores</span>
@@ -526,14 +526,14 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
                 {perCore.map(({ cpu, usage }) => {
                   const intensity = Math.min(100, Math.max(0, usage)) / 100;
-                  const coreColor = usage > 85 ? 'rgba(239,68,68,0.8)' : usage > 65 ? 'rgba(245,158,11,0.8)' : 'rgba(16,185,129,0.8)';
+                  const coreColor = usage > 85 ? 'var(--color-rgb-239-68-68-0-8)' : usage > 65 ? 'var(--color-rgb-245-158-11-0-8)' : 'var(--color-rgb-16-185-129-0-8)';
                   return (
                     <div 
                       key={cpu} 
                       style={{ 
                         padding: '6px 8px', 
-                        background: 'rgba(255,255,255,0.01)', 
-                        border: '1px solid rgba(255,255,255,0.02)', 
+                        background: 'var(--color-rgb-255-255-255-0-01)', 
+                        border: '1px solid var(--color-rgb-255-255-255-0-02)', 
                         borderRadius: 'var(--radius-sm)',
                         display: 'flex', 
                         flexDirection: 'column', 
@@ -545,7 +545,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                         <span>C{cpu}</span>
                         <span style={{ color: coreColor, fontWeight: 600 }}>{usage.toFixed(0)}%</span>
                       </div>
-                      <div style={{ height: '3px', background: 'rgba(255,255,255,0.03)', borderRadius: '1.5px', overflow: 'hidden' }}>
+                      <div style={{ height: '3px', background: 'var(--color-rgb-255-255-255-0-03)', borderRadius: '1.5px', overflow: 'hidden' }}>
                         <div style={{ width: `${usage}%`, height: '100%', background: coreColor, borderRadius: '1.5px' }} />
                       </div>
                     </div>
@@ -556,7 +556,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
           )}
 
           {/* System Identity & Metadata */}
-          <div style={{ padding: '16px 20px', borderRadius: 'var(--radius-md)', background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ padding: '16px 20px', borderRadius: 'var(--radius-md)', background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <span style={{ fontSize: '0.62rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>System Parameters</span>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -568,7 +568,7 @@ export default function ServerDetailView({ serverName, onBack, onNavigateToGraph
                 { label: 'System Load Average', value: live?.load1 ? `${fmtNum(live.load1, 2)} (1m) · ${fmtNum(specs?.load5, 2)} (5m)` : '—' },
                 { label: 'CPU Specs', value: specs?.cpuModelName ? `${specs.cpuModelName} (${specs.cpuCores || perCore.length}T)` : '—' }
               ].map((spec) => (
-                <div key={spec.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '1px solid rgba(255,255,255,0.015)', paddingBottom: '8px' }}>
+                <div key={spec.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)', paddingBottom: '8px' }}>
                   <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{spec.label}</span>
                   <span style={{ 
                     fontSize: '0.74rem', 
@@ -602,8 +602,8 @@ function PremiumChartCard({ title, legends = [], children, style = {}, onClick }
     <div 
       onClick={onClick}
       style={{ 
-        background: 'rgba(255,255,255,0.005)', 
-        border: '1px solid rgba(255,255,255,0.03)', 
+        background: 'var(--color-rgb-255-255-255-0-005)', 
+        border: '1px solid var(--color-rgb-255-255-255-0-03)', 
         borderRadius: 'var(--radius-md)', 
         padding: '20px 24px',
         display: 'flex',
@@ -638,11 +638,11 @@ function CustomChartTooltip({ active, payload, label, suffix = '', formatter }) 
   if (!active || !payload?.length) return null;
   return (
     <div style={{ 
-      background: '#09090b', 
-      border: '1px solid rgba(255,255,255,0.05)', 
+      background: 'var(--color-hex-09090b)', 
+      border: '1px solid var(--color-rgb-255-255-255-0-05)', 
       borderRadius: 'var(--radius-sm)', 
       padding: '8px 12px', 
-      boxShadow: '0 10px 30px -10px rgba(0,0,0,0.7)',
+      boxShadow: '0 10px 30px -10px var(--color-rgb-0-0-0-0-7)',
       minWidth: '120px',
       display: 'flex',
       flexDirection: 'column',
@@ -676,13 +676,13 @@ const backBtnStyle = {
   outline: 'none',
   ':hover': {
     color: 'var(--text-primary)',
-    backgroundColor: 'rgba(255,255,255,0.03)'
+    backgroundColor: 'var(--color-rgb-255-255-255-0-03)'
   }
 };
 
 const actionBtnStyle = {
-  background: 'rgba(255,255,255,0.02)',
-  border: '1px solid rgba(255,255,255,0.03)',
+  background: 'var(--color-rgb-255-255-255-0-02)',
+  border: '1px solid var(--color-rgb-255-255-255-0-03)',
   color: 'var(--text-secondary)',
   padding: '6px 12px',
   borderRadius: 'var(--radius-sm)',

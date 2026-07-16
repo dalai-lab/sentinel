@@ -45,7 +45,7 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       
       {/* Top Attacking Countries */}
       {topCountries.length > 0 && (
-        <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+        <div style={{ background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
             <Activity size={12} color="var(--text-muted)" />
             Top Attacking Countries
@@ -67,7 +67,7 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       )}
 
       {/* Top Targeted Accounts */}
-      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+      <div style={{ background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
           <User size={12} color="var(--status-danger)" />
           Top Targeted Accounts
@@ -84,7 +84,7 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
       </div>
 
       {/* Top Attacker IPs */}
-      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
+      <div style={{ background: 'var(--color-rgb-255-255-255-0-005)', border: '1px solid var(--color-rgb-255-255-255-0-03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
           <AlertTriangle size={12} color="var(--status-danger)" />
           Top Attacker IPs

@@ -19,7 +19,7 @@ export default function LogConsoleFilters({
     <div className="ssh-header" style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '14px' }}>
       
       {/* TABS (Severity) */}
-      <div className="tabs" style={{ display: 'flex', gap: '4px', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', padding: '3px', borderRadius: '4px' }}>
+      <div className="tabs" style={{ display: 'flex', gap: '4px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', padding: '3px', borderRadius: '4px' }}>
         {['ALL', 'ERROR', 'WARN', 'INFO'].map(lvl => (
           <button 
             key={lvl}
@@ -43,7 +43,7 @@ export default function LogConsoleFilters({
 
       {/* SEARCH AND SERVICE FILTER */}
       <div style={{ display: 'flex', gap: '8px', flex: 1, minWidth: '260px' }}>
-        <div className="search-bar" style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.01)', borderRadius: '4px', padding: '0 8px', flex: 1, border: '1px solid var(--border-color)' }}>
+        <div className="search-bar" style={{ display: 'flex', alignItems: 'center', background: 'var(--color-rgb-255-255-255-0-01)', borderRadius: '4px', padding: '0 8px', flex: 1, border: '1px solid var(--border-color)' }}>
           <Search size={12} color="var(--text-muted)" />
           <input 
             type="text" 
@@ -54,7 +54,7 @@ export default function LogConsoleFilters({
           />
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.01)', borderRadius: '4px', padding: '0 8px', border: '1px solid var(--border-color)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', background: 'var(--color-rgb-255-255-255-0-01)', borderRadius: '4px', padding: '0 8px', border: '1px solid var(--border-color)' }}>
           <Layers size={12} color="var(--text-muted)" style={{ marginRight: '6px' }} />
           <select 
             value={serviceFilter} 
@@ -74,7 +74,7 @@ export default function LogConsoleFilters({
           onClick={refreshLogs} 
           disabled={loading}
           style={{ 
-            background: 'rgba(255,255,255,0.01)', 
+            background: 'var(--color-rgb-255-255-255-0-01)', 
             border: '1px solid var(--border-color)', 
             color: 'var(--text-primary)', 
             padding: '6px 8px', 
@@ -92,8 +92,8 @@ export default function LogConsoleFilters({
           onClick={() => setIsLive(!isLive)}
           style={{
             display: 'flex', alignItems: 'center', gap: '4px',
-            background: isLive ? 'rgba(16, 185, 129, 0.05)' : 'rgba(255,255,255,0.01)',
-            border: `1px solid ${isLive ? 'rgba(16, 185, 129, 0.2)' : 'var(--border-color)'}`,
+            background: isLive ? 'var(--color-rgb-16-185-129-0-05)' : 'var(--color-rgb-255-255-255-0-01)',
+            border: `1px solid ${isLive ? 'var(--color-rgb-16-185-129-0-2)' : 'var(--border-color)'}`,
             color: isLive ? 'var(--status-healthy)' : 'var(--text-secondary)',
             padding: '6px 12px',
             borderRadius: '4px',

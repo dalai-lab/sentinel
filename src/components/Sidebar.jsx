@@ -120,7 +120,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
                         color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
                         fontWeight: isActive ? 500 : 450,
                         padding: '8px 10px',
-                        background: isActive ? 'rgba(255, 255, 255, 0.04)' : 'transparent',
+                        background: isActive ? 'var(--color-rgb-255-255-255-0-04)' : 'transparent',
                         borderRadius: 'var(--radius-sm)',
                         cursor: 'pointer',
                         transition: 'var(--transition)'
@@ -143,7 +143,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, onTabChange }) {
       <style>{`
         .nav-item:hover {
           color: var(--text-primary) !important;
-          background: rgba(255, 255, 255, 0.02) !important;
+          background: var(--color-rgb-255-255-255-0-02) !important;
         }
         @media (min-width: 769px) {
           .mobile-close-btn {

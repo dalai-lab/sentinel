@@ -81,18 +81,18 @@ export default function SshEventRow({ event, geo, onClick }) {
         alignItems: 'center',
         gap: '14px',
         padding: '12px 16px',
-        borderBottom: '1px solid rgba(255,255,255,0.015)',
+        borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)',
         cursor: 'pointer',
         transition: 'background 0.15s ease',
-        background: isImportant ? 'rgba(239,68,68,0.005)' : 'transparent',
+        background: isImportant ? 'var(--color-rgb-239-68-68-0-005)' : 'transparent',
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.015)'}
-      onMouseLeave={(e) => e.currentTarget.style.background = isImportant ? 'rgba(239,68,68,0.005)' : 'transparent'}
+      onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-015)'}
+      onMouseLeave={(e) => e.currentTarget.style.background = isImportant ? 'var(--color-rgb-239-68-68-0-005)' : 'transparent'}
     >
       {/* Left Icon Panel */}
       <div style={{
         width: '26px', height: '26px', borderRadius: '6px',
-        background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)',
+        background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0
       }}>
         {icon}
@@ -113,8 +113,8 @@ export default function SshEventRow({ event, geo, onClick }) {
         {/* Row 2: Secondary Metadata Badges */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', fontSize: '0.66rem', color: 'var(--text-muted)' }}>
           <span style={{ 
-            background: 'rgba(255,255,255,0.02)', 
-            border: '1px solid rgba(255,255,255,0.03)',
+            background: 'var(--color-rgb-255-255-255-0-02)', 
+            border: '1px solid var(--color-rgb-255-255-255-0-03)',
             padding: '2px 6px',
             borderRadius: '4px',
             color: 'var(--text-secondary)'

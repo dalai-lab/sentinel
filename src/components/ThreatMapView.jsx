@@ -169,7 +169,7 @@ export default function ThreatMapView() {
           <select
             value={timeWindow}
             onChange={e => setTimeWindow(parseInt(e.target.value))}
-            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.03)', color: 'var(--text-primary)', padding: '5px 10px', borderRadius: 'var(--radius-sm)', outline: 'none', cursor: 'pointer', fontSize: '0.74rem' }}
+            style={{ background: 'var(--color-rgb-255-255-255-0-02)', border: '1px solid var(--color-rgb-255-255-255-0-03)', color: 'var(--text-primary)', padding: '5px 10px', borderRadius: 'var(--radius-sm)', outline: 'none', cursor: 'pointer', fontSize: '0.74rem' }}
           >
             {TIME_WINDOWS.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
           </select>
@@ -184,10 +184,10 @@ export default function ThreatMapView() {
         {[
           { icon: ShieldAlert, label: 'Total Attempts', value: totalAttacks.toLocaleString(), color: 'var(--status-danger)', sub: 'blocked by SSH' },
           { icon: Globe, label: 'Unique Attackers', value: uniqueIPs.toLocaleString(), color: 'var(--status-warning)', sub: 'distinct IPs' },
-          { icon: TrendingUp, label: 'Top Origin', value: topCountry, color: '#8b5cf6', sub: topCountries[0] ? `${topCountries[0].hits} attempts` : 'no origin logs' },
-          { icon: Server, label: 'Most Targeted', value: mostTargeted, color: '#06b6d4', sub: targetMap[mostTargeted] ? `${targetMap[mostTargeted]} hits` : 'no target logs' },
+          { icon: TrendingUp, label: 'Top Origin', value: topCountry, color: 'var(--color-hex-8b5cf6)', sub: topCountries[0] ? `${topCountries[0].hits} attempts` : 'no origin logs' },
+          { icon: Server, label: 'Most Targeted', value: mostTargeted, color: 'var(--color-hex-06b6d4)', sub: targetMap[mostTargeted] ? `${targetMap[mostTargeted]} hits` : 'no target logs' },
         ].map(({ icon: Icon, label, value, color, sub }) => (
-          <div key={label} style={{ padding: '20px 24px', background: 'rgba(255,255,255,0.003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div key={label} style={{ padding: '20px 24px', background: 'var(--color-rgb-255-255-255-0-003)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '0.72rem', fontWeight: 500, color: 'var(--text-secondary)' }}>{label}</span>
               <Icon size={14} color={color} />
@@ -208,7 +208,7 @@ export default function ThreatMapView() {
       ) : (
         <div className="threat-map-container" ref={mapContainerRef}>
           {loading && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(9,9,11,0.6)', zIndex: 20 }}>
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-rgb-9-9-11-0-6)', zIndex: 20 }}>
               <RefreshCw size={20} className="spin" color="var(--text-primary)" />
             </div>
           )}
@@ -222,12 +222,12 @@ export default function ThreatMapView() {
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill="rgba(255, 255, 255, 0.015)"
-                      stroke="rgba(255, 255, 255, 0.04)"
+                      fill="var(--color-rgb-255-255-255-0-015)"
+                      stroke="var(--color-rgb-255-255-255-0-04)"
                       strokeWidth={0.5}
                       style={{
                         default: { outline: 'none' },
-                        hover: { fill: 'rgba(255, 255, 255, 0.035)', outline: 'none' },
+                        hover: { fill: 'var(--color-rgb-255-255-255-0-035)', outline: 'none' },
                         pressed: { outline: 'none' },
                       }}
                     />
@@ -238,8 +238,8 @@ export default function ThreatMapView() {
               {/* Server target markers */}
               {Object.entries(SERVER_LOCATIONS).map(([name, coords]) => (
                 <Marker key={name} coordinates={[coords.lon, coords.lat]}>
-                  <circle r={4} fill="#818cf8" />
-                  <circle r={10} fill="#818cf8" opacity={0.12} />
+                  <circle r={4} fill="var(--color-hex-818cf8)" />
+                  <circle r={10} fill="var(--color-hex-818cf8)" opacity={0.12} />
                   <text textAnchor="middle" y={-9} style={{ fill: 'var(--text-secondary)', fontSize: '7px', fontWeight: 500, pointerEvents: 'none' }}>
                     {coords.label}
                   </text>
@@ -265,7 +265,7 @@ export default function ThreatMapView() {
           {/* FLOATING OVERLAY: Top Countries (Top Right) */}
           <div className="threat-overlay countries-overlay">
             <div style={{ fontWeight: 500, fontSize: '0.74rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
-              <Globe size={12} color="#8b5cf6" /> Top Origin Countries
+              <Globe size={12} color="var(--color-hex-8b5cf6)" /> Top Origin Countries
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {topCountries.length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>No data yet…</div>}
@@ -284,8 +284,8 @@ export default function ThreatMapView() {
                         <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginLeft: '3px' }}>{c.ips} IPs</span>
                       </div>
                     </div>
-                    <div style={{ height: '2px', background: 'rgba(255,255,255,0.02)', borderRadius: '1px', overflow: 'hidden' }}>
-                      <div style={{ height: '100%', width: `${barPct}%`, background: i === 0 ? 'var(--status-danger)' : 'rgba(239,68,68,0.4)', borderRadius: '1px', transition: 'width 0.4s ease' }} />
+                    <div style={{ height: '2px', background: 'var(--color-rgb-255-255-255-0-02)', borderRadius: '1px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${barPct}%`, background: i === 0 ? 'var(--status-danger)' : 'var(--color-rgb-239-68-68-0-4)', borderRadius: '1px', transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
                 );
@@ -309,8 +309,8 @@ export default function ThreatMapView() {
                     style={{
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       padding: '5px 6px', borderRadius: 'var(--radius-sm)', cursor: 'pointer',
-                      background: selectedOrigin === atk.ip ? 'rgba(251,191,36,0.02)' : 'rgba(255,255,255,0.006)',
-                      border: `1px solid ${selectedOrigin === atk.ip ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.015)'}`,
+                      background: selectedOrigin === atk.ip ? 'var(--color-rgb-251-191-36-0-02)' : 'var(--color-rgb-255-255-255-0-006)',
+                      border: `1px solid ${selectedOrigin === atk.ip ? 'var(--color-rgb-251-191-36-0-15)' : 'var(--color-rgb-255-255-255-0-015)'}`,
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -336,22 +336,22 @@ export default function ThreatMapView() {
           {/* FLOATING OVERLAY: Attacks Per Server (Bottom Left) */}
           <div className="threat-overlay targets-overlay">
             <div style={{ fontWeight: 500, fontSize: '0.74rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)' }}>
-              <Server size={12} color="#06b6d4" /> Target Distribution
+              <Server size={12} color="var(--color-hex-06b6d4)" /> Target Distribution
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
               {Object.entries(targetMap).sort((a, b) => b[1] - a[1]).map(([server, hits]) => (
-                <div key={server} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.015)' }}>
+                <div key={server} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 0', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)' }}>
                   <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>{server}</span>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 600, color: '#06b6d4' }}>{hits.toLocaleString()}</span>
+                  <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--color-hex-06b6d4)' }}>{hits.toLocaleString()}</span>
                 </div>
               ))}
               {Object.keys(targetMap).length === 0 && <div style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>No data.</div>}
             </div>
 
             {/* Map Legend inline */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.03)', fontSize: '0.58rem', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '10px', paddingTop: '8px', borderTop: '1px solid var(--color-rgb-255-255-255-0-03)', fontSize: '0.58rem', color: 'var(--text-muted)' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--status-danger)', display: 'inline-block' }} /> Attack Source</span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: '#818cf8', display: 'inline-block' }} /> Server Target</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--color-hex-818cf8)', display: 'inline-block' }} /> Server Target</span>
             </div>
           </div>
 

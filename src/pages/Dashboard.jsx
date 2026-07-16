@@ -487,8 +487,8 @@ export default function Dashboard() {
           transition: var(--transition);
         }
         .command-copy-box:hover {
-          background: rgba(99, 102, 241, 0.08) !important;
-          border-color: rgba(99, 102, 241, 0.3) !important;
+          background: var(--color-rgb-99-102-241-0-08) !important;
+          border-color: var(--color-rgb-99-102-241-0-3) !important;
         }
 
         @media (min-width: 1024px) {

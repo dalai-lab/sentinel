@@ -31,8 +31,8 @@ export default function OverviewScansWidget() {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
-      border: '1px solid rgba(255,255,255,0.03)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
+      border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
       padding: '20px 24px',
       display: 'flex',
@@ -41,7 +41,7 @@ export default function OverviewScansWidget() {
       height: '380px',
       overflow: 'hidden'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.015)', paddingBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)', paddingBottom: '12px' }}>
         <h3 style={{ margin: 0, fontSize: '0.76rem', fontWeight: 500, color: 'var(--text-primary)' }}>Recent Scans</h3>
       </div>
 
@@ -63,8 +63,8 @@ export default function OverviewScansWidget() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   padding: '10px 12px',
-                  background: infected ? 'rgba(239, 68, 68, 0.02)' : 'rgba(255, 255, 255, 0.005)',
-                  border: `1px solid ${infected ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255,255,255,0.02)'}`,
+                  background: infected ? 'var(--color-rgb-239-68-68-0-02)' : 'var(--color-rgb-255-255-255-0-005)',
+                  border: `1px solid ${infected ? 'var(--color-rgb-239-68-68-0-1)' : 'var(--color-rgb-255-255-255-0-02)'}`,
                   borderRadius: 'var(--radius-sm)'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0, flex: 1 }}>

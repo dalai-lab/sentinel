@@ -37,7 +37,7 @@ function HBar({ label, value, icon: Icon }) {
         </div>
         <span style={{ fontSize: '0.74rem', fontWeight: 650, color: c }}>{n.toFixed(0)}%</span>
       </div>
-      <div style={{ height: '3px', background: 'rgba(255,255,255,0.05)', borderRadius: '2px', overflow: 'hidden' }}>
+      <div style={{ height: '3px', background: 'var(--color-rgb-255-255-255-0-05)', borderRadius: '2px', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${n}%`, background: c, borderRadius: '2px', transition: 'width 0.6s ease' }} />
       </div>
     </div>
@@ -48,11 +48,11 @@ function SparklineTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: '#09090b',
-      border: '1px solid rgba(255,255,255,0.05)',
+      background: 'var(--color-hex-09090b)',
+      border: '1px solid var(--color-rgb-255-255-255-0-05)',
       borderRadius: 'var(--radius-sm)',
       padding: '6px 10px',
-      boxShadow: '0 10px 30px -10px rgba(0,0,0,0.7)',
+      boxShadow: '0 10px 30px -10px var(--color-rgb-0-0-0-0-7)',
       display: 'flex',
       flexDirection: 'column',
       gap: '3px'
@@ -95,15 +95,15 @@ function LargeSparkline({ cpuValues, ramValues, diskValues }) {
           <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'var(--status-healthy)' }}>
             <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--status-healthy)' }} /> CPU
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: '#a78bfa' }}>
-            <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#a78bfa' }} /> RAM
+          <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'var(--color-hex-a78bfa)' }}>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--color-hex-a78bfa)' }} /> RAM
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'var(--status-warning)' }}>
             <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--status-warning)' }} /> Disk
           </span>
         </div>
       </div>
-      <div style={{ height: '140px', position: 'relative', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', overflow: 'hidden' }}>
+      <div style={{ height: '140px', position: 'relative', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', overflow: 'hidden' }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
             <defs>
@@ -112,8 +112,8 @@ function LargeSparkline({ cpuValues, ramValues, diskValues }) {
                 <stop offset="95%" stopColor="var(--status-healthy)" stopOpacity={0}/>
               </linearGradient>
               <linearGradient id="sparklineRam" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.16}/>
-                <stop offset="95%" stopColor="#a78bfa" stopOpacity={0}/>
+                <stop offset="5%" stopColor="var(--color-hex-a78bfa)" stopOpacity={0.16}/>
+                <stop offset="95%" stopColor="var(--color-hex-a78bfa)" stopOpacity={0}/>
               </linearGradient>
               <linearGradient id="sparklineDisk" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="var(--status-warning)" stopOpacity={0.16}/>
@@ -122,9 +122,9 @@ function LargeSparkline({ cpuValues, ramValues, diskValues }) {
             </defs>
             <XAxis dataKey="time" hide={true} />
             <YAxis domain={[0, 100]} hide={true} />
-            <Tooltip content={<SparklineTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
+            <Tooltip content={<SparklineTooltip />} cursor={{ stroke: 'var(--color-rgb-255-255-255-0-05)', strokeWidth: 1 }} />
             <Area type="monotone" dataKey="CPU" stroke="var(--status-healthy)" fill="url(#sparklineCpu)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px var(--status-healthy)30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
-            <Area type="monotone" dataKey="RAM" stroke="#a78bfa" fill="url(#sparklineRam)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px #a78bfa30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
+            <Area type="monotone" dataKey="RAM" stroke="var(--color-hex-a78bfa)" fill="url(#sparklineRam)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px var(--color-hex-a78bfa)30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
             <Area type="monotone" dataKey="Disk" stroke="var(--status-warning)" fill="url(#sparklineDisk)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px var(--status-warning)30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
           </AreaChart>
         </ResponsiveContainer>
@@ -140,7 +140,7 @@ const SERVER_DETAILS = {
   'Dalai':                  { ip: '168.231.122.248', host: 'srv1055295', role: 'Web Server', services: ['Dalai.in Services'], os: 'Debian 11 Stable' },
 };
 
-const ROLE_COLORS = { 'Central Hub': '#8b5cf6', 'Web Server': '#06b6d4' };
+const ROLE_COLORS = { 'Central Hub': 'var(--color-hex-8b5cf6)', 'Web Server': 'var(--color-hex-06b6d4)' };
 
 export default function ServerList({ servers, onSelectServer }) {
   const onlineCount = (servers || []).filter(s => s.status === 'online').length;
@@ -234,8 +234,8 @@ export default function ServerList({ servers, onSelectServer }) {
               fontSize: '0.7rem',
               fontWeight: 500,
               color: color,
-              background: 'rgba(255,255,255,0.01)',
-              border: '1px solid rgba(255,255,255,0.02)',
+              background: 'var(--color-rgb-255-255-255-0-01)',
+              border: '1px solid var(--color-rgb-255-255-255-0-02)',
               padding: '4px 10px',
               borderRadius: 'var(--radius-sm)'
             }}>
@@ -257,27 +257,27 @@ export default function ServerList({ servers, onSelectServer }) {
             const isOnline = live?.status === 'online';
             const isCrit = isOnline && (parseFloat(live?.cpu) > 85 || parseFloat(live?.ram) > 85 || parseFloat(live?.disk) > 85);
             const isWarn = isOnline && !isCrit && (parseFloat(live?.cpu) > 70 || parseFloat(live?.ram) > 70 || parseFloat(live?.disk) > 70);
-            const roleColor = ROLE_COLORS[info.role] || '#818cf8';
+            const roleColor = ROLE_COLORS[info.role] || 'var(--color-hex-818cf8)';
 
-            let borderColor = 'rgba(255,255,255,0.03)';
+            let borderColor = 'var(--color-rgb-255-255-255-0-03)';
             if (isOnline) {
-              if (isCrit) { borderColor = 'rgba(239, 68, 68, 0.15)'; }
-              else if (isWarn) { borderColor = 'rgba(245, 158, 11, 0.15)'; }
+              if (isCrit) { borderColor = 'var(--color-rgb-239-68-68-0-15)'; }
+              else if (isWarn) { borderColor = 'var(--color-rgb-245-158-11-0-15)'; }
             }
 
             return (
               <div key={name} className="server-row-container" style={{ borderColor }}
                 onClick={() => onSelectServer && onSelectServer(name)}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'rgba(255,255,255,0.01)'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = 'rgba(255,255,255,0.005)'; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-1)'; e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-01)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor; e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-005)'; }}
               >
                 {/* Column 1: Details & Telemetry Progress Bars */}
                 <div className="server-row-col1">
                   {/* Identity Header */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <div style={{
-                      background: 'rgba(255, 255, 255, 0.01)',
-                      border: '1px solid rgba(255,255,255,0.02)',
+                      background: 'var(--color-rgb-255-255-255-0-01)',
+                      border: '1px solid var(--color-rgb-255-255-255-0-02)',
                       borderRadius: 'var(--radius-sm)',
                       padding: '8px',
                       position: 'relative',
@@ -295,7 +295,7 @@ export default function ServerList({ servers, onSelectServer }) {
                           height: '6px',
                           borderRadius: '50%',
                           backgroundColor: 'var(--status-healthy)',
-                          border: '1px solid #09090b'
+                          border: '1px solid var(--color-hex-09090b)'
                         }} />
                       )}
                     </div>
@@ -303,20 +303,20 @@ export default function ServerList({ servers, onSelectServer }) {
                       <div style={{ fontWeight: 500, fontSize: '0.85rem', color: 'var(--text-primary)', marginBottom: '2px' }}>{name}</div>
                       <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.68rem', fontFamily: 'monospace', color: 'var(--text-muted)' }}><Globe size={10} />{info.ip}</span>
-                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.01)', padding: '1px 6px', borderRadius: '3px', border: '1px solid rgba(255,255,255,0.02)' }}>{info.os}</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-secondary)', background: 'var(--color-rgb-255-255-255-0-01)', padding: '1px 6px', borderRadius: '3px', border: '1px solid var(--color-rgb-255-255-255-0-02)' }}>{info.os}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Telemetry Progress Bars */}
                   {isOnline && live ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '10px 12px' }}>
                       <HBar label="CPU Usage" value={live.cpu} icon={Cpu} />
                       <HBar label="Memory" value={live.ram} icon={Layers} />
                       <HBar label="Root Disk" value={live.disk} icon={HardDrive} />
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '12px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)', fontSize: '0.74rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '12px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', color: 'var(--text-muted)', fontSize: '0.74rem' }}>
                       <XCircle size={12} /> Host offline — no metrics
                     </div>
                   )}
@@ -330,7 +330,7 @@ export default function ServerList({ servers, onSelectServer }) {
                     diskValues={metricsHistory[name]?.disk || [{ val: parseFloat(live.disk) || 0, ts: Date.now() }]} 
                   />
                 ) : (
-                  <div style={{ flex: 1, height: '140px', border: '1px dashed rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.74rem' }}>
+                  <div style={{ flex: 1, height: '140px', border: '1px dashed var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.74rem' }}>
                     No historical data
                   </div>
                 )}
@@ -342,7 +342,7 @@ export default function ServerList({ servers, onSelectServer }) {
                     <div style={{ fontSize: '0.62rem', fontWeight: 500, color: roleColor, background: `${roleColor}08`, border: `1px solid ${roleColor}15`, padding: '2px 8px', borderRadius: '4px' }}>
                       {info.role}
                     </div>
-                    <div style={{ fontSize: '0.62rem', fontWeight: 500, color: isOnline ? 'var(--status-healthy)' : 'var(--text-muted)', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', padding: '2px 8px', borderRadius: '4px' }}>
+                    <div style={{ fontSize: '0.62rem', fontWeight: 500, color: isOnline ? 'var(--status-healthy)' : 'var(--text-muted)', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', padding: '2px 8px', borderRadius: '4px' }}>
                       {isOnline ? 'Active' : 'Offline'}
                     </div>
                   </div>
@@ -354,7 +354,7 @@ export default function ServerList({ servers, onSelectServer }) {
                         { label: 'Load', value: live.load || '—' },
                         { label: 'Uptime', value: uptime(live.uptime) },
                       ].map(({ label, value }) => (
-                        <div key={label} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '4px 6px' }}>
+                        <div key={label} style={{ background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '4px 6px' }}>
                           <span style={{ fontSize: '0.55rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 650, display: 'block', marginBottom: '1px' }}>{label}</span>
                           <span style={{ fontSize: '0.68rem', fontWeight: 600, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{value}</span>
                         </div>
@@ -366,7 +366,7 @@ export default function ServerList({ servers, onSelectServer }) {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                       {info.services.map(svc => (
-                        <div key={svc} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: '3px', padding: '2px 6px' }}>
+                        <div key={svc} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: '3px', padding: '2px 6px' }}>
                           <span style={{ width: 4, height: 4, borderRadius: '50%', background: isOnline ? 'var(--status-healthy)' : 'var(--text-muted)', display: 'inline-block' }} />
                           <span style={{ fontSize: '0.62rem', color: 'var(--text-secondary)' }}>{svc}</span>
                         </div>
@@ -375,7 +375,7 @@ export default function ServerList({ servers, onSelectServer }) {
                     {isOnline && (
                       <div style={{ display: 'flex', gap: '4px' }}>
                         {[{ label: 'node', port: '9100' }, { label: 'otel', port: 'active' }].map(s => (
-                          <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', gap: '6px', fontSize: '0.58rem', color: 'var(--text-muted)', fontFamily: 'monospace', padding: '1px 4px', borderRadius: '3px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)' }}>
+                          <div key={s.label} style={{ display: 'flex', justifyContent: 'space-between', gap: '6px', fontSize: '0.58rem', color: 'var(--text-muted)', fontFamily: 'monospace', padding: '1px 4px', borderRadius: '3px', background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)' }}>
                             <span>{s.label}</span>
                             <span style={{ color: 'var(--status-healthy)', fontWeight: 600 }}>{s.port}</span>
                           </div>

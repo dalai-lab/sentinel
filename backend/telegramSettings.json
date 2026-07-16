@@ -1,0 +1,14 @@
+{
+  "botToken": "8846365524:AAHD-E9JlzMCTVjBj9xi0edZn5KACIIX7yI",
+  "recipients": [
+    {
+      "id": "tg_1784216130029",
+      "name": "sleepyarno",
+      "chatId": "5587057392",
+      "active": true
+    }
+  ],
+  "active": true,
+  "pendingQueue": [],
+  "lastUpdateId": 965210817
+}

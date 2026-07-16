@@ -99,7 +99,7 @@ export default function LogConsole() {
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)', position: 'relative', overflow: 'hidden' }}>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
+          <div style={{ background: 'var(--color-rgb-255-255-255-0-02)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', display: 'flex' }}>
             <Terminal size={14} color="var(--text-secondary)" />
           </div>
           <h3 style={{ margin: 0, fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-primary)' }}>Application Telemetry</h3>
@@ -113,7 +113,7 @@ export default function LogConsole() {
           refreshLogs={refreshLogs} loading={loading}
         />
 
-        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'rgba(0,0,0,0.15)', marginTop: '12px' }} className="custom-scrollbar">
+        <div ref={scrollContainerRef} style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--color-rgb-0-0-0-0-15)', marginTop: '12px' }} className="custom-scrollbar">
           
           {loading && logs.length === 0 && (
             <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -148,8 +148,8 @@ export default function LogConsole() {
                 }}
                 disabled={fetchingOlder}
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'var(--color-rgb-255-255-255-0-05)',
+                  border: '1px solid var(--color-rgb-255-255-255-0-1)',
                   padding: '10px 24px',
                   borderRadius: '24px',
                   color: 'var(--text-color)',
@@ -160,10 +160,10 @@ export default function LogConsole() {
                   alignItems: 'center',
                   gap: '8px',
                   transition: 'all 0.2s',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  boxShadow: '0 4px 12px var(--color-rgb-0-0-0-0-1)'
                 }}
-                onMouseEnter={e => { if(!fetchingOlder) e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; }}
-                onMouseLeave={e => { if(!fetchingOlder) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                onMouseEnter={e => { if(!fetchingOlder) e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-1)'; }}
+                onMouseLeave={e => { if(!fetchingOlder) e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-05)'; }}
               >
                 {fetchingOlder ? (
                   <>

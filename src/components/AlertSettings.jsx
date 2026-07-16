@@ -111,7 +111,7 @@ export default function AlertSettings() {
     const v = val ?? 50;
     const pct = ((v - 10) / 90) * 100;
     return {
-      background: `linear-gradient(to right, var(--text-primary) 0%, var(--text-primary) ${pct}%, rgba(255, 255, 255, 0.05) ${pct}%, rgba(255, 255, 255, 0.05) 100%)`
+      background: `linear-gradient(to right, var(--text-primary) 0%, var(--text-primary) ${pct}%, var(--color-rgb-255-255-255-0-05) ${pct}%, var(--color-rgb-255-255-255-0-05) 100%)`
     };
   };
 
@@ -119,8 +119,8 @@ export default function AlertSettings() {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
-      border: '1px solid rgba(255,255,255,0.03)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
+      border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
       padding: '20px 24px',
       display: 'flex',
@@ -151,7 +151,7 @@ export default function AlertSettings() {
             }}
           >
             {SERVER_LIST.map(s => (
-              <option key={s.id} value={s.id} style={{ background: '#09090b' }}>
+              <option key={s.id} value={s.id} style={{ background: 'var(--color-hex-09090b)' }}>
                 {s.name}
               </option>
             ))}
@@ -161,8 +161,8 @@ export default function AlertSettings() {
 
       {selectedScope !== 'global' && (
         <div style={{
-          background: isOverridden ? 'rgba(16,185,129,0.02)' : 'rgba(255,255,255,0.01)',
-          border: `1px solid ${isOverridden ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.02)'}`,
+          background: isOverridden ? 'var(--color-rgb-16-185-129-0-02)' : 'var(--color-rgb-255-255-255-0-01)',
+          border: `1px solid ${isOverridden ? 'var(--color-rgb-16-185-129-0-15)' : 'var(--color-rgb-255-255-255-0-02)'}`,
           borderRadius: 'var(--radius-sm)',
           padding: '10px 14px',
           display: 'flex',
@@ -192,7 +192,7 @@ export default function AlertSettings() {
         
         {/* CPU Threshold */}
         <div style={{
-          background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
             <Cpu size={14} color="var(--text-muted)" />
@@ -215,7 +215,7 @@ export default function AlertSettings() {
 
         {/* RAM Threshold */}
         <div style={{
-          background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
             <Server size={14} color="var(--text-muted)" />
@@ -238,7 +238,7 @@ export default function AlertSettings() {
 
         {/* Disk Threshold */}
         <div style={{
-          background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
             <HardDrive size={14} color="var(--text-muted)" />
@@ -261,7 +261,7 @@ export default function AlertSettings() {
 
         {/* Antivirus Toggle */}
         <div style={{
-          background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px',
+          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--color-rgb-255-255-255-0-02)', borderRadius: 'var(--radius-sm)', padding: '12px 14px',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

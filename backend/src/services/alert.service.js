@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const signozService = require('./signoz.service');
 const emailService = require('./emailService');
+const telegramService = require('./telegramService');
 
 const SETTINGS_PATH = path.join(__dirname, '../config/alertSettings.json');
 const ALERTS_HISTORY_PATH = path.join(__dirname, '../config/alertsHistory.json');
@@ -11,9 +12,9 @@ class AlertService {
     this.settings = this.loadSettings();
     this.alerts = this.loadAlerts();
     this.intervalId = null;
-    
+
     // To prevent spamming the exact same alert repeatedly
-    this.lastTriggered = {}; 
+    this.lastTriggered = {};
   }
 
   loadSettings() {
@@ -105,19 +106,24 @@ class AlertService {
     };
 
     this.alerts.push(newAlert);
-    
+
     // Keep max 100 alerts in history
     if (this.alerts.length > 100) {
       this.alerts = this.alerts.slice(-100);
     }
-    
+
     this.saveAlerts();
     this.lastTriggered[dedupKey] = now;
     console.log(`[ALERT SERVICE] 🚨 New Alert Triggered: [${alert.severity.toUpperCase()}] ${alert.title} on ${alert.host}`);
-    
+
     // Dispatch Email Notification via ZeptoMail SMTP
     emailService.sendAlertNotification(newAlert).catch(err => {
       console.error('[ALERT SERVICE] Email forwarding error:', err.message);
+    });
+
+    // Dispatch Telegram Notification
+    telegramService.sendAlertNotification(newAlert).catch(err => {
+      console.error('[ALERT SERVICE] Telegram forwarding error:', err.message);
     });
   }
 
@@ -221,7 +227,7 @@ class AlertService {
   start() {
     console.log('[ALERT SERVICE] Initializing custom alerting daemon...');
     this.checkState();
-    
+
     // Check thresholds every 60 seconds
     this.intervalId = setInterval(() => {
       this.checkState();

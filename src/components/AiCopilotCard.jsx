@@ -11,20 +11,20 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
   const moodColors = {
     healthy: {
       color: 'var(--status-healthy)',
-      bg: 'rgba(16, 185, 129, 0.04)',
-      border: 'rgba(16, 185, 129, 0.15)',
+      bg: 'var(--color-rgb-16-185-129-0-04)',
+      border: 'var(--color-rgb-16-185-129-0-15)',
       icon: <ShieldCheck size={14} color="var(--status-healthy)" />
     },
     warning: {
       color: 'var(--status-warning)',
-      bg: 'rgba(245, 158, 11, 0.04)',
-      border: 'rgba(245, 158, 11, 0.15)',
+      bg: 'var(--color-rgb-245-158-11-0-04)',
+      border: 'var(--color-rgb-245-158-11-0-15)',
       icon: <AlertTriangle size={14} color="var(--status-warning)" />
     },
     critical: {
       color: 'var(--status-danger)',
-      bg: 'rgba(239, 68, 68, 0.04)',
-      border: 'rgba(239, 68, 68, 0.15)',
+      bg: 'var(--color-rgb-239-68-68-0-04)',
+      border: 'var(--color-rgb-239-68-68-0-15)',
       icon: <AlertTriangle size={14} color="var(--status-danger)" />
     }
   };
@@ -107,14 +107,14 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         const code = lines.slice(1, -1).join('\n');
         return (
           <div key={idx} style={{
-            background: 'rgba(0, 0, 0, 0.2)',
-            border: '1px solid rgba(255,255,255,0.03)',
+            background: 'var(--color-rgb-0-0-0-0-2)',
+            border: '1px solid var(--color-rgb-255-255-255-0-03)',
             borderRadius: 'var(--radius-sm)',
             padding: '10px 12px',
             margin: '8px 0',
             fontFamily: 'var(--font-mono, monospace)',
             fontSize: '0.74rem',
-            color: '#e5e7eb',
+            color: 'var(--color-hex-e5e7eb)',
             whiteSpace: 'pre-wrap',
             position: 'relative',
             overflowX: 'auto'
@@ -138,8 +138,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
-      border: '1px solid rgba(255,255,255,0.03)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
+      border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
       padding: '20px 24px',
       height: '380px',
@@ -155,7 +155,7 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '10px',
-        borderBottom: '1px solid rgba(255,255,255,0.015)',
+        borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)',
         paddingBottom: '12px',
         marginBottom: '16px',
         flexShrink: 0
@@ -226,8 +226,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
         {/* Top Threat Alert (If Active) */}
         {aiData.top_threat && (
           <div style={{
-            background: 'rgba(239, 68, 68, 0.02)',
-            border: '1px solid rgba(239, 68, 68, 0.1)',
+            background: 'var(--color-rgb-239-68-68-0-02)',
+            border: '1px solid var(--color-rgb-239-68-68-0-1)',
             borderRadius: 'var(--radius-sm)',
             padding: '8px 12px',
             display: 'flex',
@@ -239,15 +239,15 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
               <AlertTriangle size={12} color="var(--status-danger)" style={{ flexShrink: 0 }} />
               <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', minWidth: 0, flex: 1 }}>
                 <span style={{ color: 'var(--status-danger)', marginRight: '3px', fontWeight: 600 }}>Active Alert:</span>
-                Suspicious activity logged: <span className="text-mono" style={{ background: 'rgba(255,255,255,0.03)', padding: '1px 4px', borderRadius: '3px', fontSize: '0.68rem', wordBreak: 'break-all' }}>{aiData.top_threat}</span>
+                Suspicious activity logged: <span className="text-mono" style={{ background: 'var(--color-rgb-255-255-255-0-03)', padding: '1px 4px', borderRadius: '3px', fontSize: '0.68rem', wordBreak: 'break-all' }}>{aiData.top_threat}</span>
               </div>
             </div>
             <button 
               onClick={handleClearIncidents}
               disabled={loading}
               style={{
-                background: 'rgba(239, 68, 68, 0.05)',
-                border: '1px solid rgba(239, 68, 68, 0.15)',
+                background: 'var(--color-rgb-239-68-68-0-05)',
+                border: '1px solid var(--color-rgb-239-68-68-0-15)',
                 borderRadius: 'var(--radius-sm)',
                 color: 'var(--status-danger)',
                 fontSize: '0.65rem',
@@ -292,8 +292,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
           {/* Advice & Remediation */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.008)',
-            border: '1px solid rgba(255,255,255,0.02)',
+            background: 'var(--color-rgb-255-255-255-0-008)',
+            border: '1px solid var(--color-rgb-255-255-255-0-02)',
             borderRadius: 'var(--radius-sm)',
             padding: '10px 12px'
           }}>
@@ -312,8 +312,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                background: 'rgba(255, 255, 255, 0.015)',
-                border: '1px solid rgba(255,255,255,0.02)',
+                background: 'var(--color-rgb-255-255-255-0-015)',
+                border: '1px solid var(--color-rgb-255-255-255-0-02)',
                 borderRadius: 'var(--radius-sm)',
                 padding: '5px 10px',
                 cursor: 'pointer',
@@ -342,7 +342,7 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
 
         {/* Ask Copilot Interactive Section */}
         <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.015)',
+          borderTop: '1px solid var(--color-rgb-255-255-255-0-015)',
           paddingTop: '10px',
           marginTop: '6px'
         }}>
@@ -380,15 +380,15 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                   maxHeight: '140px',
                   overflowY: 'auto',
                   padding: '6px',
-                  background: 'rgba(255,255,255,0.01)',
+                  background: 'var(--color-rgb-255-255-255-0-01)',
                   borderRadius: 'var(--radius-sm)',
-                  border: '1px solid rgba(255,255,255,0.02)'
+                  border: '1px solid var(--color-rgb-255-255-255-0-02)'
                 }}>
                   {chatHistory.map((chat, idx) => (
                     <div key={idx} style={{
                       alignSelf: chat.sender === 'user' ? 'flex-end' : 'flex-start',
-                      background: chat.sender === 'user' ? 'rgba(255, 255, 255, 0.02)' : 'transparent',
-                      border: '1px solid rgba(255,255,255,0.02)',
+                      background: chat.sender === 'user' ? 'var(--color-rgb-255-255-255-0-02)' : 'transparent',
+                      border: '1px solid var(--color-rgb-255-255-255-0-02)',
                       borderRadius: '4px',
                       padding: '6px 10px',
                       maxWidth: '90%',
@@ -421,8 +421,8 @@ export default function AiCopilotCard({ aiData, servers, alerts, recentLogs, onC
                   disabled={loading}
                   style={{
                     flex: 1,
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '1px solid rgba(255,255,255,0.03)',
+                    background: 'var(--color-rgb-255-255-255-0-02)',
+                    border: '1px solid var(--color-rgb-255-255-255-0-03)',
                     borderRadius: 'var(--radius-sm)',
                     padding: '6px 10px',
                     fontSize: '0.74rem',

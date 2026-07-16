@@ -51,8 +51,8 @@ export default function AlertCenterWidget() {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.005)',
-      border: '1px solid rgba(255,255,255,0.03)',
+      background: 'var(--color-rgb-255-255-255-0-005)',
+      border: '1px solid var(--color-rgb-255-255-255-0-03)',
       borderRadius: 'var(--radius-md)',
       padding: '20px 24px',
       display: 'flex',
@@ -61,10 +61,10 @@ export default function AlertCenterWidget() {
       height: '380px',
       overflow: 'hidden'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.015)', paddingBottom: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)', paddingBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ 
-            background: activeAlerts.length > 0 ? 'rgba(239, 68, 68, 0.04)' : 'rgba(16, 185, 129, 0.04)',
+            background: activeAlerts.length > 0 ? 'var(--color-rgb-239-68-68-0-04)' : 'var(--color-rgb-16-185-129-0-04)',
             padding: '6px', 
             borderRadius: 'var(--radius-sm)',
             color: activeAlerts.length > 0 ? 'var(--status-danger)' : 'var(--status-healthy)',
@@ -89,8 +89,8 @@ export default function AlertCenterWidget() {
           </div>
         ) : activeAlerts.length === 0 ? (
           <div style={{ 
-            background: 'rgba(16, 185, 129, 0.01)', 
-            border: '1px solid rgba(16, 185, 129, 0.05)',
+            background: 'var(--color-rgb-16-185-129-0-01)', 
+            border: '1px solid var(--color-rgb-16-185-129-0-05)',
             borderRadius: 'var(--radius-sm)',
             padding: '14px 16px',
             display: 'flex',
@@ -109,11 +109,11 @@ export default function AlertCenterWidget() {
               const color = getSeverityColor(alert.severity);
               return (
                 <div key={alert.id} style={{
-                  background: 'rgba(255, 255, 255, 0.008)',
+                  background: 'var(--color-rgb-255-255-255-0-008)',
                   borderLeft: `2.5px solid ${color}`,
-                  borderTop: '1px solid rgba(255,255,255,0.015)',
-                  borderRight: '1px solid rgba(255,255,255,0.015)',
-                  borderBottom: '1px solid rgba(255,255,255,0.015)',
+                  borderTop: '1px solid var(--color-rgb-255-255-255-0-015)',
+                  borderRight: '1px solid var(--color-rgb-255-255-255-0-015)',
+                  borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)',
                   borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',
                   padding: '8px 12px',
                   display: 'flex',
@@ -156,8 +156,8 @@ export default function AlertCenterWidget() {
                   <button 
                     onClick={() => handleAcknowledge(alert.id)}
                     style={{
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.03)',
+                      background: 'var(--color-rgb-255-255-255-0-02)',
+                      border: '1px solid var(--color-rgb-255-255-255-0-03)',
                       color: 'var(--text-secondary)',
                       padding: '4px 8px',
                       borderRadius: 'var(--radius-sm)',
@@ -183,8 +183,8 @@ export default function AlertCenterWidget() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {historicalAlerts.slice(0, 3).map(alert => (
                 <div key={alert.id} style={{
-                  background: 'rgba(255,255,255,0.005)',
-                  border: '1px solid rgba(255,255,255,0.02)',
+                  background: 'var(--color-rgb-255-255-255-0-005)',
+                  border: '1px solid var(--color-rgb-255-255-255-0-02)',
                   borderRadius: 'var(--radius-sm)',
                   padding: '6px 8px',
                   display: 'flex',

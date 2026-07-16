@@ -58,10 +58,10 @@ export default function SshLoginsCard({ topThreat }) {
     if (activeTab === 'all') combined = [...allEvents, ...crowdSecEvents];
     else if (activeTab === 'logins') combined = allEvents.filter(e => e.status === 'success');
     else if (activeTab === 'failures') combined = allEvents.filter(e => e.status === 'failed' || e.status === 'disconnected');
-    else if (activeTab === 'security alerts') combined = crowdSecEvents;
+    else if (activeTab === 'security alerts') combined = crowdSecEvents.filter(e => !e.isWhitelisted);
 
     // Apply Filters
-    return combined.filter(e => {
+    let result = combined.filter(e => {
       if (serverFilter !== 'all' && e.server !== serverFilter) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
@@ -77,6 +77,28 @@ export default function SshLoginsCard({ topThreat }) {
       if (quickFilter === 'Suspected Bot Scans') return e.isBotScan || e.scenario;
       return true;
     }).sort((a, b) => (a.rawTs < b.rawTs ? 1 : a.rawTs > b.rawTs ? -1 : 0));
+
+    // ── Collapse Triggered Alert + Whitelisted pairs for the same IP ──────────
+    // If CrowdSec flagged an IP and then immediately whitelisted it (same IP),
+    // those two events are really one thing: "CDN traffic, auto-cleared".
+    // Merging avoids showing a scary alert for something harmless.
+    if (activeTab === 'all') {
+      const whitelistedIps = new Set(
+        result.filter(e => e.isWhitelisted).map(e => e.ip)
+      );
+      result = result.map(e => {
+        if (e.action === 'Triggered Alert' && whitelistedIps.has(e.ip)) {
+          // Convert this event into a collapsed auto-cleared CDN row
+          return { ...e, isWhitelisted: true, action: 'Banned (Whitelisted)', _collapsedCdn: true };
+        }
+        return e;
+      });
+      // Now deduplicate: remove standalone Whitelisted rows whose IP was already collapsed
+      const collapsedIps = new Set(result.filter(e => e._collapsedCdn).map(e => e.ip));
+      result = result.filter(e => !(e.isWhitelisted && !e._collapsedCdn && collapsedIps.has(e.ip)));
+    }
+
+    return result;
   }, [activeTab, allEvents, crowdSecEvents, serverFilter, searchQuery, quickFilter, ipGeo]);
 
   const uniqueServers = React.useMemo(() => {

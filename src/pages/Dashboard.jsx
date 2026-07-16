@@ -43,6 +43,9 @@ export default function Dashboard() {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeMobileWidget, setActiveMobileWidget] = useState('copilot');
+  const [initialGraphServer, setInitialGraphServer] = useState('all');
+  const [initialGraphMetric, setInitialGraphMetric] = useState(null);
+  const [graphBackServer, setGraphBackServer] = useState(null);
 
   const parseAiData = (rawText) => {
     try {
@@ -238,6 +241,11 @@ export default function Dashboard() {
         onTabChange={(tab) => {
           setSelectedServerName(null);
           setActiveTab(tab);
+          if (tab !== 'graphs') {
+            setInitialGraphServer('all');
+            setInitialGraphMetric(null);
+            setGraphBackServer(null);
+          }
         }}
       />
 
@@ -253,6 +261,13 @@ export default function Dashboard() {
           <ServerDetailView
             serverName={selectedServerName}
             onBack={() => setSelectedServerName(null)}
+            onNavigateToGraphs={(server, metric) => {
+              setInitialGraphServer(server);
+              setInitialGraphMetric(metric);
+              setGraphBackServer(server);
+              setSelectedServerName(null);
+              setActiveTab('graphs');
+            }}
           />
         ) : (
           <>
@@ -428,7 +443,16 @@ export default function Dashboard() {
             </>
           )}
 
-            {activeTab === 'graphs' && <GraphsView />}
+            {activeTab === 'graphs' && (
+              <GraphsView 
+                initialServer={initialGraphServer} 
+                initialMetric={initialGraphMetric} 
+                onBack={graphBackServer ? () => {
+                  setSelectedServerName(graphBackServer);
+                  setGraphBackServer(null);
+                } : null}
+              />
+            )}
             {activeTab === 'threatmap' && <ThreatMapView />}
 
             {activeTab === 'servers' && <ServerList servers={filteredServers} onSelectServer={setSelectedServerName} />}

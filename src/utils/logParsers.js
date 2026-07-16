@@ -1,9 +1,42 @@
 const SERVER_MAP = {
+  // by IP
   '80.225.241.81': 'Oracle DB Server',
   '31.97.235.136': 'Orbithyre',
   '168.231.122.248': 'Dalai',
-  '72.61.235.141': 'Gaplytiq'
+  '72.61.235.141': 'Gaplytiq',
+  // by hostname
+  'instance-20260630-1713': 'Oracle DB Server',
+  'srv1213878': 'Orbithyre',
+  'srv1176513': 'Gaplytiq',
+  'srv1055295': 'Dalai',
 };
+
+// Known CDN/cloud IP prefixes — safe infrastructure, not real attackers
+const CDN_PREFIXES = [
+  '172.64.', '172.65.', '172.66.', '172.67.', '172.68.', '172.69.',
+  '172.70.', '172.71.',   // Cloudflare 172.64.0.0/13
+  '104.16.', '104.17.', '104.18.', '104.19.', '104.20.', '104.21.',
+  '162.158.',             // Cloudflare
+  '103.21.244.', '103.22.200.', '103.31.4.',
+  '141.101.64.', '141.101.65.', '141.101.66.', '141.101.67.',
+];
+
+export function isKnownCdn(ip) {
+  if (!ip) return false;
+  return CDN_PREFIXES.some(p => ip.startsWith(p));
+}
+
+// Humanize a raw seconds string like "14.999252431s" or "61.2s"
+function formatDuration(raw) {
+  if (!raw) return raw;
+  const secs = parseFloat(raw);
+  if (isNaN(secs)) return raw;
+  const rounded = Math.round(secs);
+  if (rounded < 60) return `${rounded}s`;
+  const m = Math.floor(rounded / 60);
+  const s = rounded % 60;
+  return s > 0 ? `${m}m ${s}s` : `${m}m`;
+}
 
 export function getFriendlyServer(rawService) {
   if (!rawService) return 'Unknown Server';
@@ -37,7 +70,8 @@ export function parseSshEvent(log) {
     if (mu) user = mu[1]; if (ipMatch) ip = ipMatch[0]; if (mp) port = mp[1];
     action = 'Auth Failed'; status = 'failed';
   } else if (lowerMsg.includes('disconnected from user') || lowerMsg.includes('disconnected from invalid user') || lowerMsg.includes('disconnected from authenticating user')) {
-    const mu = msg.match(/user\s+(\S+)/i);
+    // Match actual username — it follows the type of user, before 'from IP'
+    const mu = msg.match(/disconnected from (?:invalid user |authenticating user |user )(\S+)/i);
     const ipMatch = msg.match(/\b(?:\d{1,3}\.){3}\d{1,3}\b/);
     const mp = msg.match(/port\s+(\d+)/i);
     if (mu) user = mu[1]; if (ipMatch) ip = ipMatch[0]; if (mp) port = mp[1];
@@ -114,7 +148,7 @@ export function parseCrowdSecEvent(log) {
     if (ipMatch) ip = ipMatch[0];
     if (scenarioMatch) scenario = scenarioMatch[1];
     if (eventsMatch) {
-      details = `${eventsMatch[1]} events over ${eventsMatch[2]}`;
+      details = `${eventsMatch[1]} events over ${formatDuration(eventsMatch[2])}`;
     }
     action = 'Triggered Alert';
   }
@@ -188,13 +222,24 @@ export function parseCrowdSecEvent(log) {
 }
 
 export function computeActiveSessions(sortedEvents) {
-  // Group by (serverRaw + port) — the real unique session identifier
-  const sessionState = {};
-  for (const e of sortedEvents) {
-    const key = `${e.serverRaw}__${e.port || e.ip}`;
-    if (!sessionState[key]) {
-      sessionState[key] = e;
+  // sortedEvents is newest-first. Reverse to process chronologically (oldest first).
+  const chronological = [...sortedEvents].reverse();
+  // key: server+port uniquely identifies an SSH session
+  const sessionState = {}; // key -> { event, closed }
+
+  for (const e of chronological) {
+    const key = `${e.serverRaw || e.server}__${e.port || e.ip}`;
+    if (e.status === 'success') {
+      // A new login — record as open session
+      sessionState[key] = { event: e, closed: false };
+    } else if (e.status === 'disconnected' && sessionState[key]) {
+      // The session was explicitly closed
+      sessionState[key].closed = true;
     }
   }
-  return Object.values(sessionState).filter(e => e.status === 'success');
+
+  // Only return sessions that were opened and never explicitly closed
+  return Object.values(sessionState)
+    .filter(s => !s.closed && s.event)
+    .map(s => s.event);
 }

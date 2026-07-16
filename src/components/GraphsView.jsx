@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { fetchServerMetricsRange } from '../api/signoz';
 import { getFriendlyName } from '../utils/serverMapping';
-import { Activity, Cpu, HardDrive, Wifi, RefreshCw, TrendingUp, TrendingDown, Minus, Maximize2, X } from 'lucide-react';
+import { Activity, Cpu, HardDrive, Wifi, RefreshCw, TrendingUp, TrendingDown, Minus, Maximize2, X, ArrowLeft } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine
@@ -38,8 +38,14 @@ const METRICS = [
   },
   {
     id: 'netRecv', label: 'Network In', unit: 'B/s', icon: Wifi,
-    color: '#f59e0b',
+    color: '#38bdf8',
     desc: 'Inbound bandwidth per server',
+    thresh: null,
+  },
+  {
+    id: 'netSent', label: 'Network Out', unit: 'B/s', icon: Wifi,
+    color: '#f59e0b',
+    desc: 'Outbound bandwidth per server',
     thresh: null,
   },
 ];
@@ -226,10 +232,23 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 10, right: 10, bottom: 0, left: -25 }}>
+              <defs>
+                {hosts.map(host => {
+                  const c = SERVER_COLORS[host] || metric.color;
+                  const safeId = `grad-${host.replace(/\s+/g, '-')}`;
+                  return (
+                    <linearGradient key={safeId} id={safeId} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={c} stopOpacity={0.16}/>
+                      <stop offset="95%" stopColor={c} stopOpacity={0.0}/>
+                    </linearGradient>
+                  );
+                })}
+              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.015)" vertical={false} />
               <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false} />
               <YAxis
                 stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} axisLine={false}
+                domain={metric.unit === '%' ? [0, 100] : ['auto', 'auto']}
                 tickFormatter={v => metric.unit === 'B/s' ? fmtBytes(v) : `${v}${metric.unit}`}
               />
               <Tooltip content={<CustomTooltip unit={metric.unit} />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
@@ -238,12 +257,15 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
               )}
               {hosts.map(host => {
                 const c = SERVER_COLORS[host] || metric.color;
+                const safeId = `grad-${host.replace(/\s+/g, '-')}`;
                 return (
                   <Area
                     key={host} type="monotone" dataKey={host}
-                    stroke={c} strokeWidth={1.2}
-                    fill="none"
+                    stroke={c} strokeWidth={2}
+                    fill={`url(#${safeId})`}
+                    style={{ filter: `drop-shadow(0px 2px 6px ${c}30)` }}
                     dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: c }}
+                    isAnimationActive={false}
                   />
                 );
               })}
@@ -276,12 +298,12 @@ function MetricPanel({ metric, rawSeries, timeRange, serverFilter, onExpand, isE
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
-export default function GraphsView() {
+export default function GraphsView({ initialServer = 'all', initialMetric = null, onBack }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState(3600);
-  const [serverFilter, setServerFilter] = useState('all');
-  const [expandedMetric, setExpandedMetric] = useState(null);
+  const [serverFilter, setServerFilter] = useState(initialServer);
+  const [expandedMetric, setExpandedMetric] = useState(initialMetric);
   const [lastUpdated, setLastUpdated] = useState(null);
 
   const load = useCallback(async () => {
@@ -313,7 +335,29 @@ export default function GraphsView() {
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Telemetry</span>
         </div>
         
-        <div className="graphs-title-row">
+        <div className="graphs-title-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {onBack && (
+            <button 
+              onClick={onBack} 
+              style={{
+                background: 'transparent',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '4px',
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+              className="graphs-back-btn"
+              aria-label="Go Back to Server"
+            >
+              <ArrowLeft size={14} />
+            </button>
+          )}
           <h2 style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap' }}>
             Telemetry Analytics
           </h2>

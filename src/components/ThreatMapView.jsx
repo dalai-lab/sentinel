@@ -2,7 +2,8 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { ComposableMap, Geographies, Geography, Marker } from 'react-simple-maps';
 import { fetchRealLogs, fetchIpInfo } from '../api/signoz';
 import { getFriendlyName } from '../utils/serverMapping';
-import { Map, ShieldAlert, Globe, Activity, TrendingUp, Clock, Server, RefreshCw } from 'lucide-react';
+import { isKnownCdn } from '../utils/logParsers';
+import { Map, ShieldAlert, Globe, Activity, TrendingUp, Clock, Server, RefreshCw, Building, Zap, Target } from 'lucide-react';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
@@ -57,7 +58,10 @@ export default function ThreatMapView() {
         const match = log.msg.match(ipRegex);
         if (isFailed && match) {
           const ip = match[0];
-          if (!ip.startsWith('10.') && !ip.startsWith('192.168.') && !ip.startsWith('172.')) {
+          // Filter out private/reserved IP ranges and known CDN providers (Cloudflare etc.)
+          const isPrivate = ip.startsWith('10.') || ip.startsWith('192.168.')
+            || /^172\.(1[6-9]|2\d|3[01])\./.test(ip); // only 172.16-31 are private
+          if (!isPrivate && !isKnownCdn(ip)) {
             ipsToLookup.push(ip);
             parsedLogs.push({ ...log, ip, hostFriendly: getFriendlyName(log.service || log.host || '') });
           }
@@ -363,11 +367,23 @@ export default function ThreatMapView() {
                 </div>
                 <div style={{ fontFamily: 'monospace', color: 'var(--text-primary)', fontWeight: 600, fontSize: '0.82rem', marginBottom: '6px' }}>{selectedOrigin}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '0.7rem', color: 'var(--text-secondary)' }}>
-                  {geo.country && <span>🌍 {geo.city ? `${geo.city}, ` : ''}{geo.country}</span>}
-                  {geo.isp && <span>🏢 {geo.isp}</span>}
-                  <span style={{ color: 'var(--status-danger)', fontWeight: 500 }}>⚡ {atk.hits} attempts</span>
+                  {geo.country && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Globe size={11} color="var(--text-muted)" /> {geo.city ? `${geo.city}, ` : ''}{geo.country}
+                    </span>
+                  )}
+                  {geo.isp && (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Building size={11} color="var(--text-muted)" /> {geo.isp}
+                    </span>
+                  )}
+                  <span style={{ color: 'var(--status-danger)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Zap size={11} color="var(--status-danger)" /> {atk.hits} attempts
+                  </span>
                   {Array.from(atk.targets || []).length > 0 && (
-                    <span>🎯 Targeting: {Array.from(atk.targets).join(', ')}</span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Target size={11} color="var(--text-muted)" /> Targeting: {Array.from(atk.targets).join(', ')}
+                    </span>
                   )}
                 </div>
               </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Server, Cpu, HardDrive, Clock, ShieldCheck, ShieldAlert, ArrowDown, ArrowUp, Activity, Globe, CheckCircle, XCircle, Layers } from 'lucide-react';
 import { fetchServerMetricsRange } from '../api/signoz';
 import { getFriendlyName } from '../utils/serverMapping';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 function formatNet(bytesPerSec) {
   if (!bytesPerSec || isNaN(bytesPerSec) || bytesPerSec <= 0) return '0 B/s';
@@ -43,24 +44,48 @@ function HBar({ label, value, icon: Icon }) {
   );
 }
 
+function SparklineTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: '#09090b',
+      border: '1px solid rgba(255,255,255,0.05)',
+      borderRadius: 'var(--radius-sm)',
+      padding: '6px 10px',
+      boxShadow: '0 10px 30px -10px rgba(0,0,0,0.7)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '3px'
+    }}>
+      <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '2px' }}>{label}</div>
+      {payload.map(p => (
+        <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '0.64rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: p.color }} />
+            {p.name}
+          </span>
+          <span style={{ fontSize: '0.68rem', fontWeight: 650, color: 'var(--text-primary)' }}>{p.value.toFixed(1)}%</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function LargeSparkline({ cpuValues, ramValues, diskValues }) {
   if (!cpuValues || cpuValues.length === 0) return null;
-  
-  const width = 360;
-  const height = 140;
-  
-  const getPoints = (vals) => {
-    return vals.map((val, idx) => {
-      const x = (idx / (vals.length - 1)) * width;
-      // Fixed 0-100 scale mapping to graph height with 6px padding
-      const y = height - 6 - (val / 100) * (height - 12);
-      return `${x},${y}`;
-    }).join(' ');
-  };
 
-  const cpuPoints = getPoints(cpuValues);
-  const ramPoints = ramValues ? getPoints(ramValues) : null;
-  const diskPoints = diskValues ? getPoints(diskValues) : null;
+  const chartData = React.useMemo(() => {
+    return cpuValues.map((item, idx) => {
+      const date = new Date(item.ts || Date.now());
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return {
+        time: timeStr,
+        CPU: item.val || 0,
+        RAM: ramValues?.[idx]?.val ?? 0,
+        Disk: diskValues?.[idx]?.val ?? 0,
+      };
+    });
+  }, [cpuValues, ramValues, diskValues]);
 
   return (
     <div className="server-sparkline-container">
@@ -78,16 +103,31 @@ function LargeSparkline({ cpuValues, ramValues, diskValues }) {
           </span>
         </div>
       </div>
-      <div style={{ height: '140px', position: 'relative', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '4px', overflow: 'hidden' }}>
-        <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" style={{ overflow: 'visible' }}>
-          <line x1="0" y1={height * 0.25} x2={width} y2={height * 0.25} stroke="rgba(255,255,255,0.03)" strokeDasharray="1 3" />
-          <line x1="0" y1={height * 0.5} x2={width} y2={height * 0.5} stroke="rgba(255,255,255,0.03)" strokeDasharray="1 3" />
-          <line x1="0" y1={height * 0.75} x2={width} y2={height * 0.75} stroke="rgba(255,255,255,0.03)" strokeDasharray="1 3" />
-          
-          <polyline fill="none" stroke="var(--status-healthy)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={cpuPoints} />
-          {ramPoints && <polyline fill="none" stroke="#a78bfa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={ramPoints} />}
-          {diskPoints && <polyline fill="none" stroke="var(--status-warning)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={diskPoints} />}
-        </svg>
+      <div style={{ height: '140px', position: 'relative', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '6px', overflow: 'hidden' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData} margin={{ top: 2, right: 2, left: 2, bottom: 2 }}>
+            <defs>
+              <linearGradient id="sparklineCpu" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--status-healthy)" stopOpacity={0.16}/>
+                <stop offset="95%" stopColor="var(--status-healthy)" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="sparklineRam" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.16}/>
+                <stop offset="95%" stopColor="#a78bfa" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="sparklineDisk" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--status-warning)" stopOpacity={0.16}/>
+                <stop offset="95%" stopColor="var(--status-warning)" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="time" hide={true} />
+            <YAxis domain={[0, 100]} hide={true} />
+            <Tooltip content={<SparklineTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 1 }} />
+            <Area type="monotone" dataKey="CPU" stroke="var(--status-healthy)" fill="url(#sparklineCpu)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px var(--status-healthy)30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
+            <Area type="monotone" dataKey="RAM" stroke="#a78bfa" fill="url(#sparklineRam)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px #a78bfa30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
+            <Area type="monotone" dataKey="Disk" stroke="var(--status-warning)" fill="url(#sparklineDisk)" strokeWidth={1.8} style={{ filter: 'drop-shadow(0px 2px 4px var(--status-warning)30)' }} dot={false} activeDot={{ r: 3, strokeWidth: 0 }} />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
@@ -117,7 +157,10 @@ export default function ServerList({ servers, onSelectServer }) {
         const processMetric = (seriesList, metricName) => {
           (seriesList || []).forEach(series => {
             const host = getFriendlyName(series.metric?.host_name);
-            const values = (series.values || []).map(v => parseFloat(v[1]) || 0);
+            const values = (series.values || []).map(v => ({
+              val: parseFloat(v[1]) || 0,
+              ts: parseFloat(v[0]) * 1000
+            }));
             
             if (!historyMap[host]) {
               historyMap[host] = { cpu: [], ram: [], disk: [] };
@@ -148,19 +191,20 @@ export default function ServerList({ servers, onSelectServer }) {
         const cpuVal = parseFloat(s.cpu) || 0;
         const ramVal = parseFloat(s.ram) || 0;
         const diskVal = parseFloat(s.disk) || 0;
+        const now = Date.now();
 
         let current = next[key];
         if (!current) {
           current = {
-            cpu: [cpuVal],
-            ram: [ramVal],
-            disk: [diskVal]
+            cpu: [{ val: cpuVal, ts: now }],
+            ram: [{ val: ramVal, ts: now }],
+            disk: [{ val: diskVal, ts: now }]
           };
         } else {
           current = {
-            cpu: [...current.cpu, cpuVal].slice(-30),
-            ram: [...current.ram, ramVal].slice(-30),
-            disk: [...current.disk, diskVal].slice(-30)
+            cpu: [...current.cpu, { val: cpuVal, ts: now }].slice(-30),
+            ram: [...current.ram, { val: ramVal, ts: now }].slice(-30),
+            disk: [...current.disk, { val: diskVal, ts: now }].slice(-30)
           };
         }
         next[key] = current;
@@ -168,6 +212,7 @@ export default function ServerList({ servers, onSelectServer }) {
       return next;
     });
   }, [servers]);
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', animation: 'fadeIn 0.4s ease' }}>
@@ -280,9 +325,9 @@ export default function ServerList({ servers, onSelectServer }) {
                 {/* Column 2: Large Telemetry Sparkline Graph */}
                 {isOnline && live ? (
                   <LargeSparkline 
-                    cpuValues={metricsHistory[name]?.cpu || [parseFloat(live.cpu) || 0]} 
-                    ramValues={metricsHistory[name]?.ram || [parseFloat(live.ram) || 0]} 
-                    diskValues={metricsHistory[name]?.disk || [parseFloat(live.disk) || 0]} 
+                    cpuValues={metricsHistory[name]?.cpu || [{ val: parseFloat(live.cpu) || 0, ts: Date.now() }]} 
+                    ramValues={metricsHistory[name]?.ram || [{ val: parseFloat(live.ram) || 0, ts: Date.now() }]} 
+                    diskValues={metricsHistory[name]?.disk || [{ val: parseFloat(live.disk) || 0, ts: Date.now() }]} 
                   />
                 ) : (
                   <div style={{ flex: 1, height: '140px', border: '1px dashed rgba(255,255,255,0.02)', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: '0.74rem' }}>

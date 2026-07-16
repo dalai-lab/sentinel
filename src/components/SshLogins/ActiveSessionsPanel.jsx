@@ -1,13 +1,14 @@
 import React from 'react';
-import { User, Activity, AlertTriangle, ShieldCheck } from 'lucide-react';
-import { computeActiveSessions } from '../../utils/logParsers';
+import { User, Activity, AlertTriangle } from 'lucide-react';
+import { isKnownCdn } from '../../utils/logParsers';
 
 export default function ActiveSessionsPanel({ events, ipGeo }) {
-  const activeSessions = computeActiveSessions(events);
+  // Exclude CDN IPs (Cloudflare etc.) from attack stats — they're not real attackers
+  const realFailures = events.filter(e => e.status === 'failed' && !isKnownCdn(e.ip));
 
   // Calculate top attacking countries
   const countryHits = {};
-  events.filter(e => e.status === 'failed').forEach(e => {
+  realFailures.forEach(e => {
     const geo = ipGeo[e.ip];
     if (geo && geo.country && geo.country !== 'Private Network') {
       if (!countryHits[geo.country]) {
@@ -21,18 +22,18 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
     .slice(0, 3)
     .map(([country, data]) => ({ country, attempts: data.attempts, countryCode: data.code }));
 
-  // Calculate top targeted accounts
+  // Calculate top targeted accounts (exclude CDN IPs)
   const accountHits = {};
-  events.filter(e => e.user && e.status === 'failed').forEach(e => {
+  realFailures.filter(e => e.user).forEach(e => {
     accountHits[e.user] = (accountHits[e.user] || 0) + 1;
   });
   const topAccounts = Object.entries(accountHits)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 3);
 
-  // Calculate top attacker IPs
+  // Calculate top attacker IPs (exclude CDN IPs)
   const ipHits = {};
-  events.filter(e => e.status === 'failed').forEach(e => {
+  realFailures.forEach(e => {
     ipHits[e.ip] = (ipHits[e.ip] || 0) + 1;
   });
   const topIps = Object.entries(ipHits)
@@ -107,32 +108,6 @@ export default function ActiveSessionsPanel({ events, ipGeo }) {
             );
           })}
           {topIps.length === 0 && <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>No failed logins.</span>}
-        </div>
-      </div>
-
-      {/* Active Sessions */}
-      <div style={{ background: 'rgba(255,255,255,0.005)', border: '1px solid rgba(255,255,255,0.03)', borderRadius: 'var(--radius-md)', padding: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-primary)', fontWeight: 500, fontSize: '0.76rem' }}>
-            <ShieldCheck size={12} color="var(--status-healthy)" />
-            Active Sessions
-          </div>
-          <span style={{ background: 'rgba(16,185,129,0.04)', color: 'var(--status-healthy)', border: '1px solid rgba(16,185,129,0.15)', padding: '1px 6px', borderRadius: '3px', fontSize: '0.62rem', fontWeight: 600 }}>
-            {activeSessions.length}
-          </span>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {activeSessions.map((session, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.74rem', color: 'var(--text-primary)', fontWeight: 600 }}>{session.user}</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{session.time}</span>
-              </div>
-              <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{session.ip}</span>
-              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>{session.server}</span>
-            </div>
-          ))}
-          {activeSessions.length === 0 && <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>No active SSH sessions.</span>}
         </div>
       </div>
       

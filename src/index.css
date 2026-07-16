@@ -475,13 +475,21 @@ select option {
 }
 
 .server-detail-title-text {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.15rem;
+  font-weight: 600;
   color: var(--text-primary);
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+}
+
+.premium-chart-card-hover {
+  transition: all 0.2s ease;
+}
+.premium-chart-card-hover:hover {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.015) !important;
 }
 
 .server-detail-title-text::before {

@@ -6,7 +6,9 @@ const config = {
   SIGNOZ_URL: process.env.SIGNOZ_URL || 'http://localhost:8080',
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_MODEL: process.env.OPENAI_MODEL || 'gpt-4o-mini',
-  VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY
+  VIRUSTOTAL_API_KEY: process.env.VIRUSTOTAL_API_KEY,
+  DASHBOARD_PASSWORD_HASH: process.env.DASHBOARD_PASSWORD_HASH,
+  JWT_SECRET: process.env.JWT_SECRET
 };
 
 if (!config.SIGNOZ_API_KEY) {

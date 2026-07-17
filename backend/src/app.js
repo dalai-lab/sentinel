@@ -11,6 +11,9 @@ const { verifyToken } = require('./middleware/auth.middleware');
 
 const app = express();
 
+// Trust proxy for rate limiter (required when behind Nginx/Docker)
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));

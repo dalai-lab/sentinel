@@ -40,6 +40,7 @@ class AlertService {
       enableTelegramAlerts: true,
       minSeverityForEmail: 'info',
       minSeverityForTelegram: 'warning',
+      gracePeriodMinutes: 3,
       overrides: {}
     };
   }
@@ -211,18 +212,20 @@ class AlertService {
         const val = parseFloat(r.value[1]);
         const host = r.metric.host_name;
         const threshold = this.settings.overrides?.[host]?.cpuThreshold ?? this.settings.cpuThreshold;
+        const gracePeriod = this.settings.overrides?.[host]?.gracePeriodMinutes ?? this.settings.gracePeriodMinutes ?? 3;
+        const gracePeriodMs = gracePeriod * 60 * 1000;
         const dedupKey = `${host}-cpu`;
         
         if (val > threshold) {
           if (!this.violationStarts[dedupKey]) {
             this.violationStarts[dedupKey] = Date.now();
-          } else if (Date.now() - this.violationStarts[dedupKey] >= 3 * 60 * 1000) {
+          } else if (Date.now() - this.violationStarts[dedupKey] >= gracePeriodMs) {
             this.triggerAlert({
               type: 'cpu',
               severity: val > 95 ? 'critical' : 'warning',
               host: this.getFriendlyName(host),
               title: 'High CPU Usage',
-              message: `CPU usage has been above ${threshold}% for over 3 minutes. Currently at ${val.toFixed(1)}%.`
+              message: `CPU usage has been above ${threshold}% for over ${gracePeriod} minutes. Currently at ${val.toFixed(1)}%.`
             });
           }
         } else {
@@ -236,18 +239,20 @@ class AlertService {
         const val = parseFloat(r.value[1]);
         const host = r.metric.host_name;
         const threshold = this.settings.overrides?.[host]?.ramThreshold ?? this.settings.ramThreshold;
+        const gracePeriod = this.settings.overrides?.[host]?.gracePeriodMinutes ?? this.settings.gracePeriodMinutes ?? 3;
+        const gracePeriodMs = gracePeriod * 60 * 1000;
         const dedupKey = `${host}-ram`;
 
         if (val > threshold) {
           if (!this.violationStarts[dedupKey]) {
             this.violationStarts[dedupKey] = Date.now();
-          } else if (Date.now() - this.violationStarts[dedupKey] >= 3 * 60 * 1000) {
+          } else if (Date.now() - this.violationStarts[dedupKey] >= gracePeriodMs) {
             this.triggerAlert({
               type: 'ram',
               severity: val > 95 ? 'critical' : 'warning',
               host: this.getFriendlyName(host),
               title: 'High Memory Usage',
-              message: `RAM usage has been above ${threshold}% for over 3 minutes. Currently at ${val.toFixed(1)}%.`
+              message: `RAM usage has been above ${threshold}% for over ${gracePeriod} minutes. Currently at ${val.toFixed(1)}%.`
             });
           }
         } else {
@@ -261,18 +266,20 @@ class AlertService {
         const val = parseFloat(r.value[1]);
         const host = r.metric.host_name;
         const threshold = this.settings.overrides?.[host]?.diskThreshold ?? this.settings.diskThreshold;
+        const gracePeriod = this.settings.overrides?.[host]?.gracePeriodMinutes ?? this.settings.gracePeriodMinutes ?? 3;
+        const gracePeriodMs = gracePeriod * 60 * 1000;
         const dedupKey = `${host}-disk`;
 
         if (val > threshold) {
           if (!this.violationStarts[dedupKey]) {
             this.violationStarts[dedupKey] = Date.now();
-          } else if (Date.now() - this.violationStarts[dedupKey] >= 3 * 60 * 1000) {
+          } else if (Date.now() - this.violationStarts[dedupKey] >= gracePeriodMs) {
             this.triggerAlert({
               type: 'disk',
               severity: val > 95 ? 'critical' : 'warning',
               host: this.getFriendlyName(host),
               title: 'Storage Space Critical',
-              message: `Disk usage has been above ${threshold}% for over 3 minutes. Currently at ${val.toFixed(1)}%.`
+              message: `Disk usage has been above ${threshold}% for over ${gracePeriod} minutes. Currently at ${val.toFixed(1)}%.`
             });
           }
         } else {

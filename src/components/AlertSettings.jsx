@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Server, Cpu, HardDrive, Shield, Filter, Bell } from 'lucide-react';
+import { Save, Server, Cpu, HardDrive, Shield, Filter, Bell, Clock } from 'lucide-react';
 import { fetchAlertSettings, updateAlertSettings } from '../api/alerts';
 
 const SERVER_LIST = [
@@ -87,7 +87,8 @@ export default function AlertSettings() {
           enableEmailAlerts: prev.enableEmailAlerts,
           enableTelegramAlerts: prev.enableTelegramAlerts,
           minSeverityForEmail: prev.minSeverityForEmail,
-          minSeverityForTelegram: prev.minSeverityForTelegram
+          minSeverityForTelegram: prev.minSeverityForTelegram,
+          gracePeriodMinutes: prev.gracePeriodMinutes
         };
         return next;
       });
@@ -106,16 +107,17 @@ export default function AlertSettings() {
     enableEmailAlerts: settings.enableEmailAlerts,
     enableTelegramAlerts: settings.enableTelegramAlerts,
     minSeverityForEmail: settings.minSeverityForEmail,
-    minSeverityForTelegram: settings.minSeverityForTelegram
+    minSeverityForTelegram: settings.minSeverityForTelegram,
+    gracePeriodMinutes: settings.gracePeriodMinutes
   };
 
   if (selectedScope !== 'global' && isOverridden && settings.overrides[selectedScope]) {
     currentVals = { ...currentVals, ...settings.overrides[selectedScope] };
   }
 
-  const getSliderStyle = (val) => {
-    const v = val ?? 50;
-    const pct = ((v - 10) / 90) * 100;
+  const getSliderStyle = (val, max = 100, min = 10) => {
+    const v = val ?? (min + (max - min) / 2);
+    const pct = ((v - min) / (max - min)) * 100;
     return {
       background: `linear-gradient(to right, var(--text-primary) 0%, var(--text-primary) ${pct}%, var(--color-rgb-255-255-255-0-05) ${pct}%, var(--color-rgb-255-255-255-0-05) 100%)`
     };
@@ -228,7 +230,7 @@ export default function AlertSettings() {
                 value={currentVals.cpuThreshold ?? 85} 
                 onChange={(e) => handleChange('cpuThreshold', parseInt(e.target.value))}
                 className="minimal-range"
-                style={getSliderStyle(currentVals.cpuThreshold ?? 85)}
+                style={getSliderStyle(currentVals.cpuThreshold ?? 85, 100, 10)}
               />
               <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
                 {currentVals.cpuThreshold ?? 85}%
@@ -251,7 +253,7 @@ export default function AlertSettings() {
                 value={currentVals.ramThreshold ?? 90} 
                 onChange={(e) => handleChange('ramThreshold', parseInt(e.target.value))}
                 className="minimal-range"
-                style={getSliderStyle(currentVals.ramThreshold ?? 90)}
+                style={getSliderStyle(currentVals.ramThreshold ?? 90, 100, 10)}
               />
               <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
                 {currentVals.ramThreshold ?? 90}%
@@ -274,10 +276,33 @@ export default function AlertSettings() {
                 value={currentVals.diskThreshold ?? 90} 
                 onChange={(e) => handleChange('diskThreshold', parseInt(e.target.value))}
                 className="minimal-range"
-                style={getSliderStyle(currentVals.diskThreshold ?? 90)}
+                style={getSliderStyle(currentVals.diskThreshold ?? 90, 100, 10)}
               />
               <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
                 {currentVals.diskThreshold ?? 90}%
+              </span>
+            </div>
+          </div>
+
+          {/* Grace Period */}
+          <div style={{
+            background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px 14px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+              <Clock size={13} color="var(--text-muted)" />
+              <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Alert Grace Period</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <input 
+                type="range" 
+                min="1" max="15" 
+                value={currentVals.gracePeriodMinutes ?? 3} 
+                onChange={(e) => handleChange('gracePeriodMinutes', parseInt(e.target.value))}
+                className="minimal-range"
+                style={getSliderStyle(currentVals.gracePeriodMinutes ?? 3, 15, 1)}
+              />
+              <span style={{ fontWeight: 500, fontSize: '0.80rem', color: 'var(--text-primary)', width: '40px', textAlign: 'right', fontFamily: 'monospace' }}>
+                {currentVals.gracePeriodMinutes ?? 3} m
               </span>
             </div>
           </div>

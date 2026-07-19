@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, AlertTriangle, Cpu, HardDrive, Server, Shield, CheckCircle2, Clock } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, Cpu, HardDrive, Server, Shield, CheckCircle2, Clock, Eye } from 'lucide-react';
 import { fetchAlerts, acknowledgeAlert } from '../api/alerts';
 
 export default function AlertCenterWidget({ onNavigate }) {
@@ -33,8 +33,9 @@ export default function AlertCenterWidget({ onNavigate }) {
     }
   };
 
-  const activeAlerts = alerts.filter(a => a.status === 'active');
-  const historicalAlerts = alerts.filter(a => a.status !== 'active').slice(0, 5);
+  // Active or acknowledged alerts are ongoing
+  const activeAlerts = alerts.filter(a => a.status === 'active' || a.status === 'acknowledged');
+  const historicalAlerts = alerts.filter(a => a.status === 'resolved').slice(0, 3);
 
   const getIcon = (type) => {
     switch (type) {
@@ -46,38 +47,84 @@ export default function AlertCenterWidget({ onNavigate }) {
     }
   };
 
-  const getSeverityColor = (severity) => {
-    return severity === 'critical' ? 'var(--status-danger)' : 'var(--status-warning)';
+  const getStatusConfig = (alert) => {
+    const status = alert.status;
+    const severity = alert.severity;
+
+    if (status === 'resolved') {
+      return {
+        label: 'Resolved',
+        color: 'var(--status-healthy)',
+        bg: 'var(--color-rgb-16-185-129-0-08)',
+        border: '1px solid var(--color-rgb-16-185-129-0-15)',
+        glowing: false
+      };
+    }
+    if (status === 'acknowledged') {
+      return {
+        label: 'Acked',
+        color: '#3b82f6',
+        bg: 'rgba(59, 130, 246, 0.08)',
+        border: '1px solid rgba(59, 130, 246, 0.15)',
+        glowing: false
+      };
+    }
+
+    const isCritical = severity === 'critical';
+    return {
+      label: isCritical ? 'Critical' : 'Warning',
+      color: isCritical ? 'var(--status-danger)' : 'var(--status-warning)',
+      bg: isCritical ? 'rgba(239, 68, 68, 0.08)' : 'rgba(245, 158, 11, 0.08)',
+      border: isCritical ? '1px solid rgba(239, 68, 68, 0.15)' : '1px solid rgba(245, 158, 11, 0.15)',
+      glowing: true
+    };
+  };
+
+  const getHistoryLabel = (alert) => {
+    if (alert.type === 'antivirus_scan_completed') {
+      return {
+        text: 'Report',
+        color: '#a78bfa',
+        bg: 'rgba(167, 139, 250, 0.08)',
+        border: '1px solid rgba(167, 139, 250, 0.15)'
+      };
+    }
+    return {
+      text: 'Resolved',
+      color: 'var(--status-healthy)',
+      bg: 'var(--color-rgb-16-185-129-0-08)',
+      border: '1px solid var(--color-rgb-16-185-129-0-15)'
+    };
   };
 
   return (
     <div 
       onClick={onNavigate}
       style={{
-      background: 'var(--color-rgb-255-255-255-0-005)',
-      border: '1px solid var(--color-rgb-255-255-255-0-03)',
-      borderRadius: 'var(--radius-md)',
-      padding: '20px 24px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '16px',
-      height: '380px',
-      overflow: 'hidden',
-      cursor: onNavigate ? 'pointer' : 'default',
-      transition: 'all 0.2s ease',
-    }}
-    onMouseEnter={(e) => {
-      if (onNavigate) {
-        e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-02)';
-        e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-08)';
-      }
-    }}
-    onMouseLeave={(e) => {
-      if (onNavigate) {
-        e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-005)';
-        e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-03)';
-      }
-    }}
+        background: 'var(--color-rgb-255-255-255-0-005)',
+        border: '1px solid var(--color-rgb-255-255-255-0-03)',
+        borderRadius: 'var(--radius-md)',
+        padding: '20px 24px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        height: '380px',
+        overflow: 'hidden',
+        cursor: onNavigate ? 'pointer' : 'default',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={(e) => {
+        if (onNavigate) {
+          e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-02)';
+          e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-08)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (onNavigate) {
+          e.currentTarget.style.background = 'var(--color-rgb-255-255-255-0-005)';
+          e.currentTarget.style.borderColor = 'var(--color-rgb-255-255-255-0-03)';
+        }
+      }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)', paddingBottom: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -94,7 +141,7 @@ export default function AlertCenterWidget({ onNavigate }) {
           <div>
             <h3 style={{ margin: 0, fontSize: '0.76rem', fontWeight: 500, color: 'var(--text-primary)' }}>Alert Center</h3>
             <p style={{ margin: '2px 0 0 0', fontSize: '0.68rem', color: 'var(--text-muted)' }}>
-              {activeAlerts.length} Active System Alerts
+              {activeAlerts.length} Ongoing System Incidents
             </p>
           </div>
         </div>
@@ -124,11 +171,11 @@ export default function AlertCenterWidget({ onNavigate }) {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {activeAlerts.map(alert => {
-              const color = getSeverityColor(alert.severity);
+              const conf = getStatusConfig(alert);
               return (
                 <div key={alert.id} style={{
                   background: 'var(--color-rgb-255-255-255-0-008)',
-                  borderLeft: `2.5px solid ${color}`,
+                  borderLeft: `2.5px solid ${conf.color}`,
                   borderTop: '1px solid var(--color-rgb-255-255-255-0-015)',
                   borderRight: '1px solid var(--color-rgb-255-255-255-0-015)',
                   borderBottom: '1px solid var(--color-rgb-255-255-255-0-015)',
@@ -136,26 +183,28 @@ export default function AlertCenterWidget({ onNavigate }) {
                   padding: '8px 12px',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  boxShadow: conf.glowing ? `0 0 8px ${conf.color}05` : 'none'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', flex: 1, minWidth: 0, marginRight: '8px' }}>
-                    <div style={{ color: color, marginTop: '2.5px', flexShrink: 0 }}>
+                    <div style={{ color: conf.color, marginTop: '2.5px', flexShrink: 0 }}>
                       {getIcon(alert.type)}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0, flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                         <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '0.74rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.title}</h4>
                         <span style={{ 
-                          background: `${color}12`, 
-                          color: color, 
+                          background: conf.bg, 
+                          color: conf.color, 
+                          border: conf.border,
                           padding: '1px 5px', 
                           borderRadius: '3px', 
                           fontSize: '0.58rem', 
-                          fontWeight: 600, 
+                          fontWeight: 650, 
                           textTransform: 'uppercase',
                           letterSpacing: '0.04em'
                         }}>
-                          {alert.severity}
+                          {conf.label}
                         </span>
                       </div>
                       <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.68rem', lineHeight: '1.2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -171,22 +220,24 @@ export default function AlertCenterWidget({ onNavigate }) {
                       </div>
                     </div>
                   </div>
-                  <button 
-                    onClick={(e) => handleAcknowledge(alert.id, e)}
-                    style={{
-                      background: 'var(--color-rgb-255-255-255-0-02)',
-                      border: '1px solid var(--color-rgb-255-255-255-0-03)',
-                      color: 'var(--text-secondary)',
-                      padding: '4px 8px',
-                      borderRadius: 'var(--radius-sm)',
-                      fontSize: '0.68rem',
-                      fontWeight: 500,
-                      cursor: 'pointer',
-                      flexShrink: 0
-                    }}
-                  >
-                    Acknowledge
-                  </button>
+                  {alert.status === 'active' && (
+                    <button 
+                      onClick={(e) => handleAcknowledge(alert.id, e)}
+                      style={{
+                        background: 'var(--color-rgb-255-255-255-0-02)',
+                        border: '1px solid var(--color-rgb-255-255-255-0-03)',
+                        color: 'var(--text-secondary)',
+                        padding: '4px 8px',
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.68rem',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        flexShrink: 0
+                      }}
+                    >
+                      Ack
+                    </button>
+                  )}
                 </div>
               );
             })}
@@ -196,31 +247,47 @@ export default function AlertCenterWidget({ onNavigate }) {
         {historicalAlerts.length > 0 && (
           <div style={{ marginTop: '10px' }}>
             <h4 style={{ margin: '0 0 6px 0', fontSize: '0.62rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', fontWeight: 600 }}>
-              Recent History
+              Recent Logs
             </h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              {historicalAlerts.slice(0, 3).map(alert => (
-                <div key={alert.id} style={{
-                  background: 'var(--color-rgb-255-255-255-0-005)',
-                  border: '1px solid var(--color-rgb-255-255-255-0-02)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '6px 8px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
-                    <div style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
-                      {getIcon(alert.type)}
+              {historicalAlerts.map(alert => {
+                const conf = getHistoryLabel(alert);
+                return (
+                  <div key={alert.id} style={{
+                    background: 'var(--color-rgb-255-255-255-0-005)',
+                    border: '1px solid var(--color-rgb-255-255-255-0-02)',
+                    borderRadius: 'var(--radius-sm)',
+                    padding: '6px 8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                      <div style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
+                        {getIcon(alert.type)}
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.title}</span>
+                        <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.host} • {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.title}</span>
-                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{alert.host} • {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
+                    <span style={{
+                      fontSize: '0.58rem',
+                      color: conf.color,
+                      background: conf.bg,
+                      border: conf.border,
+                      padding: '1px 5px',
+                      borderRadius: '3px',
+                      fontWeight: 600,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.04em',
+                      flexShrink: 0
+                    }}>
+                      {conf.text}
+                    </span>
                   </div>
-                  <CheckCircle2 size={12} color="var(--text-muted)" style={{ flexShrink: 0 }} />
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

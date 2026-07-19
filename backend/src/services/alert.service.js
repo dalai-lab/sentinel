@@ -36,6 +36,10 @@ class AlertService {
       ramThreshold: 90,
       diskThreshold: 90,
       enableAntivirusAlerts: true,
+      enableEmailAlerts: true,
+      enableTelegramAlerts: true,
+      minSeverityForEmail: 'info',
+      minSeverityForTelegram: 'warning',
       overrides: {}
     };
   }
@@ -79,28 +83,101 @@ class AlertService {
     return false;
   }
 
+  resolveAlert(hostFriendly, type, message) {
+    const existing = this.alerts.find(
+      a => a.host === hostFriendly && a.type === type && a.status !== 'resolved'
+    );
+    
+    if (existing) {
+      existing.status = 'resolved';
+      existing.resolvedAt = Date.now();
+      existing.message = message || `${type.toUpperCase()} alert has been resolved.`;
+      this.saveAlerts();
+      
+      console.log(`[ALERT SERVICE] ✅ Alert Resolved: ${existing.title} on ${existing.host}`);
+      
+      const resolvedAlert = { ...existing, status: 'resolved', title: `RESOLVED: ${existing.title}` };
+      this.dispatchNotifications(resolvedAlert);
+    }
+  }
+
+  dispatchNotifications(alert) {
+    let rawHost = alert.host;
+    const fNames = {
+      'instance-20260630-1713': 'Oracle database server',
+      'Database-Server-Oracle': 'Oracle database server',
+      'srv1213878': 'Orbithyre',
+      'srv1176513': 'Gaplytiq',
+      'srv1055295': 'Dalai'
+    };
+    for (const [k, v] of Object.entries(fNames)) {
+      if (v === alert.host && this.settings.overrides?.[k]) {
+        rawHost = k;
+        break;
+      }
+    }
+
+    const hostSettings = this.settings.overrides?.[rawHost] || {};
+    const emailEnabled = hostSettings.enableEmailAlerts ?? this.settings.enableEmailAlerts ?? true;
+    const tgEnabled = hostSettings.enableTelegramAlerts ?? this.settings.enableTelegramAlerts ?? true;
+    const minSevEmail = hostSettings.minSeverityForEmail ?? this.settings.minSeverityForEmail ?? 'info';
+    const minSevTg = hostSettings.minSeverityForTelegram ?? this.settings.minSeverityForTelegram ?? 'warning';
+
+    const SEVERITY_LEVEL = { 'info': 0, 'warning': 1, 'critical': 2 };
+    const currentSev = SEVERITY_LEVEL[alert.severity] || 0;
+
+    if (emailEnabled && currentSev >= (SEVERITY_LEVEL[minSevEmail] || 0)) {
+      emailService.sendAlertNotification(alert).catch(err => {
+        console.error('[ALERT SERVICE] Email forwarding error:', err.message);
+      });
+    }
+
+    if (tgEnabled && currentSev >= (SEVERITY_LEVEL[minSevTg] || 0)) {
+      telegramService.sendAlertNotification(alert).catch(err => {
+        console.error('[ALERT SERVICE] Telegram forwarding error:', err.message);
+      });
+    }
+  }
+
   triggerAlert(alert) {
-    // Generate a deduplication key
+    const isEvent = alert.type === 'antivirus_scan_completed';
     const dedupKey = `${alert.host}-${alert.type}`;
     const now = Date.now();
+
+    if (isEvent) {
+      const newAlert = {
+        id: `alt_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        timestamp: now,
+        status: 'resolved',
+        resolvedAt: now,
+        ...alert
+      };
+
+      this.alerts.push(newAlert);
+      if (this.alerts.length > 100) this.alerts = this.alerts.slice(-100);
+      this.saveAlerts();
+      
+      console.log(`[ALERT SERVICE] ℹ️ Event Logged: ${alert.title} on ${alert.host}`);
+      this.dispatchNotifications(newAlert);
+      return;
+    }
 
     // Only trigger if we haven't triggered this EXACT alert type for this host in the last 15 minutes
     if (this.lastTriggered[dedupKey] && (now - this.lastTriggered[dedupKey]) < (15 * 60 * 1000)) {
       return;
     }
 
-    // If an unresolved alert (active or acknowledged) already exists for this
-    // host+type, don't create a duplicate — update its timestamp instead so it
-    // stays at the top of the list without spamming new rows
     const existing = this.alerts.find(
       a => a.host === alert.host && a.type === alert.type && a.status !== 'resolved'
     );
+    
     if (existing) {
       existing.lastSeen = now;
       existing.value = alert.value ?? existing.value;
       existing.message = alert.message ?? existing.message;
       this.saveAlerts();
       this.lastTriggered[dedupKey] = now;
+      console.log(`[ALERT SERVICE] 🚨 Alert Updated (Silently): [${alert.severity.toUpperCase()}] ${alert.title} on ${alert.host}`);
       return;
     }
 
@@ -112,51 +189,12 @@ class AlertService {
     };
 
     this.alerts.push(newAlert);
-
-    // Keep max 100 alerts in history
-    if (this.alerts.length > 100) {
-      this.alerts = this.alerts.slice(-100);
-    }
-
+    if (this.alerts.length > 100) this.alerts = this.alerts.slice(-100);
     this.saveAlerts();
     this.lastTriggered[dedupKey] = now;
+    
     console.log(`[ALERT SERVICE] 🚨 New Alert Triggered: [${alert.severity.toUpperCase()}] ${alert.title} on ${alert.host}`);
-
-    let sendEmailFlag = true;
-    let sendTgFlag = true;
-
-    if (alert.type === 'antivirus_scan_completed') {
-      let rawHost = alert.host;
-      const fNames = {
-        'instance-20260630-1713': 'Oracle database server',
-        'Database-Server-Oracle': 'Oracle database server',
-        'srv1213878': 'Orbithyre',
-        'srv1176513': 'Gaplytiq',
-        'srv1055295': 'Dalai'
-      };
-      for (const [k, v] of Object.entries(fNames)) {
-        if (v === alert.host && this.settings.overrides?.[k]) {
-          rawHost = k;
-          break;
-        }
-      }
-      sendEmailFlag = this.settings.overrides?.[rawHost]?.sendAntivirusReportEmail ?? this.settings.sendAntivirusReportEmail ?? true;
-      sendTgFlag = this.settings.overrides?.[rawHost]?.sendAntivirusReportTelegram ?? this.settings.sendAntivirusReportTelegram ?? true;
-    }
-
-    // Dispatch Email Notification via ZeptoMail SMTP
-    if (sendEmailFlag) {
-      emailService.sendAlertNotification(newAlert).catch(err => {
-        console.error('[ALERT SERVICE] Email forwarding error:', err.message);
-      });
-    }
-
-    // Dispatch Telegram Notification
-    if (sendTgFlag) {
-      telegramService.sendAlertNotification(newAlert).catch(err => {
-        console.error('[ALERT SERVICE] Telegram forwarding error:', err.message);
-      });
-    }
+    this.dispatchNotifications(newAlert);
   }
 
   // Friendly names map duplicated from aiManager
@@ -208,6 +246,7 @@ class AlertService {
           }
         } else {
           delete this.violationStarts[dedupKey];
+          this.resolveAlert(this.getFriendlyName(host), 'cpu', `CPU usage has recovered to ${val.toFixed(1)}%.`);
         }
       });
 
@@ -232,6 +271,7 @@ class AlertService {
           }
         } else {
           delete this.violationStarts[dedupKey];
+          this.resolveAlert(this.getFriendlyName(host), 'ram', `Memory usage has recovered to ${val.toFixed(1)}%.`);
         }
       });
 
@@ -256,6 +296,7 @@ class AlertService {
           }
         } else {
           delete this.violationStarts[dedupKey];
+          this.resolveAlert(this.getFriendlyName(host), 'disk', `Disk usage has recovered to ${val.toFixed(1)}%.`);
         }
       });
 
@@ -274,6 +315,8 @@ class AlertService {
             title: 'Malware Infection Detected',
             message: `ClamAV detected ${scan.infectedFiles} infected files during the recent scan.`
           });
+        } else if (enableAv && scan.infectedFiles === 0) {
+          this.resolveAlert(this.getFriendlyName(host), 'antivirus', `Malware cleanup completed. Scan found 0 infected files.`);
         }
 
         // Informational alert for every new scan completion

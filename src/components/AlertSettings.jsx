@@ -84,8 +84,10 @@ export default function AlertSettings() {
           ramThreshold: prev.ramThreshold,
           diskThreshold: prev.diskThreshold,
           enableAntivirusAlerts: prev.enableAntivirusAlerts,
-          sendAntivirusReportEmail: prev.sendAntivirusReportEmail,
-          sendAntivirusReportTelegram: prev.sendAntivirusReportTelegram
+          enableEmailAlerts: prev.enableEmailAlerts,
+          enableTelegramAlerts: prev.enableTelegramAlerts,
+          minSeverityForEmail: prev.minSeverityForEmail,
+          minSeverityForTelegram: prev.minSeverityForTelegram
         };
         return next;
       });
@@ -101,8 +103,10 @@ export default function AlertSettings() {
     ramThreshold: settings.ramThreshold,
     diskThreshold: settings.diskThreshold,
     enableAntivirusAlerts: settings.enableAntivirusAlerts,
-    sendAntivirusReportEmail: settings.sendAntivirusReportEmail,
-    sendAntivirusReportTelegram: settings.sendAntivirusReportTelegram
+    enableEmailAlerts: settings.enableEmailAlerts,
+    enableTelegramAlerts: settings.enableTelegramAlerts,
+    minSeverityForEmail: settings.minSeverityForEmail,
+    minSeverityForTelegram: settings.minSeverityForTelegram
   };
 
   if (selectedScope !== 'global' && isOverridden && settings.overrides[selectedScope]) {
@@ -280,7 +284,7 @@ export default function AlertSettings() {
 
         </div>
 
-        {/* Antivirus Toggle — full-width row below sliders */}
+        {/* Antivirus Toggle */}
         <div style={{
           background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '14px 16px',
           display: 'flex', flexDirection: 'column', gap: '14px'
@@ -289,8 +293,8 @@ export default function AlertSettings() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Shield size={13} color="var(--text-muted)" />
               <div>
-                <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Antivirus Scan Alerts</span>
-                <p style={{ margin: '2px 0 0 0', fontSize: '0.70rem', color: 'var(--text-muted)' }}>Trigger alerts and reports when ClamAV scans complete on any server.</p>
+                <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Antivirus Scanning</span>
+                <p style={{ margin: '2px 0 0 0', fontSize: '0.70rem', color: 'var(--text-muted)' }}>Detect malware and log scan reports.</p>
               </div>
             </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', flexShrink: 0 }}>
@@ -305,35 +309,73 @@ export default function AlertSettings() {
               </span>
             </label>
           </div>
+        </div>
 
-          {(currentVals.enableAntivirusAlerts ?? true) && (
-            <div style={{ 
-              display: 'flex', alignItems: 'center', gap: '24px',
-              paddingTop: '12px', borderTop: '1px solid var(--color-rgb-255-255-255-0-03)' 
-            }}>
-              <span style={{ fontSize: '0.70rem', color: 'var(--text-muted)', flexShrink: 0 }}>Send clean scan reports to:</span>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+        {/* Notification Channels */}
+        <div style={{
+          background: 'var(--color-rgb-255-255-255-0-01)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '14px 16px',
+          display: 'flex', flexDirection: 'column', gap: '14px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+            <Bell size={13} color="var(--text-muted)" />
+            <span style={{ fontWeight: 500, fontSize: '0.76rem', color: 'var(--text-primary)' }}>Notification Channels</span>
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {/* Email Channel */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: 'var(--color-hex-09090b)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <input 
                   type="checkbox" 
-                  checked={currentVals.sendAntivirusReportEmail ?? true}
-                  onChange={(e) => handleChange('sendAntivirusReportEmail', e.target.checked)}
+                  checked={currentVals.enableEmailAlerts ?? true}
+                  onChange={(e) => handleChange('enableEmailAlerts', e.target.checked)}
                   style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
                 />
-                <span style={{ fontSize: '0.74rem', color: (currentVals.sendAntivirusReportEmail ?? true) ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>Email</span>
+                <span style={{ fontSize: '0.74rem', color: (currentVals.enableEmailAlerts ?? true) ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>Email Alerts</span>
               </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                <input 
-                  type="checkbox" 
-                  checked={currentVals.sendAntivirusReportTelegram ?? true}
-                  onChange={(e) => handleChange('sendAntivirusReportTelegram', e.target.checked)}
-                  style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
-                />
-                <span style={{ fontSize: '0.74rem', color: (currentVals.sendAntivirusReportTelegram ?? true) ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>Telegram</span>
-              </label>
+              {(currentVals.enableEmailAlerts ?? true) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.70rem', color: 'var(--text-muted)' }}>Min. Severity:</span>
+                  <select 
+                    value={currentVals.minSeverityForEmail ?? 'info'}
+                    onChange={(e) => handleChange('minSeverityForEmail', e.target.value)}
+                    style={{ background: 'var(--color-rgb-255-255-255-0-05)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '0.70rem', padding: '2px 6px', borderRadius: '4px', outline: 'none' }}
+                  >
+                    <option value="info">INFO (All)</option>
+                    <option value="warning">WARNING & CRITICAL</option>
+                    <option value="critical">CRITICAL ONLY</option>
+                  </select>
+                </div>
+              )}
             </div>
-          )}
+
+            {/* Telegram Channel */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: 'var(--color-hex-09090b)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={currentVals.enableTelegramAlerts ?? true}
+                  onChange={(e) => handleChange('enableTelegramAlerts', e.target.checked)}
+                  style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
+                />
+                <span style={{ fontSize: '0.74rem', color: (currentVals.enableTelegramAlerts ?? true) ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 500 }}>Telegram Alerts</span>
+              </label>
+              {(currentVals.enableTelegramAlerts ?? true) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '0.70rem', color: 'var(--text-muted)' }}>Min. Severity:</span>
+                  <select 
+                    value={currentVals.minSeverityForTelegram ?? 'warning'}
+                    onChange={(e) => handleChange('minSeverityForTelegram', e.target.value)}
+                    style={{ background: 'var(--color-rgb-255-255-255-0-05)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', fontSize: '0.70rem', padding: '2px 6px', borderRadius: '4px', outline: 'none' }}
+                  >
+                    <option value="info">INFO (All)</option>
+                    <option value="warning">WARNING & CRITICAL</option>
+                    <option value="critical">CRITICAL ONLY</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
       </div>

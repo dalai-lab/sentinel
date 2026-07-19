@@ -378,27 +378,13 @@ export default function EmailSettings() {
         )}
       </div>
 
+      {/* Severity Settings Moved Note */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-color)', paddingTop: '14px' }}>
         <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 650, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           Alert Severity Dispatch Triggers
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
-          {[
-            { key: 'critical', label: 'Critical Incidents (CPU/Disk Overflow)', color: 'var(--status-danger)' },
-            { key: 'high', label: 'High Severity Threats (Viruses, SSH Spikes)', color: 'var(--status-warning)' },
-            { key: 'warning', label: 'Warning Anomalies', color: 'var(--status-warning)' },
-            { key: 'info', label: 'Informational Logs', color: 'var(--text-muted)' },
-          ].map(sev => (
-            <label key={sev.key} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
-              <input
-                type="checkbox"
-                checked={!!settings.severities?.[sev.key]}
-                onChange={e => handleSeverityChange(sev.key, e.target.checked)}
-                style={{ cursor: 'pointer', accentColor: 'var(--text-primary)' }}
-              />
-              <span style={{ fontWeight: settings.severities?.[sev.key] ? 500 : 400 }}>{sev.label}</span>
-            </label>
-          ))}
+        <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
+          Alert severity routing (INFO, WARNING, CRITICAL) for Email and Telegram is now managed globally in the <strong>Alert Settings</strong> panel.
         </div>
       </div>
     </div>

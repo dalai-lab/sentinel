@@ -107,9 +107,15 @@ class EmailService {
       badgeText = 'RESOLVED';
       humanSummary = `The issue on <strong>${hostName}</strong> has been resolved. The ${typeLabel} metrics have returned to normal operating parameters.`;
     } else if (isEvent) {
-      accentColor = '#818cf8'; // indigo
-      badgeText = 'SCAN COMPLETED';
-      humanSummary = `A scheduled antivirus check completed successfully on <strong>${hostName}</strong>. No malware was detected during this run.`;
+      if (severity === 'critical') {
+        accentColor = '#ef4444'; // critical red
+        badgeText = 'SCAN COMPLETED - THREATS FOUND';
+        humanSummary = `A scheduled antivirus check completed on <strong>${hostName}</strong>. Malware was detected during this run. Please review the details immediately.`;
+      } else {
+        accentColor = '#818cf8'; // indigo
+        badgeText = 'SCAN COMPLETED';
+        humanSummary = `A scheduled antivirus check completed successfully on <strong>${hostName}</strong>. No malware was detected during this run.`;
+      }
     } else if (isVirus) {
       accentColor = '#ef4444'; // critical red
       badgeText = 'MALWARE DETECTED';

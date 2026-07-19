@@ -79,6 +79,14 @@ export default function AlertCenterCard({ globalSearch = '' }) {
 
   const getHistoryLabel = (alert) => {
     if (alert.type === 'antivirus_scan_completed') {
+      if (alert.severity === 'critical') {
+        return {
+          text: 'Threat Report',
+          color: 'var(--status-danger)',
+          bg: 'rgba(239, 68, 68, 0.08)',
+          border: '1px solid rgba(239, 68, 68, 0.15)'
+        };
+      }
       return {
         text: 'Report',
         color: '#a78bfa', // Lavender/Indigo

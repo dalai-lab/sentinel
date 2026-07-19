@@ -222,10 +222,10 @@ async function fetchLatestScans() {
         // Lines are ASC (oldest → newest). FOUND lines appear BEFORE their own SCAN SUMMARY header.
         const scanBlocks = summaryIndices.map((summaryIdx, i) => {
           const blockStart = i === 0 ? 0 : summaryIndices[i - 1] + 1;
-          const blockEnd   = i < summaryIndices.length - 1 ? summaryIndices[i + 1] : lines.length;
-          const blockLines = lines.slice(blockStart, blockEnd); // scoped to just this block
           const preSummary = lines.slice(blockStart, summaryIdx); // FOUND lines before summary header
-          const body = blockLines.join('\n');
+          // Only slice the immediate details following THIS summary, to prevent bleeding from previous scans
+          const bodyLines = lines.slice(summaryIdx, summaryIdx + 50); 
+          const body = bodyLines.join('\n');
           const pf = (regex, def = '') => { const m = body.match(regex); return m ? m[1].trim() : def; };
           const infectedCount = parseInt(pf(/Infected files:\s*(\d+)/, '0'));
           return { summaryIdx, preSummary, body, pf, infectedCount };

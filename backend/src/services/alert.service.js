@@ -325,7 +325,7 @@ class AlertService {
           if (lastTs > 0 && scan.timestamp > lastTs) {
             this.triggerAlert({
               type: 'antivirus_scan_completed',
-              severity: 'info',
+              severity: scan.infectedFiles > 0 ? 'critical' : 'info',
               host: this.getFriendlyName(host),
               title: 'Antivirus Scan Completed',
               message: `ClamAV scan completed. Scanned ${scan.scannedFiles || 0} files (${scan.dataScanned || '0 MB'}) in ${scan.timeTaken || '0 sec'}. Infected files: ${scan.infectedFiles}.`

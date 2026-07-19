@@ -97,6 +97,9 @@ class AlertService {
       
       console.log(`[ALERT SERVICE] ✅ Alert Resolved: ${existing.title} on ${existing.host}`);
       
+      const incidentService = require('./incident.service');
+      incidentService.removeIncident(existing.id);
+
       const resolvedAlert = { ...existing, status: 'resolved', title: `RESOLVED: ${existing.title}` };
       this.dispatchNotifications(resolvedAlert);
     }

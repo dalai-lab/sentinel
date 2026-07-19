@@ -58,6 +58,15 @@ class IncidentService {
     this.saveIncidents();
     console.log('[INCIDENT SERVICE] All persistent incidents cleared.');
   }
+
+  removeIncident(fingerprint) {
+    const initialLength = this.incidents.length;
+    this.incidents = this.incidents.filter(i => i.fingerprint !== fingerprint);
+    if (this.incidents.length < initialLength) {
+      this.saveIncidents();
+      console.log(`[INCIDENT SERVICE] Removed resolved incident: ${fingerprint}`);
+    }
+  }
 }
 
 module.exports = new IncidentService();

@@ -140,27 +140,8 @@ class AlertService {
   }
 
   triggerAlert(alert) {
-    const isEvent = alert.type === 'antivirus_scan_completed';
     const dedupKey = `${alert.host}-${alert.type}`;
     const now = Date.now();
-
-    if (isEvent) {
-      const newAlert = {
-        id: `alt_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-        timestamp: now,
-        status: 'resolved',
-        resolvedAt: now,
-        ...alert
-      };
-
-      this.alerts.push(newAlert);
-      if (this.alerts.length > 100) this.alerts = this.alerts.slice(-100);
-      this.saveAlerts();
-      
-      console.log(`[ALERT SERVICE] ℹ️ Event Logged: ${alert.title} on ${alert.host}`);
-      this.dispatchNotifications(newAlert);
-      return;
-    }
 
     // Only trigger if we haven't triggered this EXACT alert type for this host in the last 15 minutes
     if (this.lastTriggered[dedupKey] && (now - this.lastTriggered[dedupKey]) < (15 * 60 * 1000)) {
@@ -319,23 +300,7 @@ class AlertService {
           this.resolveAlert(this.getFriendlyName(host), 'antivirus', `Malware cleanup completed. Scan found 0 infected files.`);
         }
 
-        // Informational alert for every new scan completion
-        if (enableAv) {
-          const lastTs = this.lastScanTimestamps[host] || 0;
-          if (lastTs > 0 && scan.timestamp > lastTs) {
-            this.triggerAlert({
-              type: 'antivirus_scan_completed',
-              severity: scan.infectedFiles > 0 ? 'critical' : 'info',
-              host: this.getFriendlyName(host),
-              title: 'Antivirus Scan Completed',
-              message: `ClamAV scan completed. Scanned ${scan.scannedFiles || 0} files (${scan.dataScanned || '0 MB'}) in ${scan.timeTaken || '0 sec'}. Infected files: ${scan.infectedFiles}.`
-            });
-          }
-          // Update the known timestamp
-          if (scan.timestamp > lastTs) {
-            this.lastScanTimestamps[host] = scan.timestamp;
-          }
-        }
+
       });
 
     } catch (e) {

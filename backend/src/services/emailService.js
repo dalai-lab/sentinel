@@ -93,25 +93,36 @@ class EmailService {
     const status = alert.status;
     const isResolved = status === 'resolved' && alert.title?.toUpperCase().includes('RESOLVED');
     const isEvent = alert.type === 'antivirus_scan_completed';
+    const isVirus = alert.type === 'antivirus';
     
-    let accentColor = '#ef4444'; // default critical red
-    let badgeText = 'CRITICAL ALERT';
-    
+    let accentColor = '#ef4444'; // critical red
+    let badgeText = 'INCIDENT REGISTERED';
+    let humanSummary = '';
+
+    const hostName = alert.host || 'one of your servers';
+    const typeLabel = alert.type ? alert.type.toUpperCase() : 'system';
+
     if (isResolved) {
-      accentColor = '#10b981'; // green
+      accentColor = '#10b981'; // emerald green
       badgeText = 'RESOLVED';
+      humanSummary = `The issue on <strong>${hostName}</strong> has been resolved. The ${typeLabel} metrics have returned to normal operating parameters.`;
     } else if (isEvent) {
       accentColor = '#818cf8'; // indigo
-      badgeText = 'SYSTEM REPORT';
-    } else if (severity === 'warning') {
-      accentColor = '#f59e0b'; // amber
-      badgeText = 'WARNING';
-    } else if (severity === 'info') {
-      accentColor = '#71717a'; // gray
-      badgeText = 'INFO';
+      badgeText = 'SCAN COMPLETED';
+      humanSummary = `A scheduled antivirus check completed successfully on <strong>${hostName}</strong>. No malware was detected during this run.`;
+    } else if (isVirus) {
+      accentColor = '#ef4444'; // critical red
+      badgeText = 'MALWARE DETECTED';
+      humanSummary = `Security warning: Infected files were detected during a scan on <strong>${hostName}</strong>. Action may be required to quarantine or clean up.`;
+    } else {
+      // CPU/RAM/Disk trigger
+      accentColor = severity === 'warning' ? '#f59e0b' : '#ef4444';
+      badgeText = severity === 'warning' ? 'WARNING' : 'CRITICAL LIMIT';
+      humanSummary = `The server <strong>${hostName}</strong> is experiencing high resource load. The ${typeLabel} usage has climbed to <strong>${alert.value}%</strong>, crossing your threshold.`;
     }
 
-    const timestamp = new Date(alert.timestamp || Date.now()).toUTCString();
+    const timestamp = new Date(alert.timestamp || Date.now()).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' });
+    const dashboardUrl = process.env.DASHBOARD_URL || 'http://localhost:5173';
 
     return `
 <!DOCTYPE html>
@@ -119,26 +130,26 @@ class EmailService {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sentinel Alert Notification</title>
+  <title>Sentinel Status Update</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #09090b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #a1a1aa;">
   <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #09090b; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="100%" max-width="560" border="0" cellspacing="0" cellpadding="0" style="max-width: 560px; background-color: #0d0d11; border: 1px solid rgba(255,255,255,0.06); border-top: 4px solid ${accentColor}; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <table width="100%" max-width="540" border="0" cellspacing="0" cellpadding="0" style="max-width: 540px; background-color: #0d0d11; border: 1px solid rgba(255,255,255,0.06); border-top: 4px solid ${accentColor}; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.45);">
           
-          <!-- Header Bar -->
+          <!-- Header -->
           <tr>
             <td style="padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); background-color: #0d0d11;">
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="left">
-                    <span style="font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #71717a; text-transform: uppercase;">
-                      SENTINEL SECURITY GATEWAY
+                    <span style="font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: #71717a; text-transform: uppercase;">
+                      SENTINEL SYSTEM UPDATE
                     </span>
                   </td>
                   <td align="right">
-                    <span style="display: inline-block; padding: 3px 10px; border-radius: 4px; background-color: ${accentColor}12; border: 1px solid ${accentColor}30; color: ${accentColor}; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                    <span style="display: inline-block; padding: 3px 9px; border-radius: 4px; background-color: ${accentColor}12; border: 1px solid ${accentColor}30; color: ${accentColor}; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                       ${badgeText}
                     </span>
                   </td>
@@ -147,44 +158,33 @@ class EmailService {
             </td>
           </tr>
 
-          <!-- Main Content -->
+          <!-- Body -->
           <tr>
-            <td style="padding: 32px 24px;">
+            <td style="padding: 28px 24px;">
               <h2 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 600; color: #f4f4f5; letter-spacing: -0.02em;">
-                ${alert.title || 'Incident Event Registered'}
+                ${alert.title || 'System notification alert'}
               </h2>
               
-              <p style="margin: 0 0 24px 0; font-size: 14px; color: #a1a1aa; line-height: 1.6; font-weight: 400;">
-                ${alert.message || 'An infrastructure telemetry event has triggered this notification.'}
+              <p style="margin: 0 0 20px 0; font-size: 14px; color: #a1a1aa; line-height: 1.6; font-weight: 400;">
+                ${humanSummary}
               </p>
 
-              <!-- Telemetry Metadata Card -->
-              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 24px;">
-                <tr>
-                  <td style="padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; color: #71717a; font-weight: 500;">Server Host</td>
-                  <td style="padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; color: #f4f4f5; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 600;" align="right">${alert.host || 'Global Fleet'}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; color: #71717a; font-weight: 500;">Alert Type</td>
-                  <td style="padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; color: #f4f4f5; text-transform: uppercase; font-family: ui-monospace, SFMono-Regular, monospace; font-weight: 600; font-size: 11px;" align="right">${alert.type || 'Telemetry'}</td>
-                </tr>
-                ${alert.value !== undefined ? `
-                <tr>
-                  <td style="padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; color: #71717a; font-weight: 500;">Recorded Metric Value</td>
-                  <td style="padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 12px; color: ${accentColor}; font-weight: 600; font-family: ui-monospace, SFMono-Regular, monospace;" align="right">${alert.value}%</td>
-                </tr>` : ''}
-                <tr>
-                  <td style="padding: 12px 14px; font-size: 12px; color: #71717a; font-weight: 500;">Timestamp (UTC)</td>
-                  <td style="padding: 12px 14px; font-size: 12px; color: #a1a1aa; font-family: ui-monospace, SFMono-Regular, monospace;" align="right">${timestamp}</td>
-                </tr>
-              </table>
+              <!-- Detailed context box -->
+              <div style="background-color: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 16px; margin-bottom: 24px;">
+                <p style="margin: 0 0 8px 0; font-size: 13px; color: #f4f4f5; line-height: 1.5;">
+                  <strong>Details:</strong> ${alert.message || 'No additional message details provided.'}
+                </p>
+                <p style="margin: 0; font-size: 12px; color: #71717a;">
+                  Logged on ${timestamp} (UTC)
+                </p>
+              </div>
 
-              <!-- Call to Action -->
+              <!-- Button -->
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <a href="http://localhost:5173" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #f4f4f5; color: #09090b; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 4px; letter-spacing: 0.5px; transition: background 0.15s ease;">
-                      Access Central Console
+                    <a href="${dashboardUrl}" target="_blank" style="display: inline-block; padding: 10px 22px; background-color: #f4f4f5; color: #09090b; font-size: 12px; font-weight: 600; text-decoration: none; border-radius: 4px; letter-spacing: 0.5px; transition: background 0.15s ease;">
+                      Open Dashboard
                     </a>
                   </td>
                 </tr>
@@ -194,9 +194,9 @@ class EmailService {
 
           <!-- Footer -->
           <tr>
-            <td style="padding: 20px; background-color: #09090b; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
-              <p style="margin: 0; font-size: 11px; color: #52525b; font-weight: 500; letter-spacing: 0.5px;">
-                Sentinel Fleet Monitoring System • AAA Alert Gateway
+            <td style="padding: 16px; background-color: #09090b; border-top: 1px solid rgba(255,255,255,0.05); text-align: center;">
+              <p style="margin: 0; font-size: 11px; color: #52525b; font-weight: 500;">
+                Automated notification from Sentinel Security Dashboard
               </p>
             </td>
           </tr>
